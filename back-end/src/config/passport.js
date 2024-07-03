@@ -3,7 +3,7 @@ import passport from "passport";
 import pkg from 'passport-local';
 const { Strategy: LocalStrategy } = pkg;
 
-import User from "../models/User.js";
+import Usuario from "../models/Usuario.js";
 
 passport.use(
   new LocalStrategy(
@@ -11,14 +11,14 @@ passport.use(
       usernameField: "email",
     },
     async (email, password, done) => {
-      // Match Email's User
-      const user = await User.findOne({ email: email });
+      // Match Email's Usuario
+      const user = await Usuario.findOne({ email: email });
       
       if (!user) {
-        return done(null, false, { message: "Not User found." });
+        return done(null, false, { message: "Not Usuario found." });
       }
 
-      // Match Password's User
+      // Match Password's Usuario
       const isMatch = await user.matchPassword(password);
       if (!isMatch){
         console.log("llega");
@@ -35,7 +35,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  User.findById(id, (err, user) => {
+  Usuario.findById(id, (err, user) => {
     done(err, user);
   });
 });

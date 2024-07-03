@@ -1,11 +1,11 @@
-import User from "../models/User.js";
+import Usuario from "../models/Usuario.js";
 
 export const createAdminUser = async () => {
-  const userFound = await User.findOne({ email: "admin@localhost" });
+  const userFound = await Usuario.findOne({ email: "admin@localhost" });
 
   if (userFound) return;
 
-  const newUser = new User({
+  const newUser = new Usuario({
     username: "admin",
     email: "admin@localhost",
   });

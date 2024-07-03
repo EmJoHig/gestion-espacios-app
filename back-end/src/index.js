@@ -5,9 +5,11 @@ import { createAdminUser } from "./libs/createUser.js";
 async function main() {
   await connectDB();
   await createAdminUser();
-  app.listen(app.get("port")); 
+  
+  app.listen(3000, () => {
+    console.log("Servidor iniciado en el puerto 3000");
+  });
 
-  console.log("Server on port", app.get("port"));
   // console.log("Environment:", process.env.NODE_ENV); 
 }
 
