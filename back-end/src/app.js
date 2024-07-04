@@ -12,6 +12,7 @@ import usuarioRoutes from "./routes/usuario.routes.js";
 import "./config/passport.js";
 import bodyParser from "body-parser";
 import multer from "multer";
+import cors  from "cors";
 
 
 // Initializations
@@ -21,6 +22,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 
 // middlewares
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true, // Habilitar el intercambio de cookies y otros datos de autenticación
+};
+app.use(cors(corsOptions));
+
 app.use(
   bodyParser.urlencoded({
       limit: "50mb",
