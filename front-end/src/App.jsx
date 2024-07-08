@@ -37,9 +37,9 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route element={<ProtectedRoute />}>
-                      <Route path="/home" element={<HomePage />} />
-                      <Route path="/ministerio" element={<MinisterioPage />} />
-                      <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
+                    <Route path="/home" element={<HomePage />} />
+                    <Route path="/ministerio" element={<MinisterioPage />} />
+                    <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
                       {/* <Route path="/add-task" element={<TaskFormPage />} />
                     <Route path="/tasks/:id" element={<TaskFormPage />} />
                     <Route path="/profile" element={<h1>Profile</h1>} /> */}

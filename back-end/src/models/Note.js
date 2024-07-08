@@ -1,23 +1,12 @@
-import mongoose from "mongoose";
+import { DataTypes } from "sequelize";
+import db2 from "../database/db2.js";
 
-const NoteSchema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    user: {
-      type: String,
-      required: true,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+const NoteSchema = db2.define('note', {
+    id: {type: DataTypes.INTEGER,
+        primaryKey: true},
+    title: {type: DataTypes.STRING},
+    description: {type: DataTypes.STRING},
+    user:{type: DataTypes.STRING}
+}, {timestamps: false})
 
-export default mongoose.model("Note", NoteSchema);
+export default NoteSchema
