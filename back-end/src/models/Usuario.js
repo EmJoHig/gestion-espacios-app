@@ -14,7 +14,7 @@ class Usuario extends Model {
 }
 
 Usuario.init({
-  name: {
+  username: {
     type: DataTypes.STRING,
     allowNull: true,
     trim: true,
