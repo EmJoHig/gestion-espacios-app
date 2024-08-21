@@ -30,15 +30,47 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export function HomePage() {
-  const { isAuthenticated, logout, usuario } = useAuth();
+  // const [usuario, setUsuario] = useState(null);
+  const { isAuthenticated, logout } = useAuth();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('usuario');
+    
+    // setUsuario(_usuario);
     console.log(usuario);
   }, []);
 
+  const usuario = {
+    username: "Belthier",
+    email: "prueba.gmail.com",
+    password: "12345678",
+    role: "admin-espacio-reserv",
+    modulos: [
+      {
+        codigo: "2",
+        descripcion: "ABM Reservas",
+        ruta: "/reservas"
+      },
+      {
+        codigo: "3",
+        descripcion: "ABM Espacios",
+        ruta: "/espacio"
+      },
+      {
+        codigo: "4",
+        descripcion: "Solicitudes de Reservas",
+        ruta: "/solicitudes-reservas"
+      },
+      {
+        codigo: "5",
+        descripcion: "ABM Ministerios",
+        ruta: "/ministerio"
+      },
+    ]
+  };
+
+  
 
   const [age, setAge] = React.useState('');
 

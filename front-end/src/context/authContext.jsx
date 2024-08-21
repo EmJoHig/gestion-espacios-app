@@ -72,16 +72,26 @@ export const AuthProvider = ({ children }) => {
         password: usuario.password,
         role: "admin-espacio-reserv",
         modulos: [
-          {
-            codigo: "3",
-            descripcion: "ABM Espacios",
-            ruta: "/espacio"
-          },
-          {
-            codigo: "4",
-            descripcion: "Solicitudes de Reservas",
-            ruta: "/solicitudes-reservas"
-          },
+          // {
+          //   codigo: "2",
+          //   descripcion: "ABM Reservas",
+          //   ruta: "/reserva"
+          // },
+          // {
+          //   codigo: "3",
+          //   descripcion: "ABM Espacios",
+          //   ruta: "/espacio"
+          // },
+          // {
+          //   codigo: "4",
+          //   descripcion: "Solicitudes de Reservas",
+          //   ruta: "/solicitudes-reservas"
+          // },
+          // {
+          //   codigo: "5",
+          //   descripcion: "ABM Ministerios",
+          //   ruta: "/ministerio"
+          // },
         ]
       };
 

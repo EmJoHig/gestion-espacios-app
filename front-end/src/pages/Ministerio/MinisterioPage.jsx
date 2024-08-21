@@ -106,7 +106,7 @@ export function MinisterioPage() {
                     <DialogTitle>Nuevo Ministerio</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            
+
                         </DialogContentText>
                         <TextField
                             autoFocus
@@ -148,8 +148,15 @@ export function MinisterioPage() {
                 </Typography>
 
                 <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
+                <Button variant="contained" onClick={handleClickOpen} style={{ marginLeft: '20px' }}>Responsables por Ministerio</Button>
                 <RenderizarDialog />
-                <TablaGenerica data={data} columnasTabla={columnas} nombreTabla={"Listado de Ministerios"} />
+
+                <Box sx={{ marginTop: '50px' }}>
+                    <TablaGenerica data={data} columnasTabla={columnas} nombreTabla={"Listado de Ministerios"} />
+                </Box>
+
+
+
             </Box>
         </>
     );
