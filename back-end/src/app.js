@@ -9,6 +9,7 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { MONGODB_URI, PORT } from "./config.js";
 import usuarioRoutes from "./routes/usuario.routes.js";
+import ministerioRoutes from "./routes/ministerio.routes.js";
 import "./config/passport.js";
 import bodyParser from "body-parser";
 import multer from "multer";
@@ -74,6 +75,8 @@ app.use((req, res, next) => {
 // routes
 // app.use(usuarioRoutes);
 app.use("/usuarios",usuarioRoutes);
+app.use("/ministerio",ministerioRoutes);
+
 
 // static files
 app.use(express.static(join(__dirname, "public")));

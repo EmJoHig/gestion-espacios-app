@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 // router.get('/', authenticateToken, getUsers);
-router.get('/', getUsers);
+router.get('/get_usuarios', getUsers);
 router.get('/:id', getUserById);
 router.patch('/editar-usuario/:id', updateUser);
 router.delete('/eliminar-usuario/:id', deleteUser);
