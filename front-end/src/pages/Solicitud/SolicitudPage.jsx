@@ -132,10 +132,15 @@ export function SolicitudPage() {
                 </Typography>
 
 
-                <Button style={{ marginTop: '10px' }} variant="contained" onClick={() => navigate("/home")}>
+                <Button style={{ marginTop: '10px', marginBottom:'10px' }} variant="contained" onClick={() => navigate("/home")}>
                     HOME
                 </Button>
 
+
+
+                <Typography gutterBottom variant="h4" component="div">
+                    componente CALENDARIO QUE MUESTRE LOS DIAS QUE HAY RESERVAS
+                </Typography>
                 {/* <MonthlyCalendar /> */}
 
 

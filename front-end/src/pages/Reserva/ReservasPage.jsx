@@ -219,6 +219,12 @@ export function ReservasPage() {
                     HOME
                 </Button>
 
+
+                <Typography gutterBottom variant="h4" component="div" style={{ marginTop: '50px' }}>
+                    componente CALENDARIO QUE MUESTRE LOS DIAS QUE HAY RESERVAS
+                </Typography>
+
+
                 {/* <MonthlyCalendar /> */}
 
 

@@ -141,7 +141,7 @@ function EnhancedTableHead(props) {
           <TableCell
             key={headCell.id}
             align="center"//{headCell.numeric ? 'right' : 'center'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
+            padding={headCell.disablePadding ? 'normal' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
@@ -378,7 +378,7 @@ export default function EnhancedTable({ data, columnasTabla }) {
                       component="th"
                       id={labelId}
                       scope="row"
-                      padding="none"
+                      padding="normal"
                       align="center"
                     >
                       {row.codigo}
