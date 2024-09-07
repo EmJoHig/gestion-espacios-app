@@ -14,7 +14,8 @@ import "./config/passport.js";
 import bodyParser from "body-parser";
 import multer from "multer";
 import cors  from "cors";
-
+//AUTH0
+import { auth } from 'express-oauth2-jwt-bearer';
 
 // Initializations
 // var upload = multer();
@@ -23,11 +24,49 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 
 // middlewares
+
+
+
+
+// const config = {
+//   authRequired: false,
+//   auth0Logout: true,
+//   secret: 'D88REM5wu7odEcAJ72Nk5XgxF1bOcJ80ZP3PyoEeZjKOBaXI9gPIYqlO1R9vumkm',
+//   baseURL: 'http://localhost:3000',
+//   clientID: 'mkKOcT1cFlYveX1fij08DUpqu18obztN',
+//   issuerBaseURL: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com'
+// };
+
+// // auth router attaches /login, /logout, and /callback routes to the baseURL
+// app.use(auth(config));
+
+// // req.isAuthenticated is provided from the auth router
+// app.get('/', (req, res) => {
+//   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+// });
+
+// fin middleware auth0
+
 const corsOptions = {
   origin: "http://localhost:5173",
   credentials: true, // Habilitar el intercambio de cookies y otros datos de autenticación
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Authorization, Origin, X-Requested-With, Content-Type, Accept",
 };
 app.use(cors(corsOptions));
+
+
+
+
+// const jwtCheck = auth({
+//   audience: 'https://gestion-espacios/api',
+//   issuerBaseURL: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/',
+//   tokenSigningAlg: 'RS256'
+// });
+
+// enforce on all endpoints
+// app.use(jwtCheck);
+
 
 app.use(
   bodyParser.urlencoded({
@@ -80,5 +119,8 @@ app.use("/ministerio",ministerioRoutes);
 
 // static files
 app.use(express.static(join(__dirname, "public")));
+
+
+
 
 export default app;
