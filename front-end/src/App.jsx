@@ -34,11 +34,10 @@ function App() {
                 <Container fixed>
                   <Routes>
                     <Route path="/" element={<WelcomePage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
+                    {/* <Route path="/login" element={<LoginPage />} /> */}
+                    {/* <Route path="/register" element={<RegisterPage />} /> */}
 
-                    {/* <Route element={<ProtectedRoute />}> */}
-
+                    <Route element={<ProtectedRoute />}>
 
                       <Route path="/home" element={<HomePage />} />
                       <Route path="/ministerio" element={<MinisterioPage />} />
@@ -49,12 +48,10 @@ function App() {
                       <Route path="/tasks/:id" element={<TaskFormPage />} />
                       <Route path="/profile" element={<h1>Profile</h1>} /> */}
 
-
-                    {/* </Route> */}
-
-
+                    </Route>
                   </Routes>
                 </Container>
+
               </main>
             </BrowserRouter>
           </UsuarioProvider>

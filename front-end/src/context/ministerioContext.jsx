@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   getMinisteriosRequest,
   // getMinisterioRequest,
@@ -17,22 +18,34 @@ export const useMinisterio = () => {
 
 export function MinisterioProvider({ children }) {
   const [ministerios, setMinisterios] = useState([]);
+  const { getAccessTokenSilently } = useAuth0();
+
 
   const getMinisterios = async () => {
-    const res = await getMinisteriosRequest();
-    // console.log("GET MINISTERIOS");
-    setMinisterios(res.data);
-    // console.log(ministerios);
+    // const res = await getMinisteriosRequest();
+    // setMinisterios(res.data);
+    try {
+      // Obtén el token de acceso
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      // Llama a la API con el token
+      const res = await getMinisteriosRequest(token);
+      setMinisterios(res.data);
+    } catch (error) {
+      console.error('Error fetching ministerios:', error);
+    }
   };
 
-//   const getMinisterio = async (id) => {
-//     try {
-//       const res = await getMinisterioRequest(id);
-//       return res.data;
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   };
+  //   const getMinisterio = async (id) => {
+  //     try {
+  //       const res = await getMinisterioRequest(id);
+  //       return res.data;
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
 
   const createMinisterio = async (ministerio) => {
     try {

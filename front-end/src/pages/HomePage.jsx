@@ -31,8 +31,9 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export function HomePage() {
   // const [usuario, setUsuario] = useState(null);
-  const { isAuthenticated, logout } = useAuth();
+  // const { isAuthenticated, logout } = useAuth();
 
+  
   const navigate = useNavigate();
 
   useEffect(() => {

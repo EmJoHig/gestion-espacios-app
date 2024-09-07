@@ -1,6 +1,25 @@
 import axios from "./axios";
 
-export const getMinisteriosRequest = async () => axios.get("http://localhost:3000/ministerio/get_ministerios");
+// export const getMinisteriosRequest = async () => axios.get("http://localhost:3000/ministerio/get_ministerios");
+
+export const getMinisteriosRequest = async (token) => {
+    console.log("token: ",token);
+    console.log(token);
+
+    try {
+        const response = await axios.get("http://localhost:3000/ministerio/get_ministerios", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response;
+    } catch (error) {
+        console.error('Error fetching ministerios:', error);
+        throw error;
+    }
+};
+
 
 export const createMinisterioRequest = async (ministerio) => axios.post("http://localhost:3000/ministerio/nuevo_ministerio", ministerio);
 

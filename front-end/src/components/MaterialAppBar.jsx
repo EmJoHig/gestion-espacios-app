@@ -17,6 +17,9 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useAuth } from "../context/authContext";
 import Button from '@mui/material/Button';
+//auth0
+import { useAuth0 } from "@auth0/auth0-react";
+
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -59,13 +62,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function PrimarySearchAppBar() {
+  // const { isAuthenticated, logout, usuario } = useAuth();
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const { isAuthenticated, logout, usuario } = useAuth();
 
+  //auth0
+  const { loginWithRedirect, user, isAuthenticated, logout } = useAuth0();
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -193,7 +199,7 @@ export default function PrimarySearchAppBar() {
                   noWrap
                   sx={{ display: { xs: 'none', sm: 'block' } }}
                 >
-                  {usuario.role}
+                  {user.name}
                 </Typography>
 
                 <IconButton
@@ -232,8 +238,9 @@ export default function PrimarySearchAppBar() {
             </>
           ) : (
             <>
-              <Button color="inherit" href="/login">Login</Button>
-              <Button color="inherit" href="/register">Register</Button>
+              <Button color="inherit" onClick={() => loginWithRedirect()}>Login</Button>
+
+              {/* <Button color="inherit" href="http://localhost:3000/login">Register</Button> */}
             </>
           )}
 
