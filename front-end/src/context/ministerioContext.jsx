@@ -25,12 +25,11 @@ export function MinisterioProvider({ children }) {
     // const res = await getMinisteriosRequest();
     // setMinisterios(res.data);
     try {
-      // Obtén el token de acceso
+      
       const token = await getAccessTokenSilently({
         audience: 'https://gestion-espacios/api',
       });
 
-      // Llama a la API con el token
       const res = await getMinisteriosRequest(token);
       setMinisterios(res.data);
     } catch (error) {

@@ -17,6 +17,8 @@ function WelcomePage() {
 
   useEffect(() => {
     if (isAuthenticated) {
+      console.log("USUARIO DATOS AUTH0");
+      console.log(user);
       navigate("/home");
     }
   }, [isAuthenticated]);

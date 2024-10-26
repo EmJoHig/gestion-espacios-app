@@ -3,8 +3,8 @@ import axios from "./axios";
 // export const getMinisteriosRequest = async () => axios.get("http://localhost:3000/ministerio/get_ministerios");
 
 export const getMinisteriosRequest = async (token) => {
-    console.log("token: ",token);
-    console.log(token);
+    // console.log("token: ");
+    // console.log(token);
 
     try {
         const response = await axios.get("http://localhost:3000/ministerio/get_ministerios", {

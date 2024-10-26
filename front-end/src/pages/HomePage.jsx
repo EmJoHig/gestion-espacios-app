@@ -39,7 +39,7 @@ export function HomePage() {
   useEffect(() => {
     
     // setUsuario(_usuario);
-    console.log(usuario);
+    // console.log(usuario);
   }, []);
 
   const usuario = {
@@ -67,6 +67,11 @@ export function HomePage() {
         codigo: "5",
         descripcion: "ABM Ministerios",
         ruta: "/ministerio"
+      },
+      {
+        codigo: "6",
+        descripcion: "ABM ROLES",
+        ruta: "/rol"
       },
     ]
   };

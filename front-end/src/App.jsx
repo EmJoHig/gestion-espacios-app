@@ -19,11 +19,14 @@ import { HomePage } from "./pages/HomePage";
 import { MinisterioPage } from "./pages/Ministerio/MinisterioPage";
 import { SolicitudPage } from "./pages/Solicitud/SolicitudPage";
 import { ReservasPage } from "./pages/Reserva/ReservasPage";
+import { RolPage } from "./pages/Rol/RolPage";
+import { RolProvider } from "./context/rolContext";
 
 function App() {
   return (
-    <AuthProvider>
+    // <AuthProvider>
       <MinisterioProvider>
+        <RolProvider>
           <UsuarioProvider>
             <BrowserRouter>
               <CssBaseline />
@@ -43,7 +46,7 @@ function App() {
                       <Route path="/ministerio" element={<MinisterioPage />} />
                       <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
                       <Route path="/reservas" element={<ReservasPage />} />
-
+                      <Route path="/rol" element={<RolPage />} />
                       {/* <Route path="/add-task" element={<TaskFormPage />} />
                       <Route path="/tasks/:id" element={<TaskFormPage />} />
                       <Route path="/profile" element={<h1>Profile</h1>} /> */}
@@ -55,8 +58,9 @@ function App() {
               </main>
             </BrowserRouter>
           </UsuarioProvider>
+          </RolProvider>
       </MinisterioProvider>
-    </AuthProvider>
+    // </AuthProvider>
   );
 }
 
