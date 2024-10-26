@@ -10,6 +10,8 @@ import { fileURLToPath } from "url";
 import { MONGODB_URI, PORT } from "./config.js";
 import usuarioRoutes from "./routes/usuario.routes.js";
 import ministerioRoutes from "./routes/ministerio.routes.js";
+import rolRoutes from "./routes/rol.routes.js";
+
 import "./config/passport.js";
 import bodyParser from "body-parser";
 import multer from "multer";
@@ -115,6 +117,7 @@ app.use((req, res, next) => {
 // app.use(usuarioRoutes);
 app.use("/usuarios",usuarioRoutes);
 app.use("/ministerio",ministerioRoutes);
+app.use("/rol", rolRoutes);
 
 
 // static files
