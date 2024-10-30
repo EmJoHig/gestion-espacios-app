@@ -6,7 +6,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { CardActionArea } from '@mui/material';
+import { CardActionArea, FormControl, InputLabel, MenuItem, Select, Checkbox, ListItemText } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -14,11 +14,12 @@ import Box from '@mui/material/Box';
 import img1 from '../assets/municipalidad.jpg';
 import img2 from '../assets/responsables.jpg';
 import MaterialTable from '../components/MaterialTable';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
 import { useAuth } from "../context/authContext";
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -85,11 +86,41 @@ export function HomePage() {
   };
 
 
-  // const handleClick = (event) => {
-  //   console.log('click');
-  //   console.log(event);
-  //   // navigate('/ministerio');
-  // };
+  // Mapeo de colores para cada espacio
+  const colorMapping = {
+    "Aula 1": "#1E90FF",
+    "Aula 2": "#32CD32",
+    "Aula 3": "#FFD700",
+    "Salón Principal": "#FF4500",
+    "Cocina": "#8A2BE2"
+  };
+
+  // Configuración de eventos con color asignado
+  const events = [
+    { title: 'Reserva Aula 1', start: '2024-11-01T10:00:00', end: '2024-11-01T12:00:00', espacio: 'Aula 1', color: colorMapping["Aula 1"] },
+    { title: 'Reserva Aula 2', start: '2024-11-02T14:00:00', end: '2024-11-02T15:30:00', espacio: 'Aula 2', color: colorMapping["Aula 2"] },
+    { title: 'Reserva Salón Principal', start: '2024-11-03T09:00:00', end: '2024-11-03T11:00:00', espacio: 'Salón Principal', color: colorMapping["Salón Principal"] },
+    { title: 'Reserva Cocina', start: '2024-11-04T16:00:00', end: '2024-11-04T18:00:00', espacio: 'Cocina', color: colorMapping["Cocina"] },
+    { title: 'Reserva Aula 3', start: '2024-11-05T13:00:00', end: '2024-11-05T15:00:00', espacio: 'Aula 3', color: colorMapping["Aula 3"] }
+  ];
+
+    // Espacios disponibles para filtrar
+    const espaciosDisponibles = Object.keys(colorMapping);
+
+    // Estado para el filtro de espacios seleccionados
+    const [espaciosSeleccionados, setEspaciosSeleccionados] = useState(espaciosDisponibles);
+  
+    // Manejar el cambio en el filtro de espacios
+    const handleChange = (event) => {
+      const {
+        target: { value },
+      } = event;
+      setEspaciosSeleccionados(typeof value === 'string' ? value.split(',') : value);
+    };
+  
+    // Filtrar eventos según los espacios seleccionados
+    const eventosFiltrados = events.filter((event) => espaciosSeleccionados.includes(event.espacio));
+  
 
 
   const handleClick = (property) => (event) => {
@@ -134,6 +165,42 @@ export function HomePage() {
             </Grid>
           ))}
         </Grid>
+      </Box>
+
+      <Box sx={{ width: '100%', marginTop: '50px' }}>
+        <Typography gutterBottom variant="h5">
+          Calendario de Reservas
+        </Typography>
+
+         {/* Select para filtrar espacios */}
+         <FormControl sx={{ m: 1, width: 300 }}>
+          <InputLabel>Espacios</InputLabel>
+          <Select
+            multiple
+            value={espaciosSeleccionados}
+            onChange={handleChange}
+            renderValue={(selected) => selected.join(', ')}
+          >
+            {espaciosDisponibles.map((espacio) => (
+              <MenuItem key={espacio} value={espacio}>
+                <Checkbox checked={espaciosSeleccionados.includes(espacio)} />
+                <ListItemText primary={espacio} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FullCalendar
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin ]}
+          initialView="dayGridMonth"
+          headerToolbar={{
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          }}
+          events={eventosFiltrados}
+          //editable={usuario.role.includes("admin")}
+        />
       </Box>
 
       <Box sx={{ width: '100%', marginTop: '50px' }}>

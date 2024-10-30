@@ -24,8 +24,7 @@ const providerConfig = {
   clientId: clientId,
   onRedirectCallback,
   authorizationParams: {
-    redirect_uri: window.location.origin,
-    audience: "https://gestion-espacios/api"
+    redirect_uri: window.location.origin
   },
 };
 
