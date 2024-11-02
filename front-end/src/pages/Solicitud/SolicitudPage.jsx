@@ -29,7 +29,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TablaSolictudes from './TablaSolicitudes.jsx';
 
 // importo el conetxt de usuario para llamar a la api
-import { useUsuarios } from "../../context/usuarioContext.jsx";
+import { useUsuario } from "../../context/usuarioContext.jsx";
 
 //picker
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -38,7 +38,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 export function SolicitudPage() {
-    const { usuarios, getUsuarios } = useUsuarios();
+    const { usuarios, getUsuarios } = useUsuario();
 
     const [valueFecha, setValueFecha] = useState(null);
 

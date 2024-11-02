@@ -5,7 +5,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { CardActionArea } from '@mui/material';
+import { CardActionArea, Divider } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -17,13 +17,16 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import TablaGenerica from '../../components/TablaGenerica';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
+import IconButton from '@mui/material/IconButton';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import EditIcon from '@mui/icons-material/Edit';
 import { useAuth0 } from "@auth0/auth0-react";
 
 import TablaRoles from './TablaRoles';
@@ -31,66 +34,33 @@ import { useRol } from "../../context/rolContext";
 
 export function RolPage() {
 
-    const { roles, getRoles, createRol, updateRol } = useRol();
+    const { roles, getRoles, createRol, updateRol, deleteRol } = useRol();
     const { user } = useAuth0();
-    const [rolesUsuario, setRolesUsuario] = useState([]);
+    const [rolesUsuarioAUTH0, setRolesUsuarioAUTH0] = useState([]);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         getRoles();
-        console.log("USUARIO ROLES DATOS AUTH0");
-        console.log(user);
-        
         if (user && user["https://gestion-espacios/roles"]) {
             const rolesFromUser = user["https://gestion-espacios/roles"];
-            setRolesUsuario(rolesFromUser);
-            //console.log("roles_usuario", rolesFromUser);
+            setRolesUsuarioAUTH0(rolesFromUser);
         }
-    }, [user]);
+    }, []);//[user]
 
-    // const data = [
-    //     { id: 1, codigo: 'M1', descripcion: 'MINISTERIO 1' },
-    //     { id: 2, codigo: 'M2', descripcion: 'MINISTERIO DOS' },
-    //     { id: 3, codigo: 'M3', descripcion: 'MINISTERIO TRES' },
-    //     { id: 4, codigo: 'M4', descripcion: 'MINISTERIO CUATRO' },
-    // ];
-
-    const [age, setAge] = React.useState('');
-
-    const ChangeSelectMuni = (event) => {
-        setAge(event.target.value);
-    };
-
-
-    const columnas = [
-        {
-            id: 'name',
-            numeric: false,
-            disablePadding: true,
-            label: 'Name',
-        },
-        {
-            id: 'description',
-            numeric: true,
-            disablePadding: false,
-            label: 'Descripcion',
-        },
-        {
-            id: 'accion',
-            numeric: true,
-            disablePadding: false,
-            label: 'Accion',
-        },
-    ];
+    // const ChangeSelectMuni = (event) => {
+    //     setAge(event.target.value);
+    // };
 
 
     const [rolEdicion, setRolEdicion] = React.useState(null);
 
+    const [rolIdToDelete, setRolIdToDelete] = React.useState(null);
 
 
     const [open, setOpen] = React.useState(false);
     const [openEdit, setOpenEdit] = React.useState(false);
+    const [openConfirm, setOpenConfirm] = React.useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -103,8 +73,9 @@ export function RolPage() {
 
     const handleSubmit = async (rolJson) => {
         try {
-            const { name, description } = rolJson;
-            await createRol(rolJson);
+            console.log("user:", user);
+            // const { name, description } = rolJson;
+            await createRol(user.sub, rolJson);
             await getRoles();
             handleClose();
         } catch (error) {
@@ -112,48 +83,12 @@ export function RolPage() {
         }
     };
 
-
-    //edit
-    const handleClickOpenEdit = () => {
-        setOpenEdit(true);
-    };
-
-    const handleCloseEdit = () => {
-        setOpenEdit(false);
-    };
-
-
-    const handleSubmitEdit = async (rolJson) => {
-        try {
-            const { name, description } = rolJson;
-            rolEdicion.name = name;
-            rolEdicion.description = description;
-            await updateRol(rolEdicion);
-            await getRols();
-            handleCloseEdit();
-        } catch (error) {
-            console.error('Error al editar el rol:', error);
-        }
-    };
-
-
-    const handleTEST = () => {
-        console.log("Roles", roles);
-    };
-
-
-
-
-
+    // const RedirigirAsociarRoles = () => {
+    //     console.log("Roles", roles);
+    // };
 
     //DIALOG NUEVO
     function RenderizarDialogNuevoRol(props) {
-        // const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, columnasTablaParam } =
-        //     props;
-        // const createSortHandler = (property) => (event) => {
-        //     onRequestSort(event, property);
-        // };
-
         return (
             <>
                 <Dialog
@@ -207,6 +142,30 @@ export function RolPage() {
 
 
     //DIALOG EDITAR
+
+    //edit
+    const handleClickOpenEdit = () => {
+        setOpenEdit(true);
+    };
+
+    const handleCloseEdit = () => {
+        setOpenEdit(false);
+    };
+
+
+    const handleSubmitEdit = async (rolJson) => {
+        try {
+            const { name, description } = rolJson;
+            rolEdicion.name = name;
+            rolEdicion.description = description;
+            await updateRol(rolEdicion);
+            await getRoles();
+            handleCloseEdit();
+        } catch (error) {
+            console.error('Error al editar el rol:', error);
+        }
+    };
+
 
     function RenderizarDialogEditarRol({ rol }) {
 
@@ -280,22 +239,77 @@ export function RolPage() {
     }
 
 
-    //metodo que envia los datos de la fila seleccionada para editar
-    const handleObtenerRow = (rol) => {
-        console.log("Datos del rol seleccionado:", rol);
-        setRolEdicion(rol);
-        handleClickOpenEdit();
-    };
+    // //metodo que envia los datos de la fila seleccionada para editar
+    // const handleObtenerRow = (rol) => {
+    //     console.log("Datos del rol seleccionado:", rol);
+    //     setRolEdicion(rol);
+    //     handleClickOpenEdit();
+    // };
 
-    // metodo que envia el id de la row seleccionada para eliminar
-    const handleDeleteRol = (idsRoles) => {
-        console.log("Datos del rol seleccionado:", idsRoles);
-
-    };
 
     const handleClick = (property) => (event) => {
-        
-      };
+
+    };
+
+    const handleSetRolState = (rol) => {
+        setRolEdicion(rol);
+        handleClickOpenEdit();
+    }
+
+
+
+    const EliminarRol = async (id) => {
+
+        try {
+            await deleteRol(id);
+            await getRoles();
+            console.log("rol eliminado");
+            handleCloseConfirm();
+        } catch (error) {
+            console.error('Error al eliminar el rol:', error);
+        }
+    }
+
+    //confirmar eliminar
+    const handleConfirmarEliminarRol = (id) => {
+        setRolIdToDelete(id);
+        setOpenConfirm(true);
+    }
+
+    const handleCloseConfirm = () => {
+        setOpenConfirm(false);
+    };
+
+
+    function RenderizarDialogConfirmar({ id }) {
+        return (
+            <>
+                <Dialog
+                    open={openConfirm}
+                    onClose={handleCloseConfirm}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">
+                        {"Eliminar Rol"}
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Esta seguro que desea eliminar el rol?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseConfirm}>CANCELAR</Button>
+                        <Button onClick={() => EliminarRol(id)} autoFocus>
+                            CONFIRMAR
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </>
+        );
+    }
+
+
 
     return (
         <>
@@ -309,14 +323,21 @@ export function RolPage() {
                 </Button>
 
                 <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-                <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>Responsables por Rol</Button>
+                <Button variant="contained" onClick={() => navigate("/asociar-roles")} style={{ marginLeft: '20px' }}>ASOCIAR ROLES</Button>
+
                 <RenderizarDialogNuevoRol />
-                <RenderizarDialogEditarRol rol={rolEdicion} />
+
+                {openEdit && (
+                    <RenderizarDialogEditarRol rol={rolEdicion} />
+                )}
+
+                {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={rolIdToDelete} />}
+
                 <Box sx={{ marginTop: '50px' }}>
 
-                {/* {rolesUsuario != null && rolesUsuario.length > 0 ? (
+                    {/* {rolesUsuarioAUTH0 != null && rolesUsuarioAUTH0.length > 0 ? (
                     <TablaRoles
-                    data={rolesUsuario}
+                    data={rolesUsuarioAUTH0}
                     columnasTabla={columnas}
                     nombreTabla={"Listado de Roles"}
                     onEditClick={handleObtenerRow}
@@ -326,39 +347,92 @@ export function RolPage() {
                     <h1>no hay roles</h1>
                 )} */}
 
-                {rolesUsuario != null && rolesUsuario.length > 0 ? (
-                    <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                    <Typography gutterBottom variant="h5" component="div">
+                        Roles UTH0
+                    </Typography>
 
-                        {rolesUsuario.length === 0 && (
-                        <h1>no hay roles</h1>
-                        )}
+                    {rolesUsuarioAUTH0 != null && rolesUsuarioAUTH0.length > 0 ? (
+                        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
 
-                        {rolesUsuario.map((descrip) => (
-                        <Grid item xs={3}>
-                            <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={handleClick(null)}>
-                            <CardActionArea>
-                                {/* <CardMedia
-                                id={modulo.id}
-                                component="img"
-                                height="140"
-                                image={img2}
-                                alt="green iguana"
-                                /> */}
-                                <CardContent>
-                                <Typography gutterBottom variant="h6" component="div">
-                                    {descrip}
-                                </Typography>
-                                </CardContent>
-                            </CardActionArea>
-                            </Card>
+                            {rolesUsuarioAUTH0.length === 0 && (
+                                <h1>no hay roles</h1>
+                            )}
+
+                            {rolesUsuarioAUTH0.map((descrip) => (
+                                <Grid item xs={3} key={descrip}>
+                                    <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={handleClick(null)}>
+                                        <CardActionArea>
+                                            <CardContent>
+                                                <Typography gutterBottom variant="h6" component="div">
+                                                    {descrip}
+                                                </Typography>
+                                            </CardContent>
+                                        </CardActionArea>
+                                    </Card>
+                                </Grid>
+                            ))}
                         </Grid>
-                        ))}
-                    </Grid>
-                ) : (
-                    <h1>no hay roles</h1>
-                )}
+                    ) : (
+                        <h1>no hay roles AUTH0</h1>
+                    )}
 
-                
+                    <br />
+                    <Divider />
+                    <br />
+
+                    <Typography gutterBottom variant="h5" component="div">
+                        Roles MI BD
+                    </Typography>
+
+                    {roles != null && roles.length > 0 ? (
+                        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+
+                            {roles.length === 0 && (
+                                <h1>no hay roles</h1>
+                            )}
+
+                            {roles.map((rol) => (
+                                <Grid item xs={3} key={rol.id}>
+                                    <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={handleClick(null)}>
+                                        {/* <CardActionArea> */}
+                                            {/* <CardMedia
+                                            id={modulo.id}
+                                            component="img"
+                                            height="140"
+                                            image={img2}
+                                            alt="green iguana"
+                                            /> */}
+                                            <CardContent>
+                                                <Stack direction="row" spacing={0} sx={{
+                                                    justifyContent: "flex-end",
+                                                    alignItems: "center",
+                                                }}>
+                                                    <IconButton aria-label="edit" onClick={() => handleSetRolState(rol)}>
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                </Stack>
+                                            </CardContent>
+                                        {/* </CardActionArea> */}
+                                        <CardContent>
+                                            <Typography gutterBottom variant="h6" component="div">
+                                                <b>{rol.name}</b>
+                                            </Typography>
+                                            <br />
+                                            <Typography gutterBottom variant="h6" component="div">
+                                                {rol.description}
+                                            </Typography>
+                                            <br />
+                                            <Button variant="contained" onClick={() => handleConfirmarEliminarRol(rol.id)}>
+                                                ELIMINAR
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    ) : (
+                        <h1>no hay rolesUsuario</h1>
+                    )}
 
                 </Box>
             </Box>

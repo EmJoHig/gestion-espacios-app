@@ -6,9 +6,12 @@ import {
   createRolRequest,
   updateRolRequest,
   deleteRolRequest,
+  asociarRolAlUsuarioRequest,
 } from "../api/rol";
 
 const RolContext = createContext();
+
+const TOKEN_AUTH0 = import.meta.env.VITE_AUTH0_TOKEN;
 
 export const useRol = () => {
   const context = useContext(RolContext);
@@ -17,17 +20,16 @@ export const useRol = () => {
 };
 
 export function RolProvider({ children }) {
-  const [rols, setRoles] = useState([]);
+  const [roles, setRoles] = useState([]);
   const { getAccessTokenSilently } = useAuth0();
 
 
-  const getRoles = async () => {
-    // const res = await getRolsRequest();
-    // setRols(res.data);
+  const getRoles = async () => {    
     try {
       
       const token = await getAccessTokenSilently({
-        audience: 'https://gestion-espacios/api',
+        audience: 'https://gestion-espacios/api',// USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
       });
 
       const res = await getRolesRequest(token);
@@ -46,9 +48,15 @@ export function RolProvider({ children }) {
   //     }
   //   };
 
-  const createRol = async (rol) => {
+  const createRol = async (idUsuarioAuth0, rol) => {
     try {
-      const res = await createRolRequest(rol);
+      
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token',
+      });
+
+      const res = await createRolRequest(token, idUsuarioAuth0, rol);
       // console.log(res.data);
     } catch (error) {
       console.log(error);
@@ -57,9 +65,15 @@ export function RolProvider({ children }) {
 
 
 
-  const updateRol = async (id, rol) => {
+  const updateRol = async (rol) => {
     try {
-      await updateRolRequest(id, rol);
+      
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token',
+      });
+
+      await updateRolRequest(token, rol);
     } catch (error) {
       console.error(error);
     }
@@ -68,10 +82,31 @@ export function RolProvider({ children }) {
 
   const deleteRol = async (id) => {
     try {
-      const res = await deleteRolRequest(id);
-      console.log("response delete rol");
-      console.log(res);
-      // if (res.status === 204) setRols(rols.filter((rol) => rol._id !== id));
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
+      });
+
+      const res = await deleteRolRequest(token, id);
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  //ASOCIAR ROL A USUARIO
+  const AsociarRolAlUsuario = async (bodyUsuaroRol) => {
+    try {
+      
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token',
+      });
+
+      const res = await asociarRolAlUsuarioRequest(token, bodyUsuaroRol);
+      // console.log(res.data);
     } catch (error) {
       console.log(error);
     }
@@ -81,12 +116,13 @@ export function RolProvider({ children }) {
   return (
     <RolContext.Provider
       value={{
-        rols,
+        roles,
         getRoles,
         // getRol,
         createRol,
         updateRol,
         deleteRol,
+        AsociarRolAlUsuario,
       }}
     >
       {children}

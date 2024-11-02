@@ -69,12 +69,12 @@ export function HomePage() {
         ruta: "/solicitudes-reservas"
       },
       {
-        codigo: "5",
+        codigo: "6",
         descripcion: "ABM Ministerios",
         ruta: "/ministerio"
       },
       {
-        codigo: "6",
+        codigo: "7",
         descripcion: "ABM ROLES",
         ruta: "/rol"
       },

@@ -25,44 +25,36 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import TablaMinisterios from './TablaMinisterios';
-import { useMinisterio } from "../../context/ministerioContext";
+import TablaRecursos from './TablaRecursos';
+import { useRecurso } from "../../context/recursoContext";
 
-export function MinisterioPage() {
+export function RecursoPage() {
 
-    const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
+    const { recursos, getRecursos, createRecurso, updateRecurso } = useRecurso();
     const navigate = useNavigate();
 
     useEffect(() => {
-        getMinisterios();
+        getRecursos();
     }, []);
-
-    // const data = [
-    //     { id: 1, codigo: 'M1', descripcion: 'MINISTERIO 1' },
-    //     { id: 2, codigo: 'M2', descripcion: 'MINISTERIO DOS' },
-    //     { id: 3, codigo: 'M3', descripcion: 'MINISTERIO TRES' },
-    //     { id: 4, codigo: 'M4', descripcion: 'MINISTERIO CUATRO' },
-    // ];
-
-    const [age, setAge] = React.useState('');
-
-    const ChangeSelectMuni = (event) => {
-        setAge(event.target.value);
-    };
-
 
     const columnas = [
         {
-            id: 'codigo',
+            id: 'nombre',
             numeric: false,
             disablePadding: true,
-            label: 'Codigo',
+            label: 'Nombre',
         },
         {
             id: 'descripcion',
             numeric: true,
             disablePadding: false,
             label: 'Descripcion',
+        },
+        {
+            id: 'cantidad',
+            numeric: true,
+            disablePadding: false,
+            label: 'Cantidad',
         },
         {
             id: 'accion',
@@ -73,7 +65,7 @@ export function MinisterioPage() {
     ];
 
 
-    const [ministerioEdicion, setMinisterioEdicion] = React.useState(null);
+    const [recursoEdicion, setRecursoEdicion] = React.useState(null);
 
 
 
@@ -89,14 +81,14 @@ export function MinisterioPage() {
     };
 
 
-    const handleSubmit = async (ministJson) => {
+    const handleSubmit = async (recursoJson) => {
         try {
-            const { codigo, descripcion } = ministJson;
-            await createMinisterio(ministJson);
-            await getMinisterios();
+            const { nombre, descripcion, cantidad } = recursoJson;
+            await createRecurso(recursoJson);
+            await getRecursos();
             handleClose();
         } catch (error) {
-            console.error('Error al crear el ministerio:', error);
+            console.error('Error al crear el recurso:', error);
         }
     };
 
@@ -111,37 +103,28 @@ export function MinisterioPage() {
     };
 
 
-    const handleSubmitEdit = async (ministJson) => {
+    const handleSubmitEdit = async (recursoJson) => {
         try {
-            const { codigo, descripcion } = ministJson;
-            ministerioEdicion.codigo = codigo;
-            ministerioEdicion.descripcion = descripcion;
-            await updateMinisterio(ministerioEdicion);
-            await getMinisterios();
+            const { nombre, descripcion, cantidad } = recursoJson;
+            recursoEdicion.nombre = nombre;
+            recursoEdicion.descripcion = descripcion;
+            recursoEdicion.cantidad = cantidad;
+            await updateRecurso(recursoEdicion);
+            await getRecursos();
             handleCloseEdit();
         } catch (error) {
-            console.error('Error al editar el ministerio:', error);
+            console.error('Error al editar el recurso:', error);
         }
     };
 
 
     const handleTEST = () => {
-        console.log("Ministerios", ministerios);
+        console.log("Recursos", recursos);
     };
 
 
-
-
-
-
     //DIALOG NUEVO
-    function RenderizarDialogNuevoMinist(props) {
-        // const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, columnasTablaParam } =
-        //     props;
-        // const createSortHandler = (property) => (event) => {
-        //     onRequestSort(event, property);
-        // };
-
+    function RenderizarDialogNuevoRecurso(props) {
         return (
             <>
                 <Dialog
@@ -157,7 +140,7 @@ export function MinisterioPage() {
                         },
                     }}
                 >
-                    <DialogTitle>Nuevo Ministerio</DialogTitle>
+                    <DialogTitle>Nuevo Recurso</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
 
@@ -166,9 +149,9 @@ export function MinisterioPage() {
                             autoFocus
                             required
                             margin="dense"
-                            id="codigo"
-                            name="codigo"
-                            label="Codigo"
+                            id="nombre"
+                            name="nombre"
+                            label="Nombre"
                             type="text"
                             fullWidth
                             variant="standard"
@@ -183,10 +166,26 @@ export function MinisterioPage() {
                             fullWidth
                             variant="standard"
                         />
+                        <TextField
+                            autoFocus
+                            required
+                            margin="dense"
+                            id="cantidad"
+                            name="cantidad"
+                            label="Cantidad"
+                            type="number"
+                            slotProps={{
+                                inputLabel: {
+                                shrink: true,
+                                },
+                            }}
+                            fullWidth
+                            variant="standard"
+                        />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Cancelar</Button>
-                        <Button type="submit">Guardar</Button>
+                        <Button type="submit">Guardar Recurso</Button>
                     </DialogActions>
                 </Dialog>
             </>
@@ -196,20 +195,23 @@ export function MinisterioPage() {
 
     //DIALOG EDITAR
 
-    function RenderizarDialogEditarMinist({ ministerio }) {
+    function RenderizarDialogEditarRecurso({ recurso }) {
 
-        // console.log("Ministerio a editar:", ministerio);
+        // console.log("Recurso a editar:", recurso);
 
-        const [codigoEdit, setCodigoEdit] = React.useState(ministerio ? ministerio.codigo : "");
-        const [descripcionEdit, setDescripcionEdit] = React.useState(ministerio ? ministerio.descripcion : "");
+        const [nombreEdit, setNombreEdit] = React.useState(recurso ? recurso.nombre : "");
+        const [descripcionEdit, setDescripcionEdit] = React.useState(recurso ? recurso.descripcion : "");
+        const [cantidadEdit, setCantidadEdit] = React.useState(recurso ? recurso.cantidad : "");
 
         // Actualiza el estado cuando cambien los valores de los campos
-        const handleCodigoChange = (event) => {
-            setCodigoEdit(event.target.value);
+        const handleNombreChange = (event) => {
+            setNombreEdit(event.target.value);
         };
-
         const handleDescripcionChange = (event) => {
             setDescripcionEdit(event.target.value);
+        };
+        const handleCantidadChange = (event) => {
+            setCantidadEdit(event.target.value);
         };
         return (
             <>
@@ -226,7 +228,7 @@ export function MinisterioPage() {
                         },
                     }}
                 >
-                    <DialogTitle>Editar Ministerio</DialogTitle>
+                    <DialogTitle>Editar Recurso</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
 
@@ -235,14 +237,14 @@ export function MinisterioPage() {
                             autoFocus
                             required
                             margin="dense"
-                            id="codigo"
-                            name="codigo"
-                            label="Codigo"
+                            id="nombre"
+                            name="nombre"
+                            label="Nombre"
                             type="text"
-                            fullWidth
                             variant="standard"
-                            value={codigoEdit}
-                            onChange={handleCodigoChange}
+                            fullWidth
+                            value={nombreEdit}
+                            onChange={handleNombreChange}
                         />
                         <TextField
                             required
@@ -250,12 +252,23 @@ export function MinisterioPage() {
                             id="descripcion"
                             name="descripcion"
                             label="Descripcion"
-                            type="test"
-                            fullWidth
+                            type="text"
                             variant="standard"
+                            fullWidth
                             value={descripcionEdit}
                             onChange={handleDescripcionChange}
-
+                        />
+                        <TextField
+                            required
+                            margin="dense"
+                            id="cantidad"
+                            name="cantidad"
+                            label="Cantidad"
+                            type="number"
+                            variant="standard"
+                            fullWidth
+                            value={cantidadEdit}
+                            onChange={handleCantidadChange}
                         />
                     </DialogContent>
                     <DialogActions>
@@ -269,15 +282,15 @@ export function MinisterioPage() {
 
 
     //metodo que envia los datos de la fila seleccionada para editar
-    const handleObtenerRow = (ministerio) => {
-        console.log("Datos del ministerio seleccionado:", ministerio);
-        setMinisterioEdicion(ministerio);
+    const handleObtenerRow = (recurso) => {
+        console.log("Datos del recurso seleccionado:", recurso);
+        setRecursoEdicion(recurso);
         handleClickOpenEdit();
     };
 
     // metodo que envia el id de la row seleccionada para eliminar
-    const handleDeleteMinisterio = (idsMinisterios) => {
-        console.log("Datos del ministerio seleccionado:", idsMinisterios);
+    const handleDeleteRecurso = (idsRecursos) => {
+        console.log("Datos del recurso seleccionado:", idsRecursos);
 
     };
 
@@ -285,7 +298,7 @@ export function MinisterioPage() {
         <>
             <Box sx={{ marginTop: '50px' }}>
                 <Typography gutterBottom variant="h5" component="div">
-                    Modulo Ministerios
+                    Modulo Recursos
                 </Typography>
 
                 <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
@@ -293,18 +306,18 @@ export function MinisterioPage() {
                 </Button>
 
                 <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-                <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>Responsables por Ministerio</Button>
-                <RenderizarDialogNuevoMinist />
+                <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>Responsables por Recurso</Button>
                 {openEdit && (
-                    <RenderizarDialogEditarMinist ministerio={ministerioEdicion} />
+                    <RenderizarDialogEditarRecurso recurso={recursoEdicion} />
                 )}
+                <RenderizarDialogNuevoRecurso />
                 <Box sx={{ marginTop: '50px' }}>
-                    <TablaMinisterios
-                        data={ministerios}
+                    <TablaRecursos
+                        data={recursos}
                         columnasTabla={columnas}
-                        nombreTabla={"Listado de Ministerios"}
+                        nombreTabla={"Listado de Recursos"}
                         onEditClick={handleObtenerRow}
-                        // onClickDeleteMinisterio={handleDeleteMinisterio}
+                        // onClickDeleteRecurso={handleDeleteRecurso}
                     />
                 </Box>
 

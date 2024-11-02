@@ -10,6 +10,8 @@ import { AuthProvider } from "./context/authContext";
 import { ProtectedRoute } from "./routes";
 import { MinisterioProvider } from "./context/ministerioContext";
 import { UsuarioProvider } from "./context/usuarioContext";
+import { RolProvider } from "./context/rolContext";
+import { RecursoProvider } from "./context/recursoContext";
 
 // vistas
 import WelcomePage from "./pages/WelcomePage";
@@ -20,11 +22,14 @@ import { MinisterioPage } from "./pages/Ministerio/MinisterioPage";
 import { SolicitudPage } from "./pages/Solicitud/SolicitudPage";
 import { ReservasPage } from "./pages/Reserva/ReservasPage";
 import { RolPage } from "./pages/Rol/RolPage";
-import { RolProvider } from "./context/rolContext";
+import { RecursoPage } from "./pages/Recurso/RecursoPage";
+import { AsociarRolesPage } from "./pages/Rol/AsociarRolesPage";
+
 
 function App() {
   return (
     // <AuthProvider>
+    <RecursoProvider>
       <MinisterioProvider>
         <RolProvider>
           <UsuarioProvider>
@@ -47,6 +52,9 @@ function App() {
                       <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
                       <Route path="/reservas" element={<ReservasPage />} />
                       <Route path="/rol" element={<RolPage />} />
+                      <Route path="/asociar-roles" element={<AsociarRolesPage />} />
+                      <Route path="/recurso" element={<RecursoPage />} />
+
                       {/* <Route path="/add-task" element={<TaskFormPage />} />
                       <Route path="/tasks/:id" element={<TaskFormPage />} />
                       <Route path="/profile" element={<h1>Profile</h1>} /> */}
@@ -58,8 +66,9 @@ function App() {
               </main>
             </BrowserRouter>
           </UsuarioProvider>
-          </RolProvider>
+        </RolProvider>
       </MinisterioProvider>
+    </RecursoProvider>
     // </AuthProvider>
   );
 }

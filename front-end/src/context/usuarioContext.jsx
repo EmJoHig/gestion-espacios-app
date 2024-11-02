@@ -6,24 +6,33 @@ import {
   getUsuarioRequest,
   updateUsuarioRequest,
 } from "../api/usuario";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const UsuarioContext = createContext();
 
-export const useUsuarios = () => {
+export const useUsuario = () => {
   const context = useContext(UsuarioContext);
-  if (!context) throw new Error("useUsuarios must be used within a UsuarioProvider");
+  if (!context) throw new Error("useUsuario must be used within a UsuarioProvider");
   return context;
 };
 
 export function UsuarioProvider({ children }) {
   const [usuarios, setUsuarios] = useState([]);
 
+  const { getAccessTokenSilently } = useAuth0();
+
   const getUsuarios = async () => {
 
     try {
-      const res = await getUsuariosRequest();
-      console.log("res.data");
-      console.log(res.data);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',// USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
+      });
+
+      const res = await getUsuariosRequest(token);
+      // console.log("res.data");
+      // console.log(res.data);
       setUsuarios(res.data);
       return res.data;
 
