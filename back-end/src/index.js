@@ -5,6 +5,7 @@ import { createAdminUser } from "./libs/createUser.js";
 import Usuario from './models/Usuario.js';
 import Ministerio from './models/Ministerio.js';
 import Rol from './models/Rol.js';
+import Recurso from './models/Recurso.js';
 
 async function main() {
   //await connectDB();
@@ -15,11 +16,14 @@ async function main() {
       await Usuario.sync({ alter: false });// alter en false para no pisar las tablas
       console.log("Tabla 'users' sincronizada");
 
-      await Ministerio.sync({ alter: false });// alter en false para no pisar las tablas
+      await Ministerio.sync({ alter: false });
       console.log("Tabla 'ministerio' sincronizada");
 
-      await Rol.sync({ alter: false });// alter en false para no pisar las tablas
+      await Rol.sync({ alter: false });
       console.log("Tabla 'rol' sincronizada");
+
+      await Recurso.sync({ alter: false });
+      console.log("Tabla 'Recurso' sincronizada");
 
   } catch (error) {
       console.log("error en la conexion", error)

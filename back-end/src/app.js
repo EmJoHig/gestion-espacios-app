@@ -11,6 +11,8 @@ import { MONGODB_URI, PORT } from "./config.js";
 import usuarioRoutes from "./routes/usuario.routes.js";
 import ministerioRoutes from "./routes/ministerio.routes.js";
 import rolRoutes from "./routes/rol.routes.js";
+import recursoRoutes from "./routes/recurso.routes.js";
+
 
 import "./config/passport.js";
 import bodyParser from "body-parser";
@@ -118,7 +120,7 @@ app.use((req, res, next) => {
 app.use("/usuarios",usuarioRoutes);
 app.use("/ministerio",ministerioRoutes);
 app.use("/rol", rolRoutes);
-
+app.use("/recurso", recursoRoutes);
 
 // static files
 app.use(express.static(join(__dirname, "public")));

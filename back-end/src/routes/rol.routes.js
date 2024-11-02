@@ -4,11 +4,12 @@ import { auth } from 'express-oauth2-jwt-bearer';
 
 const { Router } = pkg;
 import {
-    getRoles,
+    getRolesPorUsuario,
     getRolById,
     createRol,
     updateRol,
     deleteRol,
+    asociarRolAlUsuario
 } from "../controllers/rol.controller.js";
 
 const router = express.Router();
@@ -20,12 +21,13 @@ const jwtCheck = auth({
   });
 
 
-router.get('/get_roles', jwtCheck, getRoles);
+router.get('/get_roles', jwtCheck, getRolesPorUsuario);
 // router.get('/get_roles', getRoles);
 router.get('/:id', getRolById);
-router.post('/nuevo_rol', createRol);
-router.put('/editar_rol/:id', updateRol);
-router.delete('/eliminar_rol/:id', deleteRol);
+router.post('/nuevo_rol', jwtCheck, createRol);
+router.put('/editar_rol/:id', jwtCheck, updateRol);
+router.delete('/eliminar_rol/:id', jwtCheck, deleteRol);
 
+router.post('/asociar_rol_usuario', jwtCheck, asociarRolAlUsuario);
 
 export default router;

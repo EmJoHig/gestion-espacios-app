@@ -2,31 +2,34 @@ import { DataTypes, Model } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import db2 from '../database/db2.js';  // Ajusta esta ruta según tu configuración de Sequelize
 
-class Rol extends Model {
+class Recurso extends Model {
   
 }
 
-Rol.init({
-  id: {type: DataTypes.INTEGER,
-    primaryKey: true},
-  name: {
+Recurso.init({
+  nombre: {
     type: DataTypes.STRING,
     allowNull: true,
     trim: true,
   },
-  description: {
+  descripcion: {
     type: DataTypes.STRING,
     allowNull: false,
     trim: true,
   },
+  cantidad: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    trim: true,
+  },
 }, {
   sequelize: db2,
-  modelName: 'Rol',
-  tableName: 'rol',
+  modelName: 'Recurso',
+  tableName: 'recurso',
   timestamps: false,
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   version: false,
 });
 
-export default Rol;
+export default Recurso;

@@ -1,14 +1,21 @@
 import Usuario from "../models/Usuario.js";
+import Rol from "../models/Rol.js";
 import bcrypt from "bcryptjs";
 
 
 export const getUsers = async (req, res) => {
   try {
-    // Obtener todos los usuarios de la base de datos
     // const users = await Usuario.find();
+    // const users = await Usuario.findAll();
 
-      const users = await Usuario.findAll()
-    // Enviar una respuesta al cliente
+    const users = await Usuario.findAll({
+      include: [{
+        model: Rol,
+        as: 'rol', // alias
+        // attributes: ['id', 'name'],
+      }],
+    });
+
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
@@ -66,8 +73,8 @@ export const deleteUser = async (req, res) => {
 
     // Buscar un usuario por su ID en la base de datos
     const user = await Usuario.destroy({
-      where: { id : id}
-  })
+      where: { id: id }
+    })
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
