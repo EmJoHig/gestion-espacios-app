@@ -60,6 +60,11 @@ export function HomePage() {
       },
       {
         codigo: "4",
+        descripcion: "ABM RECURSOS",
+        ruta: "/recurso"
+      },
+      {
+        codigo: "5",
         descripcion: "Solicitudes de Reservas",
         ruta: "/solicitudes-reservas"
       },
