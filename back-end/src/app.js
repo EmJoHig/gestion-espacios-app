@@ -125,7 +125,7 @@ app.use("/recurso", recursoRoutes);
 // static files
 app.use(express.static(join(__dirname, "public")));
 
-
+ 
 
  
 export default app;
