@@ -1,0 +1,14 @@
+
+### Obtener un token
+POST https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token
+Content-Type: application/json
+
+{
+    "client_id": "mkKOcT1cFlYveX1fij08DUpqu18obztN",
+    "client_secret": "D88REM5wu7odEcAJ72Nk5XgxF1bOcJ80ZP3PyoEeZjKOBaXI9gPIYqlO1R9vumkm",
+    "audience": "https://gestion-espacios/api",
+    "grant_type": "client_credentials"
+}
+
+### Retornar todos los usuarios
+GET http://localhost:3000/usuarios/get_usuarios

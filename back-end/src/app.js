@@ -12,25 +12,21 @@ import usuarioRoutes from "./routes/usuario.routes.js";
 import ministerioRoutes from "./routes/ministerio.routes.js";
 import rolRoutes from "./routes/rol.routes.js";
 import recursoRoutes from "./routes/recurso.routes.js";
-
+import actividadRoutes from "./routes/actividad.routes.js";
 
 import "./config/passport.js";
 import bodyParser from "body-parser";
 import multer from "multer";
-import cors  from "cors";
+import cors from "cors";
 //AUTH0
-import { auth } from 'express-oauth2-jwt-bearer';
+import { auth } from "express-oauth2-jwt-bearer";
 
 // Initializations
 // var upload = multer();
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-
 // middlewares
-
-
-
 
 // const config = {
 //   authRequired: false,
@@ -55,12 +51,10 @@ const corsOptions = {
   origin: "http://localhost:5173",
   credentials: true, // Habilitar el intercambio de cookies y otros datos de autenticación
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: "Authorization, Origin, X-Requested-With, Content-Type, Accept",
+  allowedHeaders:
+    "Authorization, Origin, X-Requested-With, Content-Type, Accept",
 };
 app.use(cors(corsOptions));
-
-
-
 
 // const jwtCheck = auth({
 //   audience: 'https://gestion-espacios/api',
@@ -71,11 +65,10 @@ app.use(cors(corsOptions));
 // enforce on all endpoints
 // app.use(jwtCheck);
 
-
 app.use(
   bodyParser.urlencoded({
-      limit: "50mb",
-      extended: true,
+    limit: "50mb",
+    extended: true,
   })
 );
 app.use(express.json());
@@ -93,7 +86,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-
 // for parsing multipart/form-data
 // app.use(upload.array());
 // app.use(bodyParser.json());
@@ -104,7 +96,6 @@ app.use(flash());
 // config view engine
 // app.use(morgan("dev"));
 // app.use(morgan('dev', { skip: (req, res) => process.env.NODE_ENV === 'test' }));
-
 
 // Global Variables
 app.use((req, res, next) => {
@@ -117,15 +108,13 @@ app.use((req, res, next) => {
 
 // routes
 // app.use(usuarioRoutes);
-app.use("/usuarios",usuarioRoutes);
-app.use("/ministerio",ministerioRoutes);
+app.use("/usuarios", usuarioRoutes);
+app.use("/ministerio", ministerioRoutes);
 app.use("/rol", rolRoutes);
 app.use("/recurso", recursoRoutes);
+app.use("/actividad", actividadRoutes);
 
 // static files
 app.use(express.static(join(__dirname, "public")));
 
- 
-
- 
 export default app;
