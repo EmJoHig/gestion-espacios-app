@@ -7,6 +7,8 @@ import Ministerio from "./models/Ministerio.js";
 import Rol from "./models/Rol.js";
 import Recurso from "./models/Recurso.js";
 import Actividad from "./models/Actividad.js";
+import EstadoEspacio from "./models/EstadoEspacio.js";
+import Espacio from "./models/Espacio.js";
 
 async function main() {
   //await connectDB();
@@ -28,6 +30,12 @@ async function main() {
 
     await Actividad.sync({ alter: false });
     console.log("Tabla 'actividad' sincronizada");
+
+    await EstadoEspacio.sync({ alter: false });
+    console.log("Tabla 'estado_espacio' sincronizada");
+
+    await Espacio.sync({ alter: false });
+    console.log("Tabla 'espacio' sincronizada");
   } catch (error) {
     console.log("error en la conexion", error);
   }

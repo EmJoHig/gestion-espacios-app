@@ -46,7 +46,7 @@ export const createActividad = async (req, res) => {
     });
 
     // Enviar una respuesta al cliente con la actividad nueva.
-    res.status(201).json(nuevoMinisterio);
+    res.status(201).json(nuevaActividad);
   } catch (error) {
     console.error("Error al crear la actividad:", error);
     res
