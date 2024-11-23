@@ -1,0 +1,4 @@
+
+
+### Retornar todas las actividades
+GET http://localhost:3000/actividades/get_actividades

@@ -1,9 +1,10 @@
-import { Sequelize } from 'sequelize'
+import { Sequelize } from "sequelize";
 
-const db2 = new Sequelize('gestion_espacios', 'root', 'rootbelt',
-    {host: "localhost", port: 3306,
-    dialect: 'mysql',
-    logging: false,
-})
+const db2 = new Sequelize("gestionespaciosdb", "root", "Titansport73.", {
+  host: "localhost",
+  port: 3306,
+  dialect: "mysql",
+  logging: false,
+});
 
-export default db2
+export default db2;
