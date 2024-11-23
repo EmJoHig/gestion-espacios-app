@@ -9,6 +9,7 @@ import {
     createMinisterio,
     updateMinisterio,
     deleteMinisterio,
+    asociarResponsableAMinist
 } from "../controllers/ministerio.controller.js";
 
 const router = express.Router();
@@ -26,6 +27,6 @@ router.get('/:id', getMinisterioById);
 router.post('/nuevo_ministerio', createMinisterio);
 router.put('/editar_ministerio/:id', updateMinisterio);
 router.delete('/eliminar_ministerio/:id', deleteMinisterio);
-
+router.post('/asociar_responsable_ministerio', jwtCheck, asociarResponsableAMinist);
 
 export default router;

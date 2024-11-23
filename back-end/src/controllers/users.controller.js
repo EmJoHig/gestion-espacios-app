@@ -1,5 +1,6 @@
 import Usuario from "../models/Usuario.js";
 import Rol from "../models/Rol.js";
+import Ministerio from "../models/Ministerio.js";
 import bcrypt from "bcryptjs";
 
 
@@ -8,13 +9,7 @@ export const getUsers = async (req, res) => {
     // const users = await Usuario.find();
     // const users = await Usuario.findAll();
 
-    const users = await Usuario.findAll({
-      include: [{
-        model: Rol,
-        as: 'rol', // alias
-        // attributes: ['id', 'name'],
-      }],
-    });
+    const users = await Usuario.findAll({ include: [{ model: Rol, as: 'rol',}, { model: Ministerio, as: 'ministerio'}]});
 
     res.status(200).json(users);
   } catch (error) {

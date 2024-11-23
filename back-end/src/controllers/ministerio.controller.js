@@ -1,4 +1,5 @@
 import Ministerio from '../models/Ministerio.js';
+import Usuario from '../models/Usuario.js';
 import bcrypt from "bcryptjs";
 
 
@@ -94,5 +95,35 @@ export const deleteMinisterio = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Ha ocurrido un error al eliminar el Ministerio' });
+    }
+};
+
+
+//ASOCIAR ROL A USUARIO
+export const asociarResponsableAMinist = async (req, res) => {
+    try {
+        const { idUsuario, idMinisterio } = req.body;
+
+        const _usuario = await Usuario.findOne({ where: { id: idUsuario }});
+
+        if(_usuario){
+            //const idMinisterioPaseado = Number.isInteger(Number(idMinisterio)) ? parseInt(idMinisterio, 10) : null;
+            const resp = await Usuario.update(
+                { ministerioId: idMinisterio }, // Campos a actualizar
+                { where: { id: idUsuario } } // Condición de búsqueda
+            );
+
+            if (resp[0] > 0) {
+                res.status(200).json({ message: 'Usuario asociado al Ministerio' });
+            } else {
+                res.status(404).json({ message: 'No se pudo asociar el usuario al ministerio. Usuario no encontrado o sin cambios' });
+            }
+
+        }else{
+            res.status(500).json({ message: 'Ha ocurrido un error al asociar el Rol al Usuario' });
+        }
+    } catch (error) {
+        console.error('Error al crear el rol:', error);
+        res.status(500).json({ message: 'Ha ocurrido un error al crear el Rol' });
     }
 };

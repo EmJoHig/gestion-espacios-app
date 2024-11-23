@@ -2,6 +2,7 @@ import { DataTypes, Model } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import db2 from '../database/db2.js';  // Ajusta esta ruta según tu configuración de Sequelize
 import Rol from '../models/Rol.js';
+import Ministerio from '../models/Ministerio.js';
 
 class Usuario extends Model {
   // async encryptPassword(password) {
@@ -46,6 +47,15 @@ Usuario.init({
     allowNull: false,
     field: 'id_rol'
   },
+  ministerioId: {  // Clave foránea hacia Rol
+    type: DataTypes.INTEGER,
+    references: {
+      model: Ministerio,
+      key: 'id'
+    },
+    allowNull: false,
+    field: 'ministerioId'
+  },
   idUsuarioAUTH0: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -67,6 +77,12 @@ Usuario.belongsTo(Rol, {
   foreignKey: 'rolId',
   as: 'rol', 
 });
+
+Usuario.belongsTo(Ministerio, {
+  foreignKey: 'ministerioId',
+  as: 'ministerio', 
+});
+
 
 
 // Hooks para encriptar la contraseña antes de guardar
