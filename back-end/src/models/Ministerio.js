@@ -7,6 +7,8 @@ class Ministerio extends Model {
 }
 
 Ministerio.init({
+  id: {type: DataTypes.INTEGER,
+    primaryKey: true},
   codigo: {
     type: DataTypes.STRING,
     allowNull: true,

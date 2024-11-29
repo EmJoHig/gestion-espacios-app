@@ -12,6 +12,8 @@ import usuarioRoutes from "./routes/usuario.routes.js";
 import ministerioRoutes from "./routes/ministerio.routes.js";
 import rolRoutes from "./routes/rol.routes.js";
 import recursoRoutes from "./routes/recurso.routes.js";
+import espacioRoutes from "./routes/espacio.routes.js";
+import reservaRoutes from "./routes/reserva.routes.js";
 
 
 import "./config/passport.js";
@@ -121,6 +123,8 @@ app.use("/usuarios",usuarioRoutes);
 app.use("/ministerio",ministerioRoutes);
 app.use("/rol", rolRoutes);
 app.use("/recurso", recursoRoutes);
+app.use("/espacio", espacioRoutes);
+app.use("/reserva", reservaRoutes);
 
 // static files
 app.use(express.static(join(__dirname, "public")));
