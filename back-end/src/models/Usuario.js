@@ -4,13 +4,13 @@ import db2 from "../database/db2.js"; // Ajusta esta ruta según tu configuraci�
 import Rol from "../models/Rol.js";
 
 class Usuario extends Model {
-  //async encryptPassword(password) {
-  //const salt = await bcrypt.genSalt(10);
-  //return await bcrypt.hash(password, salt);
-  //}
-  // async matchPassword(password) {
-  //   return await bcrypt.compare(password, this.password);
-  // }
+  async encryptPassword(password) {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
+  }
+   async matchPassword(password) {
+     return await bcrypt.compare(password, this.password);
+   }
 }
 
 Usuario.init(
@@ -28,10 +28,10 @@ Usuario.init(
       trim: true,
       field: "email",
     },
-    // password: {
-    //   type: DataTypes.STRING,
-    //   allowNull: false,
-    // },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     fechaAlta: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -49,7 +49,7 @@ Usuario.init(
     },
     idUsuarioAUTH0: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true, // Asegura que sea único para cada usuario
       field: "id_usuario_auth0",
     },
@@ -72,16 +72,16 @@ Usuario.belongsTo(Rol, {
 });
 
 // Hooks para encriptar la contraseña antes de guardar
-// Usuario.addHook('beforeCreate', async (user) => {
-//   if (user.password) {
-//     user.password = await user.encryptPassword(user.password);
-//   }
-// });
+ Usuario.addHook('beforeCreate', async (user) => {
+   if (user.password) {
+     user.password = await user.encryptPassword(user.password);
+   }
+ });
 
-// Usuario.addHook('beforeUpdate', async (user) => {
-//   if (user.password) {
-//     user.password = await user.encryptPassword(user.password);
-//   }
-// });
+ Usuario.addHook('beforeUpdate', async (user) => {
+   if (user.password) {
+     user.password = await user.encryptPassword(user.password);
+   }
+ });
 
 export default Usuario;

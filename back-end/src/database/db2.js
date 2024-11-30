@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 
-const db2 = new Sequelize("gestion_espacios", "root", "", {
+const db2 = new Sequelize(process.env.DB_NAME,process.env.DB_USER,process.env.DB_PASSWORD,
+  {
   host: "localhost",
   port: 3306,
   dialect: "mysql",
@@ -8,3 +9,5 @@ const db2 = new Sequelize("gestion_espacios", "root", "", {
 });
 
 export default db2;
+
+

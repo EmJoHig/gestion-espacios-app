@@ -15,7 +15,7 @@ import recursoRoutes from "./routes/recurso.routes.js";
 import actividadRoutes from "./routes/actividad.routes.js";
 import reservaRoutes from "./routes/reserva.routes.js";
 import solicitudReservaRoutes from "./routes/solicitudReserva.routes.js";
-
+import espacioRoutes from "./routes/espacio.routes.js";
 
 
 import "./config/passport.js";
@@ -117,6 +117,7 @@ app.use("/ministerio", ministerioRoutes);
 app.use("/rol", rolRoutes);
 app.use("/recurso", recursoRoutes);
 app.use("/actividad", actividadRoutes)
+app.use("/espacio", espacioRoutes)
 app.use("/reserva", reservaRoutes)
 app.use("/solicitudreserva", solicitudReservaRoutes)
 

@@ -36,7 +36,7 @@ export const createEspacio = async (req, res) => {
         const { nombre } = req.body;
 
         // Crear el nuevo espacio
-        const nuevoEspacio = await Ministerio.create({
+        const nuevoEspacio = await Espacio.create({
             nombre
         });
 
