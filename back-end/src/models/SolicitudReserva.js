@@ -3,7 +3,7 @@ import db2 from '../database/db2.js';
 
 class SolicitudReserva extends Model {}
 
-Reserva.init({
+SolicitudReserva.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -27,7 +27,7 @@ Reserva.init({
       key: 'id',
     },
     onUpdate: 'CASCADE',
-    onDelete: 'SET NULL', // Ejemplo: podría ser null si el ministerio es eliminado
+    //onDelete: 'SET NULL', // Ejemplo: podría ser null si el ministerio es eliminado
   },
   fechaInicio: {
     type: DataTypes.DATE,

@@ -6,6 +6,9 @@ import Usuario from './models/Usuario.js';
 import Ministerio from './models/Ministerio.js';
 import Rol from './models/Rol.js';
 import Recurso from './models/Recurso.js';
+import Espacio from './models/Espacio.js';
+import Reserva from './models/Reserva.js';
+import SolicitudReserva from './models/SolicitudReserva.js';
 
 async function main() {
   //await connectDB();
@@ -25,10 +28,20 @@ async function main() {
     await Recurso.sync({ alter: false });
     console.log("Tabla 'Recurso' sincronizada");
 
+    await Espacio.sync({ alter: false });
+    console.log("Tabla 'Espacio' sincronizada");
+
+    await Reserva.sync({ alter: false });
+    console.log("Tabla 'Reserva' sincronizada");
+
+    await SolicitudReserva.sync({ alter: false });
+    console.log("Tabla 'SolicitudReserva' sincronizada");
+
+
   } catch (error) {
     console.log("error en la conexion", error);
   }
-  await createAdminUser();
+  //await createAdminUser();
   
   app.listen(3000, () => {
     console.log("Servidor iniciado en el puerto 3000");
