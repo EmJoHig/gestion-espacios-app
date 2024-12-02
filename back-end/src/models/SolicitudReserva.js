@@ -29,6 +29,15 @@ SolicitudReserva.init({
     onUpdate: 'CASCADE',
     //onDelete: 'SET NULL', // Ejemplo: podría ser null si el ministerio es eliminado
   },
+  actividadId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'actividad', // Asegúrate de que este modelo exista y tenga su tabla
+      key: 'id',
+    },
+    onUpdate: 'CASCADE',
+  },
   fechaInicio: {
     type: DataTypes.DATE,
     allowNull: false,

@@ -7,8 +7,9 @@ class Espacio extends Model {
 
 Espacio.init({
   id: {type: DataTypes.INTEGER,
-    primaryKey: true},
-    autoIncrement: true,
+    primaryKey: true,
+    autoIncrement: true
+  },
   nombre: {
     type: DataTypes.STRING,
     allowNull: false,

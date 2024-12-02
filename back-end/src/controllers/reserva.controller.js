@@ -1,15 +1,45 @@
 import Reserva from '../models/Reserva.js';
+import Espacio from '../models/Espacio.js';
+import Ministerio from '../models/Ministerio.js';
+import Actividad from "../models/Actividad.js";
+Reserva.associate();
 
 
 export const getReservas = async (req, res) => {
     try {
-        const reservas = await Reserva.findAll();
-        // Enviar una respuesta al cliente
-        res.status(200).json(reservas);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Ha ocurrido un error al obtener las reservas' });
-    }
+        const reservas = await Reserva.findAll({
+          include: [
+            {
+              model: Espacio, // Asegúrate de tener el modelo de Espacio
+              attributes: ['nombre'], // Solo traer el nombre de espacio
+            },
+            {
+              model: Ministerio, // Asegúrate de tener el modelo de Ministerio
+              attributes: ['codigo'], // Solo traer el nombre del ministerio
+            },
+            {
+              model: Actividad, // Asegúrate de tener el modelo de Actividad
+              attributes: ['nombre'], // Solo traer el nombre de la actividad
+            },
+          ],
+          attributes: { exclude: ['espacioId', 'ministerioId', 'actividadId'] },
+        });
+    
+        const reservasFormateadas = reservas.map((reserva) => {
+            return {
+              fechaInicio: reserva.fechaInicio,
+              fechaFin: reserva.fechaFin,
+              Espacio: reserva.Espacio,
+              Ministerio: reserva.Ministerio,
+              Actividad: reserva.Actividad,
+            };
+          });
+      
+          res.json(reservasFormateadas); // Enviar las reservas sin los IDs
+        } catch (error) {
+          console.error('Error al obtener las reservas:', error);
+          res.status(500).send('Error al obtener las reservas');
+        }
 };
 
 export const getReservaById = async (req, res) => {
@@ -32,11 +62,11 @@ export const getReservaById = async (req, res) => {
 export const createReserva = async (req, res) => {
     try {
         console.log(req.body);
-        const { espacioId, ministerioId, fechaInicio, fechaFin } = req.body;
+        const { espacioId, ministerioId, actividadId, fechaInicio, fechaFin } = req.body;
 
         // Crear el nuevo espacio
         const nuevaReserva = await Reserva.create({
-            espacioId, ministerioId, fechaInicio, fechaFin
+            espacioId, ministerioId,actividadId, fechaInicio, fechaFin
         });
 
         // Enviar una respuesta al cliente con el ministerio creado
@@ -51,7 +81,7 @@ export const createReserva = async (req, res) => {
 export const updateReserva = async (req, res) => {
     try {
         const { id } = req.params;
-        const { espacioId, ministerioId, fechaInicio, fechaFin } = req.body;
+        const { espacioId, ministerioId, actividaId, fechaInicio, fechaFin } = req.body;
 
         const reserva = await Reserva.findByPk(id);
         if (!reserva) {
@@ -63,6 +93,7 @@ export const updateReserva = async (req, res) => {
         if (id) updates.id = reserva.id;
         if (espacioId) updates.espacioId = espacioId;
         if (ministerioId) updates.ministerioId = ministerioId;
+        if (actividaId) updates.actividaId = actividaId;
         if (fechaInicio) updates.fechaInicio = fechaInicio;
         if (fechaFin) updates.fechaFin = fechaFin;
 

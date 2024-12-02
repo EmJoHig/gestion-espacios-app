@@ -12,6 +12,8 @@ import { MinisterioProvider } from "./context/ministerioContext";
 import { UsuarioProvider } from "./context/usuarioContext";
 import { RolProvider } from "./context/rolContext";
 import { RecursoProvider } from "./context/recursoContext";
+import { ReservaProvider } from "./context/reservaContext";
+import { EspacioProvider } from "./context/espacioContext";
 
 // vistas
 import WelcomePage from "./pages/WelcomePage";
@@ -33,38 +35,42 @@ function App() {
       <MinisterioProvider>
         <RolProvider>
           <UsuarioProvider>
-            <BrowserRouter>
-              <CssBaseline />
+            <ReservaProvider>
+              <EspacioProvider>
+                <BrowserRouter>
+                  <CssBaseline />
 
-              <main className="">
-                <MaterialAppBar />
+                  <main className="">
+                    <MaterialAppBar />
 
-                <Container fixed>
-                  <Routes>
-                    <Route path="/" element={<WelcomePage />} />
-                    {/* <Route path="/login" element={<LoginPage />} /> */}
-                    {/* <Route path="/register" element={<RegisterPage />} /> */}
+                    <Container fixed>
+                      <Routes>
+                        <Route path="/" element={<WelcomePage />} />
+                        {/* <Route path="/login" element={<LoginPage />} /> */}
+                        {/* <Route path="/register" element={<RegisterPage />} /> */}
 
-                    <Route element={<ProtectedRoute />}>
+                        <Route element={<ProtectedRoute />}>
 
-                      <Route path="/home" element={<HomePage />} />
-                      <Route path="/ministerio" element={<MinisterioPage />} />
-                      <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
-                      <Route path="/reservas" element={<ReservasPage />} />
-                      <Route path="/rol" element={<RolPage />} />
-                      <Route path="/asociar-roles" element={<AsociarRolesPage />} />
-                      <Route path="/recurso" element={<RecursoPage />} />
+                          <Route path="/home" element={<HomePage />} />
+                          <Route path="/ministerio" element={<MinisterioPage />} />
+                          <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
+                          <Route path="/reservas" element={<ReservasPage />} />
+                          <Route path="/rol" element={<RolPage />} />
+                          <Route path="/asociar-roles" element={<AsociarRolesPage />} />
+                          <Route path="/recurso" element={<RecursoPage />} />
 
-                      {/* <Route path="/add-task" element={<TaskFormPage />} />
-                      <Route path="/tasks/:id" element={<TaskFormPage />} />
-                      <Route path="/profile" element={<h1>Profile</h1>} /> */}
+                          {/* <Route path="/add-task" element={<TaskFormPage />} />
+                          <Route path="/tasks/:id" element={<TaskFormPage />} />
+                          <Route path="/profile" element={<h1>Profile</h1>} /> */}
 
-                    </Route>
-                  </Routes>
-                </Container>
+                        </Route>
+                      </Routes>
+                    </Container>
 
-              </main>
-            </BrowserRouter>
+                  </main>
+                </BrowserRouter>
+              </EspacioProvider>
+            </ReservaProvider>
           </UsuarioProvider>
         </RolProvider>
       </MinisterioProvider>

@@ -25,49 +25,26 @@ import cors from "cors";
 //AUTH0
 import { auth } from "express-oauth2-jwt-bearer";
 
-// Initializations
-// var upload = multer();
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// middlewares
-
-// const config = {
-//   authRequired: false,
-//   auth0Logout: true,
-//   secret: 'D88REM5wu7odEcAJ72Nk5XgxF1bOcJ80ZP3PyoEeZjKOBaXI9gPIYqlO1R9vumkm',
-//   baseURL: 'http://localhost:3000',
-//   clientID: 'mkKOcT1cFlYveX1fij08DUpqu18obztN',
-//   issuerBaseURL: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com'
-// };
-
-// // auth router attaches /login, /logout, and /callback routes to the baseURL
-// app.use(auth(config));
-
-// // req.isAuthenticated is provided from the auth router
-// app.get('/', (req, res) => {
-//   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
-// });
-
-// fin middleware auth0
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: 'http://127.0.0.1:5173',
   credentials: true, // Habilitar el intercambio de cookies y otros datos de autenticación
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders:
     "Authorization, Origin, X-Requested-With, Content-Type, Accept",
 };
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+app.use((req, res, next) => {
+  console.log(`Request: ${req.method} ${req.url}`);
+  console.log(`Headers:`, req.headers);
+  next();
+});
 
-// const jwtCheck = auth({
-//   audience: 'https://gestion-espacios/api',
-//   issuerBaseURL: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/',
-//   tokenSigningAlg: 'RS256'
-// });
 
-// enforce on all endpoints
-// app.use(jwtCheck);
 
 app.use(
   bodyParser.urlencoded({
@@ -89,17 +66,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-
-// for parsing multipart/form-data
-// app.use(upload.array());
-// app.use(bodyParser.json());
-// settings
-// app.set("port", PORT);
-// app.set("views", join(__dirname, "views"));
-
-// config view engine
-// app.use(morgan("dev"));
-// app.use(morgan('dev', { skip: (req, res) => process.env.NODE_ENV === 'test' }));
 
 // Global Variables
 app.use((req, res, next) => {

@@ -8,49 +8,23 @@ import { CardActionArea, FormControl, InputLabel, MenuItem, Select, Checkbox, Li
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import MaterialTable from '../components/MaterialTable';
-import { useAuth } from "../context/authContext";
+//import { useAuth } from "../context/authContext";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import axios from 'axios';
+import { useReserva } from '../context/reservaContext';
+import { useEspacio } from '../context/espacioContext';
+
 
 export function HomePage() {
 
   const [eventos, setEventos] = useState([]);
   const [espaciosDisponibles, setEspaciosDisponibles] = useState([]);
   const [espaciosSeleccionados, setEspaciosSeleccionados] = useState([]);
-
-
-
-  const getReservas = async () => {
-    try {
-      const responseReservas = await axios.get('http://localhost:3000/reserva/get_reservas');
-
-          // Mapear los datos a un formato compatible con FullCalendar
-      const eventosMapped = responseReservas.data.map((reserva) => ({
-        title: `${reserva.Actividad.nombre} - ${reserva.Espacio.nombre} - ${reserva.Ministerio.codigo}`, // Título del evento
-        start: reserva.fechaInicio, // Fecha de inicio
-        end: reserva.fechaFin, // Fecha de fin
-        color: colorMapping[reserva.Espacio.nombre] || '#000', // Asignar un color según el espacio
-      }));
-
-    setEventos(eventosMapped); // Actualizar el estado con los eventos mapeados
-    } catch (error) {
-      console.error('Error al obtener las reservas:', error);
-    }
-  };
-
-  const getEspacios = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/espacio/get_espacios'); // Asegúrate de que esta URL sea la correcta
-      const espacios = response.data.map((espacio) => espacio.nombre); // Asumiendo que 'nombre' es la propiedad relevante
-      setEspaciosDisponibles(espacios); // Establece los espacios disponibles en el estado
-    } catch (error) {
-      console.error('Error al obtener los espacios:', error);
-    }
-  };
-
+  const { reservas, getReservas } = useReserva();
+  const { espacios, getEspacios } = useEspacio();
 
   
   const navigate = useNavigate();
@@ -58,7 +32,13 @@ export function HomePage() {
   useEffect(() => {
     getEspacios();
     getReservas();
+
   }, []);
+
+  useEffect(() => {
+    setEventos(reservas)
+    setEspaciosDisponibles(espacios)
+  }, [reservas, espacios]);
   
   useEffect(() => {
     // Cuando se cargan los espacios disponibles, seleccionarlos todos por defecto
@@ -115,17 +95,10 @@ export function HomePage() {
   };
 
 
-  // Mapeo de colores para cada espacio
-  const colorMapping = {
-    "Aula 1": "#1E90FF",
-    "Aula 2": "#32CD32",
-    "Aula 3": "#FFD700",
-    "Salón Principal": "#FF4500",
-    "Cocina": "#8A2BE2"
-  };
+
 
   const eventosFiltrados = eventos.filter((evento) =>
-    espaciosSeleccionados.includes(evento.title.split(" - ")[1]) // Extrae el nombre del espacio del título
+    espaciosSeleccionados.includes(evento.title.split(" - ")[1])
   );
 
     // Manejar el cambio en el filtro de espacios
@@ -198,7 +171,7 @@ export function HomePage() {
               ))}
             </Select>
           </FormControl>
-
+          
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin ]}
           initialView="dayGridMonth"
