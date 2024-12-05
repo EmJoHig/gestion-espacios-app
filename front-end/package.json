@@ -28,7 +28,7 @@
     "@mui/x-date-pickers": "^7.12.0",
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.8",
-    "dayjs": "^1.11.12",
+    "dayjs": "^1.11.13",
     "dayjs-plugin-utc": "^0.1.2",
     "front-end": "file:",
     "js-cookie": "^3.0.5",

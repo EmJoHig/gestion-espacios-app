@@ -1,21 +1,30 @@
-import * as React from 'react';
+import * as React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import { CardActionArea, FormControl, InputLabel, MenuItem, Select, Checkbox, ListItemText } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import MaterialTable from '../components/MaterialTable';
-//import { useAuth } from "../context/authContext";
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import axios from 'axios';
-import { useReserva } from '../context/reservaContext';
-import { useEspacio } from '../context/espacioContext';
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  Typography,
+  CardActionArea,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Checkbox,
+  ListItemText,
+} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { useReserva } from "../context/reservaContext";
+import { useEspacio } from "../context/espacioContext";
+import { useMinisterio } from "../context/ministerioContext.jsx";
+import { useActividad } from "../context/actividadContext.jsx";
+import ReservaDialog from '../components/ReservaDialog';
+import dayjs from "dayjs";
 
 
 export function HomePage() {
@@ -23,21 +32,27 @@ export function HomePage() {
   const [eventos, setEventos] = useState([]);
   const [espaciosDisponibles, setEspaciosDisponibles] = useState([]);
   const [espaciosSeleccionados, setEspaciosSeleccionados] = useState([]);
-  const { reservas, getReservas } = useReserva();
+  const { reservas, getReservas, createReserva } = useReserva();
   const { espacios, getEspacios } = useEspacio();
+  const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
+  const { actividades, getActividades } = useActividad();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   
   const navigate = useNavigate();
 
   useEffect(() => {
     getEspacios();
-    getReservas();
+    getActividades();
+    getMinisterios();
+    getReservas();  
 
   }, []);
 
   useEffect(() => {
     setEventos(reservas)
-    setEspaciosDisponibles(espacios)
+    setEspaciosDisponibles(espacios.map((espacio) => espacio.nombre))
   }, [reservas, espacios]);
   
   useEffect(() => {
@@ -114,12 +129,79 @@ export function HomePage() {
 
   const handleClick = (property) => () => {
     const ruta = property;
-    console.log(ruta);
     navigate(ruta);
+  };
+
+
+  const handleDateClick = (info) => {
+    setSelectedDate(info.date);
+    setOpenDialog(true);
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+
+/*   const buildReservaObject = (data) => {
+    const nuevaReserva = {
+      ministerioId: data.ministerioId,
+      actividadId: data.actividadId,
+      espacioId: data.espacioId,
+      fecha: data.fecha,
+      horaInicio: data.horaInicio,
+      horaFin: data.horaFin,
+    };
+    return nuevaReserva;
+  }; */
+
+  const buildReservaObject = (data) => {
+
+    const fechaInicio = dayjs(data.fecha.$d)
+        .hour(data.horaInicio.$H)
+        .minute(data.horaInicio.$m)
+        .second(data.horaInicio.$s)
+        .toISOString(); // Convierte a formato ISO
+
+    const fechaFin = dayjs(data.fecha.$d)
+        .hour(data.horaFin.$H)
+        .minute(data.horaFin.$m)
+        .second(data.horaFin.$s)
+        .toISOString(); // Convierte a formato ISO
+
+    const reserva = {
+        espacioId: data.espacioId,
+        ministerioId: data.ministerioId,
+        actividadId: data.actividadId,
+        fechaInicio,
+        fechaFin,
+    };
+
+    console.log("Reserva construida:", reserva);
+    return reserva;
+};
+  
+  const handleSaveReserva = async (reservaData) => {
+
+    const nuevaReserva = buildReservaObject(reservaData);
+    try {
+      await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
+      await getReservas(); // Refrescar las reservas después de guardar
+      setOpenDialog(false); // Cerrar el diálogo
+    } catch (error) {
+      console.error('Error al crear la reserva:', error);
+    }
   };
 
   return (
     <>
+      <ReservaDialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        onSave={handleSaveReserva}
+        ministerios={ministerios || []}
+        actividades={actividades || []}
+        espacios={espacios || []}
+      />
       <Box sx={{ flexGrow: 1, marginTop: '20px' }}>
 
         <Typography gutterBottom variant="h5" component="div">
@@ -161,7 +243,7 @@ export function HomePage() {
               multiple
               value={espaciosSeleccionados}
               onChange={handleChange}
-              renderValue={(selected) => selected.join(', ')}
+              renderValue={(selected) =>  selected.join(', ')}
             >
               {espaciosDisponibles.map((espacio) => (
                 <MenuItem key={espacio} value={espacio}>
@@ -181,7 +263,7 @@ export function HomePage() {
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
           }}
           events={eventosFiltrados}
-          //editable={usuario.role.includes("admin")}
+          dateClick={handleDateClick}
         />
       </Box>
 
@@ -220,7 +302,7 @@ export function HomePage() {
         <Typography gutterBottom variant="h5" component="div">
           esto solo se ve si es algun tipo de administrador
         </Typography>
-          <MaterialTable />
+          {/* <MaterialTable /> */}
         </>
       )}
     </>

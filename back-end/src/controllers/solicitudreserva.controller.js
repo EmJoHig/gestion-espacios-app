@@ -1,5 +1,4 @@
 import SolicitudReserva from '../models/SolicitudReserva.js';
-import Reserva from '../models/SolicitudReserva.js';
 
 
 export const getSolicitudesReservas = async (req, res) => {

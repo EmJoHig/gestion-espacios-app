@@ -27,8 +27,8 @@ export function EspacioProvider({ children }) {
         audience: 'https://gestion-espacios/api',
       });
       const res = await getEspaciosRequest(token);
-      const espacios = res.data.map((espacio) => espacio.nombre);
-      setEspacios(espacios);
+      //const espacios = res.data.map((espacio) => espacio.nombre);
+      setEspacios(res.data);
     } catch (error) {
       console.error('Error fetching espacios:', error);
     }

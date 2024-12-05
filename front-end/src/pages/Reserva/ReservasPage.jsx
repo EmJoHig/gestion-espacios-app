@@ -29,10 +29,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 //dialog
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import dayjs from "dayjs";
 
 
 
@@ -41,6 +43,10 @@ import AddIcon from '@mui/icons-material/Add';
 
 // importo el conetxt de usuario para llamar a la api
 import { useUsuario } from "../../context/usuarioContext.jsx";
+import { useMinisterio } from "../../context/ministerioContext.jsx";
+import { useActividad } from "../../context/actividadContext.jsx";
+import { useEspacio } from '../../context/espacioContext';
+import { useReserva } from '../../context/reservaContext.jsx';
 
 //picker
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -50,28 +56,64 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 export function ReservasPage() {
     const { usuarios, getUsuarios } = useUsuario();
+    const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
+    const { actividades, getActividades } = useActividad();
+    const { espacios, getEspacios } = useEspacio();
+    const { reservas, getReservas, createReserva } = useReserva();
+
+    // Estados para los selectores
+    const [selectedMinisterio, setSelectedMinisterio] = useState('');
+    const [selectedActividad, setSelectedActividad] = useState('');
+    const [actividadesFiltradas, setActividadesFiltradas] = useState([]);
+    const [selectedEspacio, setSelectedEspacio] = useState('');
+
 
     const [valueFecha, setValueFecha] = useState(null);
+    const [horaInicio, setHoraInicio] = useState(null);
+    const [horaFin, setHoraFin] = useState(null);
 
     const navigate = useNavigate();
 
     // cuando inicia la pantalla se ejecuta 
+    // Obtener datos cuando se carga el componente
     useEffect(() => {
+        const fetchData = async () => {
+            await getMinisterios(); // Llama a la API y actualiza el contexto
+            await getActividades(); // Llama a la API y actualiza el contexto
+            await getEspacios();
+        };
+        fetchData();
     }, []);
+      
 
-    const data = [
-        { id: 110011, codigo: 'M1', descripcion: 'MINISTERIO 1', asdsad4: 'MINISTERIO 1', asddsad5: 'MINISTERIO 1', asdasdsad6: 'MINISTERIO 1' },
-        { id: 220022, codigo: 'M2', descripcion: 'MINISTERIO DOS', asdsad4: 'MINISTERIO 1', asddsad5: 'MINISTERIO 1', asdasdsad6: 'MINISTERIO 1' },
-        { id: 330033, codigo: 'M3', descripcion: 'MINISTERIO TRES', asdsad4: 'MINISTERIO 1', asddsad5: 'MINISTERIO 1', asdasdsad6: 'MINISTERIO 1' },
-        { id: 440044, codigo: 'M4', descripcion: 'MINISTERIO CUATRO', asdsad4: 'MINISTERIO 1', asddsad5: 'MINISTERIO 1', asdasdsad6: 'MINISTERIO 1' },
-    ];
-
-    const [age, setAge] = React.useState('');
-
-    const ChangeSelectMuni = (event) => {
-        setAge(event.target.value);
+    const handleEspacioChange = (event) => {
+        setSelectedEspacio(event.target.value);
     };
 
+
+    // Manejar el cambio en el selector de ministerios
+    const handleMinisterioChange = (event) => {
+        const selectedId = event.target.value;
+        console.log("aca: ", selectedId)
+        setSelectedMinisterio(selectedId);
+        // Filtrar actividades relacionadas con el ministerio seleccionado
+        const actividadesRelacionadas = actividades.filter((actividad) => actividad.ministerioId === selectedId);
+        setActividadesFiltradas(actividadesRelacionadas);
+        setSelectedActividad(''); // Reiniciar actividad seleccionada
+        console.log("act: ",actividadesRelacionadas)
+    };
+
+    // Manejar el cambio en el selector de actividades
+    const handleActividadChange = (event) => {
+        setSelectedActividad(event.target.value);
+    };
+
+    console.log("min: ", selectedMinisterio)
+    console.log("act: ", selectedActividad)
+    console.log("esp: ", selectedEspacio)
+    console.log("fecha", valueFecha)
+    console.log("horaInicio", horaInicio)
+    console.log("fechaFin", horaFin)
 
     const fabStyle = {
         position: 'absolute',
@@ -79,14 +121,6 @@ export function ReservasPage() {
         right: 16,
     };
 
-    // haz un metodo para llamar a la api y traer los datos de las solicitudes
-    const handleBuscar = async () => {
-        // const Usuarios = await getUsuarios();;
-        // console.log("Usuarios");
-        // console.log(Usuarios);
-
-        alert(valueFecha);
-    };
 
 
 
@@ -101,19 +135,58 @@ export function ReservasPage() {
         setOpen(false);
     };
 
-    const handleGuardarSolicitud = () => {
+/*     const handleGuardarSolicitud = () => {
         setOpen(false);
-    };
+    }; */
 
     
 
-    const Item = styled(Paper)(({ theme }) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-        ...theme.typography.body2,
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-    }));
+    const buildReservaObject = () => {
+        if (!valueFecha || !horaInicio || !horaFin || !selectedEspacio || !selectedMinisterio || !selectedActividad) {
+            console.error("Faltan datos para construir la reserva");
+            return;
+        }
+    
+        const fechaInicio = dayjs(valueFecha.$d)
+            .hour(horaInicio.$H)
+            .minute(horaInicio.$m)
+            .second(horaInicio.$s)
+            .toISOString(); // Convierte a formato ISO
+    
+        const fechaFin = dayjs(valueFecha.$d)
+            .hour(horaFin.$H)
+            .minute(horaFin.$m)
+            .second(horaFin.$s)
+            .toISOString(); // Convierte a formato ISO
+    
+        const reserva = {
+            espacioId: selectedEspacio,
+            ministerioId: selectedMinisterio,
+            actividadId: selectedActividad,
+            fechaInicio,
+            fechaFin,
+        };
+    
+        console.log("Reserva construida:", reserva);
+        return reserva;
+    };
+
+    const handleGuardarSolicitud = async () => {
+        const nuevaReserva = buildReservaObject();
+    
+        if (nuevaReserva) {
+            try {
+                await createReserva(nuevaReserva);
+                console.log("Reserva creada con éxito");
+                setOpen(false);
+            } catch (error) {
+                console.error("Error al crear la reserva:", error);
+            }
+        } else {
+            console.error("No se pudo construir la reserva. Verifica los datos.");
+        }
+    };
+    
 
 
 
@@ -142,6 +215,58 @@ export function ReservasPage() {
                 <DialogTitle>Nueva Solicitud de Reserva</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
+                        Selecciona un ministerio y una actividad para la nueva reserva.
+                    </DialogContentText>
+
+                    {/* Selector de Ministerios */}
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="ministerio-label">Ministerio</InputLabel>
+                        <Select
+                            labelId="ministerio-label"
+                            value={selectedMinisterio}
+                            onChange={handleMinisterioChange}
+                        >
+                            {ministerios.map((ministerio) => (
+                                <MenuItem key={ministerio.id} value={ministerio.id}>
+                                    {ministerio.codigo} - {ministerio.descripcion}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    {/* Selector de Actividades */}
+                    <FormControl fullWidth margin="normal" disabled={!selectedMinisterio}>
+                        <InputLabel id="actividad-label">Actividad</InputLabel>
+                        <Select
+                            labelId="actividad-label"
+                            value={selectedActividad}
+                            onChange={handleActividadChange}
+                        >
+                            {actividadesFiltradas.map((actividad) => (
+                                <MenuItem key={actividad.id} value={actividad.id}>
+                                    {actividad.nombre}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    {/* Selector de Espacios */}
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="espacio-label">Espacio</InputLabel>
+                        <Select
+                            labelId="espacio-label"
+                            value={selectedEspacio}
+                            onChange={handleEspacioChange}
+                        >
+                            {espacios.map((espacio) => (
+                                <MenuItem key={espacio.id} value={espacio.id}>
+                                    {espacio.nombre}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <DialogContentText>
                         {/* Please enter the start and end dates, select the days, and add any observations. */}
                     </DialogContentText>
 
@@ -149,11 +274,15 @@ export function ReservasPage() {
                         <Grid item xs={6}>
                             <div>
                                 <Typography gutterBottom variant="h6" component="div">
-                                    Fecha Inicio
+                                    Día de Reserva
                                 </Typography>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DemoContainer components={['DatePicker']}>
-                                        <DatePicker value={valueFecha} onChange={(newValue) => setValueFecha(newValue)} />
+                                        <DatePicker 
+                                            label="Seleccionar Día" 
+                                            value={valueFecha} 
+                                            onChange={(newValue) => setValueFecha(newValue)} 
+                                        />
                                     </DemoContainer>
                                 </LocalizationProvider>
                             </div>
@@ -162,18 +291,43 @@ export function ReservasPage() {
                         <Grid item xs={6}>
                             <div>
                                 <Typography gutterBottom variant="h6" component="div">
-                                    Fecha Fin
+                                    Hora Inicio
                                 </Typography>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DemoContainer components={['DatePicker']}>
-                                        <DatePicker value={valueFecha} onChange={(newValue) => setValueFecha(newValue)} />
+                                    <DemoContainer components={['TimePicker']}>
+                                        <TimePicker 
+                                            label="Hora Inicio" 
+                                            value={horaInicio} 
+                                            onChange={(newValue) => {
+                                                setHoraInicio(newValue);
+                                                // Ajusta automáticamente la hora de fin
+                                                setHoraFin(newValue?.add(1, 'hour'));
+                                            }} 
+                                        />
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                            </div>
+                        </Grid>
+
+                        <Grid item xs={6} style={{ marginTop: '20px' }}>
+                            <div>
+                                <Typography gutterBottom variant="h6" component="div">
+                                    Hora Fin
+                                </Typography>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['TimePicker']}>
+                                        <TimePicker 
+                                            label="Hora Fin" 
+                                            value={horaFin} 
+                                            onChange={(newValue) => setHoraFin(newValue)} 
+                                        />
                                     </DemoContainer>
                                 </LocalizationProvider>
                             </div>
                         </Grid>
                     </Grid>
 
-                    <Grid container rowSpacing={1} style={{ marginTop: '20px' }}>
+{/*                     <Grid container rowSpacing={1} style={{ marginTop: '20px' }}>
                         <Grid item xs={6}>
                             <Typography gutterBottom variant="h6" component="div">
                                 Periodicidad
@@ -188,9 +342,9 @@ export function ReservasPage() {
                                 />
                             ))}
                         </Grid>
-                    </Grid>
+                    </Grid> */}
 
-                    <TextField
+{/*                     <TextField
                         margin="dense"
                         id="observacion"
                         name="observacion"
@@ -198,7 +352,7 @@ export function ReservasPage() {
                         type="text"
                         fullWidth
                         variant="standard"
-                    />
+                    /> */}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancelar</Button>

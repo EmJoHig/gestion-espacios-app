@@ -1,11 +1,11 @@
-import Usuario from "../models/Usuario.js";
+import Rol from "../models/Rol.js";
 
-export const createAdminUser = async () => {
-  const userFound = await Usuario.findOne({
-    where: { email: "admin@localhost.com" },
+export const createRoles = async () => {
+  const RolAdmin = await Rol.findOne({
+    where: { name: "admin" },
   });
 
-  if (userFound) return;
+  if (RolAdmin) return;
 
   const newUser = new Usuario({
     username: "admin",

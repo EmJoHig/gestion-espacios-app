@@ -8,37 +8,10 @@ import { AUTH0_TOKEN } from "../config.js";
 
 export const getRolesPorUsuario = async (req, res) => {
     try {
-        // const authHeader = req.headers.authorization;
-
-        // if (!authHeader) {
-        //     return res.status(401).json({ message: 'Token no proporcionado' });
-        // }
-
-        // const token = authHeader.split(' ')[1];
-
-        // const { userID } = req.body;
-
-        // const response = await axios.get(
-        //     `https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/users/${userID}/roles`,
-        //     {
-        //         headers: {
-        //             Authorization: `Bearer ${AUTH0_TOKEN}`,
-        //         }
-        //     }
-        // );
 
         const roles = await Rol.findAll();
         res.status(200).json(roles);
-
-        // if(response != null && response.status == 200){
-            
-        //     // const roles = await Rol.findAll();
-        //     // res.status(200).json(roles);
-            
-        // }else{
-        //     res.status(500).json({ message: 'Ha ocurrido un error al obtener roles' });
-        // }
-
+        
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Ha ocurrido un error al obtener roles' });
