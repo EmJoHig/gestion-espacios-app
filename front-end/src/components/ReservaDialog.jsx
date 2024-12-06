@@ -16,7 +16,7 @@ import {
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
-export default function ReservaDialog({ open, onClose, onSave, ministerios, actividades, espacios, selectedDate  }) {
+export default function ReservaDialog({ open, onClose, onSave, ministerios, actividades, espacios, selectedDate, errorMessage  }) {
       // Estados para los selectores
   const [selectedMinisterio, setSelectedMinisterio] = useState('');
   const [selectedActividad, setSelectedActividad] = useState('');
@@ -65,6 +65,11 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ component: 'form', onSubmit: handleSubmit }}>
       <DialogTitle>Nueva Reserva</DialogTitle>
+      {errorMessage && (
+                        <Typography color="error" variant="body2" style={{ marginBottom: '10px' }}>
+                            {errorMessage}
+                        </Typography>
+                    )}
       <DialogContent>
                             {/* Selector de Ministerios */}
                             <FormControl fullWidth margin="normal">

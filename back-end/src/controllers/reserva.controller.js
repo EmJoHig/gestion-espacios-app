@@ -2,6 +2,7 @@ import Reserva from '../models/Reserva.js';
 import Espacio from '../models/Espacio.js';
 import Ministerio from '../models/Ministerio.js';
 import Actividad from "../models/Actividad.js";
+import { Op } from 'sequelize';
 Reserva.associate();
 
 
@@ -64,6 +65,44 @@ export const createReserva = async (req, res) => {
         console.log(req.body);
         const { espacioId, ministerioId, actividadId, fechaInicio, fechaFin } = req.body;
 
+       // Verificar si ya existe una reserva para el mismo espacio en el rango de fechas
+       const reservasConflicto = await Reserva.findOne({
+            where: {
+                espacioId,
+                [Op.or]: [
+                    {
+                        fechaInicio: {
+                            [Op.between]: [fechaInicio, fechaFin],
+                        },
+                    },
+                    {
+                        fechaFin: {
+                            [Op.between]: [fechaInicio, fechaFin],
+                        },
+                    },
+                    {
+                        [Op.and]: [
+                            {
+                                fechaInicio: {
+                                    [Op.lte]: fechaInicio,
+                                },
+                            },
+                            {
+                                fechaFin: {
+                                    [Op.gte]: fechaFin,
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+        });
+
+        if (reservasConflicto) {
+            return res.status(400).json({ message: 'Ya existe una reserva para este espacio en el rango de fechas indicado.' });
+        }
+       
+       
         // Crear el nuevo espacio
         const nuevaReserva = await Reserva.create({
             espacioId, ministerioId,actividadId, fechaInicio, fechaFin

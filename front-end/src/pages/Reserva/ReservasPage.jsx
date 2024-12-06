@@ -66,6 +66,8 @@ export function ReservasPage() {
     const [selectedActividad, setSelectedActividad] = useState('');
     const [actividadesFiltradas, setActividadesFiltradas] = useState([]);
     const [selectedEspacio, setSelectedEspacio] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+
 
 
     const [valueFecha, setValueFecha] = useState(null);
@@ -176,14 +178,20 @@ export function ReservasPage() {
     
         if (nuevaReserva) {
             try {
-                await createReserva(nuevaReserva);
-                console.log("Reserva creada con éxito");
-                setOpen(false);
+                const result = await createReserva(nuevaReserva);
+                console.log("ResrvPag",result)
+                if (!result.success) {
+                    setErrorMessage(result.message || "No se pudo crear la reserva. Intente nuevamente.");
+                } else {
+                    setErrorMessage(""); // Limpia cualquier mensaje previo
+                    setOpen(false); // Cierra el diálogo si la operación fue exitosa
+                }
             } catch (error) {
                 console.error("Error al crear la reserva:", error);
+                setErrorMessage("Ocurrió un error inesperado. Intente nuevamente.");
             }
         } else {
-            console.error("No se pudo construir la reserva. Verifica los datos.");
+            setErrorMessage("Por favor complete todos los campos.");
         }
     };
     
@@ -214,6 +222,11 @@ export function ReservasPage() {
             >
                 <DialogTitle>Nueva Solicitud de Reserva</DialogTitle>
                 <DialogContent>
+                    {errorMessage && (
+                        <Typography color="error" variant="body2" style={{ marginBottom: '10px' }}>
+                            {errorMessage}
+                        </Typography>
+                    )}
                     <DialogContentText>
                         Selecciona un ministerio y una actividad para la nueva reserva.
                     </DialogContentText>
@@ -356,7 +369,7 @@ export function ReservasPage() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancelar</Button>
-                    <Button type="submit" onClick={handleGuardarSolicitud}>Guardar</Button>
+                    <Button onClick={handleGuardarSolicitud}>Guardar</Button>
                 </DialogActions>
             </Dialog>
 

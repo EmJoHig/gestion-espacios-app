@@ -38,7 +38,7 @@ export function HomePage() {
   const { actividades, getActividades } = useActividad();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-
+  const [errorMessage, setErrorMessage] = useState('');
   
   const navigate = useNavigate();
 
@@ -184,9 +184,13 @@ export function HomePage() {
 
     const nuevaReserva = buildReservaObject(reservaData);
     try {
-      await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
-      await getReservas(); // Refrescar las reservas después de guardar
-      setOpenDialog(false); // Cerrar el diálogo
+      const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
+      if (!res.success) {
+        setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
+      }else {
+        await getReservas(); // Refrescar las reservas después de guardar
+        setOpenDialog(false); // Cerrar el diálogo
+      }  
     } catch (error) {
       console.error('Error al crear la reserva:', error);
     }
@@ -201,6 +205,8 @@ export function HomePage() {
         ministerios={ministerios || []}
         actividades={actividades || []}
         espacios={espacios || []}
+        selectedDate={selectedDate}
+        errorMessage={errorMessage}
       />
       <Box sx={{ flexGrow: 1, marginTop: '20px' }}>
 

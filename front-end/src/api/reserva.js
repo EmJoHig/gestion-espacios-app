@@ -33,7 +33,32 @@ export const getReservasRequest = async (token) => {
 
 
 
-export const createReservaRequest = async (reserva) => axios.post("http://localhost:3000/reserva/nueva_reserva", reserva);
+//export const createReservaRequest = async (reserva) => axios.post("http://localhost:3000/reserva/nueva_reserva", reserva);
+
+export const createReservaRequest = async (reserva) => {
+  try {
+      const response = await axios.post("http://localhost:3000/reserva/nueva_reserva", reserva);
+      return {
+        success: true,
+        message: response.data.message
+      }
+  } catch (error) {
+      // Manejo del error
+      if (error.response) {
+          // Error de respuesta del servidor
+          return {
+              success: false,
+              message: error.response.data.message || 'Error al crear la reserva.',
+          };
+      } else {
+          // Otro tipo de error (network, etc.)
+          return {
+              success: false,
+              message: 'Error de conexión. Por favor, inténtalo más tarde.',
+          };
+      }
+  }
+};
 
 export const updateReservaRequest = async (reserva) => axios.put(`http://localhost:3000/reserva/editar_reserva/${reserva.id}`, reserva);
 
