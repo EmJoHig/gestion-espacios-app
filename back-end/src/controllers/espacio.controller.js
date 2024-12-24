@@ -47,7 +47,7 @@ export const createEspacio = async (req, res) => {
     });
 
     // Enviar una respuesta al cliente con la espacio nueva.
-    res.status(201).json(nuevoEspacio);
+    res.status(200).json(nuevoEspacio);
   } catch (error) {
     console.error("Error al crear el espacio:", error);
     res

@@ -1,8 +1,12 @@
 import Actividad from "../models/Actividad.js";
+import Ministerio from "../models/Ministerio.js";
+
 
 export const getActividades = async (req, res) => {
   try {
-    const actividades = await Actividad.findAll();
+
+    const actividades = await Actividad.findAll({ include: [{ model: Ministerio, as: 'ministerio' }] });
+
     // Enviar una respuesta al cliente
     res.status(200).json(actividades);
   } catch (error) {
@@ -33,8 +37,6 @@ export const getActividadById = async (req, res) => {
 
 export const createActividad = async (req, res) => {
   try {
-    console.log("req.body");
-    console.log(req.body);
 
     const { nombre, descripcion, ministerioId } = req.body;
 
@@ -46,7 +48,7 @@ export const createActividad = async (req, res) => {
     });
 
     // Enviar una respuesta al cliente con la actividad nueva.
-    res.status(201).json(nuevaActividad);
+    res.status(200).json(nuevaActividad);
   } catch (error) {
     console.error("Error al crear la actividad:", error);
     res

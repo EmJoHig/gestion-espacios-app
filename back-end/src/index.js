@@ -17,25 +17,18 @@ async function main() {
     console.log("conexion exitosa");
 
     await Rol.sync({ alter: false });
-    console.log("Tabla 'rol' sincronizada");
 
     await Usuario.sync({ alter: false }); // alter en false para no pisar las tablas
-    console.log("Tabla 'users' sincronizada");
 
     await Ministerio.sync({ alter: false });
-    console.log("Tabla 'ministerio' sincronizada");
 
     await Recurso.sync({ alter: false });
-    console.log("Tabla 'Recurso' sincronizada");
 
     await Actividad.sync({ alter: false });
-    console.log("Tabla 'actividad' sincronizada");
 
     await EstadoEspacio.sync({ alter: false });
-    console.log("Tabla 'estado_espacio' sincronizada");
 
     await Espacio.sync({ alter: false });
-    console.log("Tabla 'espacio' sincronizada");
   } catch (error) {
     console.log("error en la conexion", error);
   }

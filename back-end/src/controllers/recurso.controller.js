@@ -41,7 +41,7 @@ export const createRecurso = async (req, res) => {
             cantidad
         });
 
-        res.status(201).json(nuevoRecurso);     
+        res.status(200).json(nuevoRecurso);     
     } catch (error) {
         console.error('Error al crear el recurso:', error);
         res.status(500).json({ message: 'Ha ocurrido un error al crear el Recurso' });

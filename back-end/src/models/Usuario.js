@@ -44,7 +44,7 @@ Usuario.init({
       model: Rol,
       key: 'id'
     },
-    allowNull: false,
+    allowNull: true,
     field: 'id_rol'
   },
   ministerioId: {  // Clave foránea hacia Rol
@@ -53,12 +53,12 @@ Usuario.init({
       model: Ministerio,
       key: 'id'
     },
-    allowNull: false,
+    allowNull: true,
     field: 'ministerioId'
   },
   idUsuarioAUTH0: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
     unique: true,  // Asegura que sea único para cada usuario
     field: 'id_usuario_auth0'
   }

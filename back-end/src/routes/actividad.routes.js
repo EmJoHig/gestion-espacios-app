@@ -22,8 +22,8 @@ const jwtCheck = auth({
 // router.get('/', authenticateToken, getUsers);
 router.get("/get_actividades", jwtCheck, getActividades);
 router.get("/:id", getActividadById);
-router.post("/nueva_actividad", createActividad);
-router.put("/editar_actividad/:id", updateActividad);
-router.delete("/eliminar_actividad/:id", deleteActividad);
+router.post("/nueva_actividad", jwtCheck, createActividad);
+router.put("/editar_actividad/:id", jwtCheck, updateActividad);
+router.delete("/eliminar_actividad/:id", jwtCheck, deleteActividad);
 
 export default router;

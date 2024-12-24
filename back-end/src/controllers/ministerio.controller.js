@@ -45,7 +45,7 @@ export const createMinisterio = async (req, res) => {
         });
 
         // Enviar una respuesta al cliente con el ministerio creado
-        res.status(201).json(nuevoMinisterio);
+        res.status(200).json(nuevoMinisterio);
     } catch (error) {
         console.error('Error al crear el ministerio:', error);
         res.status(500).json({ message: 'Ha ocurrido un error al crear el Ministerio' });
