@@ -22,7 +22,7 @@ const jwtCheck = auth({
 
 
 // router.get('/', authenticateToken, getUsers);
-router.get('/get_ministerios', jwtCheck, getMinisterios);
+router.get('/get_ministerios', getMinisterios);
 router.get('/:id', getMinisterioById);
 router.post('/nuevo_ministerio', createMinisterio);
 router.put('/editar_ministerio/:id', updateMinisterio);

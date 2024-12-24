@@ -12,6 +12,8 @@ import { MinisterioProvider } from "./context/ministerioContext";
 import { UsuarioProvider } from "./context/usuarioContext";
 import { RolProvider } from "./context/rolContext";
 import { RecursoProvider } from "./context/recursoContext";
+import { ReservaProvider } from "./context/reservaContext";
+import { EspacioProvider } from "./context/espacioContext";
 import { ActividadProvider } from "./context/actividadContext";
 
 // vistas
@@ -35,24 +37,26 @@ import { UsuarioPage } from "./pages/Usuario/UsuarioPage";
 function App() {
   return (
     // <AuthProvider>
-    <ActividadProvider>
-      <RecursoProvider>
-        <MinisterioProvider>
-          <RolProvider>
-            <UsuarioProvider>
-              <BrowserRouter>
-                <CssBaseline />
+    <RecursoProvider>
+      <MinisterioProvider>
+        <RolProvider>
+          <UsuarioProvider>
+            <ReservaProvider>
+              <EspacioProvider>
+                <ActividadProvider>
+                  <BrowserRouter>
+                    <CssBaseline />
 
-                <main className="">
-                  <MaterialAppBar />
+                    <main className="">
+                      <MaterialAppBar />
 
-                  <Container fixed>
-                    <Routes>
-                      <Route path="/" element={<WelcomePage />} />
-                      {/* <Route path="/login" element={<LoginPage />} /> */}
-                      {/* <Route path="/register" element={<RegisterPage />} /> */}
+                      <Container fixed>
+                        <Routes>
+                          <Route path="/" element={<WelcomePage />} />
+                          {/* <Route path="/login" element={<LoginPage />} /> */}
+                          {/* <Route path="/register" element={<RegisterPage />} /> */}
 
-                      <Route element={<ProtectedRoute />}>
+                          <Route element={<ProtectedRoute />}>
 
                         <Route path="/home" element={<HomePage />} />
                         <Route path="/ministerio" element={<MinisterioPage />} />
@@ -69,17 +73,19 @@ function App() {
                       <Route path="/tasks/:id" element={<TaskFormPage />} />
                       <Route path="/profile" element={<h1>Profile</h1>} /> */}
 
-                      </Route>
-                    </Routes>
-                  </Container>
+                          </Route>
+                        </Routes>
+                      </Container>
 
-                </main>
-              </BrowserRouter>
-            </UsuarioProvider>
-          </RolProvider>
-        </MinisterioProvider>
-      </RecursoProvider>
-    </ActividadProvider>
+                    </main>
+                  </BrowserRouter>
+                </ActividadProvider>
+              </EspacioProvider>
+            </ReservaProvider>
+          </UsuarioProvider>
+        </RolProvider>
+      </MinisterioProvider>
+    </RecursoProvider>
     // </AuthProvider>
   );
 }

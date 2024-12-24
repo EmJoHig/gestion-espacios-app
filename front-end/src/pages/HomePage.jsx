@@ -1,54 +1,68 @@
-import * as React from 'react';
+import * as React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import { ImFileEmpty } from "react-icons/im";
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import { CardActionArea, FormControl, InputLabel, MenuItem, Select, Checkbox, ListItemText } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import img1 from '../assets/municipalidad.jpg';
-import img2 from '../assets/responsables.jpg';
-import MaterialTable from '../components/MaterialTable';
-import { useAuth } from "../context/authContext";
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  Typography,
+  CardActionArea,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Checkbox,
+  ListItemText,
+} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { useReserva } from "../context/reservaContext";
+import { useEspacio } from "../context/espacioContext";
+import { useMinisterio } from "../context/ministerioContext.jsx";
+import { useActividad } from "../context/actividadContext.jsx";
+import ReservaDialog from '../components/ReservaDialog';
+import dayjs from "dayjs";
 import { useAuth0 } from "@auth0/auth0-react";
 
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
-
 export function HomePage() {
-  // const [usuario, setUsuario] = useState(null);
+
+  const [eventos, setEventos] = useState([]);
+  const [espaciosDisponibles, setEspaciosDisponibles] = useState([]);
+  const [espaciosSeleccionados, setEspaciosSeleccionados] = useState([]);
+  const { reservas, getReservas, createReserva } = useReserva();
+  const { espacios, getEspacios } = useEspacio();
+  const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
+  const { actividades, getActividades } = useActividad();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  
   const { user } = useAuth0();
 
-  
   const navigate = useNavigate();
 
   useEffect(() => {
-    
-    // setUsuario(_usuario);
-    // console.log("aca estoy en el home");
-    // console.log("user");
-    // console.log(user);
-
+    getEspacios();
+    getActividades();
+    getMinisterios();
+    getReservas();  
 
   }, []);
 
-
-
+  useEffect(() => {
+    setEventos(reservas)
+    setEspaciosDisponibles(espacios.map((espacio) => espacio.nombre))
+  }, [reservas, espacios]);
+  
+  useEffect(() => {
+    // Cuando se cargan los espacios disponibles, seleccionarlos todos por defecto
+    if (espaciosDisponibles.length > 0) {
+      setEspaciosSeleccionados(espaciosDisponibles);
+    }
+  }, [espaciosDisponibles]);
 
   const usuario = {
     username: "Belthier",
@@ -108,51 +122,104 @@ export function HomePage() {
   };
 
 
-  // Mapeo de colores para cada espacio
-  const colorMapping = {
-    "Aula 1": "#1E90FF",
-    "Aula 2": "#32CD32",
-    "Aula 3": "#FFD700",
-    "Salón Principal": "#FF4500",
-    "Cocina": "#8A2BE2"
+
+
+  const eventosFiltrados = eventos.filter((evento) =>
+    espaciosSeleccionados.includes(evento.title.split(" - ")[1])
+  );
+
+    // Manejar el cambio en el filtro de espacios
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setEspaciosSeleccionados(
+      typeof value === "string" ? value.split(",") : value
+    );
   };
 
-  // Configuración de eventos con color asignado
-  const events = [
-    { title: 'Reserva Aula 1', start: '2024-11-01T10:00:00', end: '2024-11-01T12:00:00', espacio: 'Aula 1', color: colorMapping["Aula 1"] },
-    { title: 'Reserva Aula 2', start: '2024-11-02T14:00:00', end: '2024-11-02T15:30:00', espacio: 'Aula 2', color: colorMapping["Aula 2"] },
-    { title: 'Reserva Salón Principal', start: '2024-11-03T09:00:00', end: '2024-11-03T11:00:00', espacio: 'Salón Principal', color: colorMapping["Salón Principal"] },
-    { title: 'Reserva Cocina', start: '2024-11-04T16:00:00', end: '2024-11-04T18:00:00', espacio: 'Cocina', color: colorMapping["Cocina"] },
-    { title: 'Reserva Aula 3', start: '2024-11-05T13:00:00', end: '2024-11-05T15:00:00', espacio: 'Aula 3', color: colorMapping["Aula 3"] }
-  ];
 
-    // Espacios disponibles para filtrar
-    const espaciosDisponibles = Object.keys(colorMapping);
-
-    // Estado para el filtro de espacios seleccionados
-    const [espaciosSeleccionados, setEspaciosSeleccionados] = useState(espaciosDisponibles);
-  
-    // Manejar el cambio en el filtro de espacios
-    const handleChange = (event) => {
-      const {
-        target: { value },
-      } = event;
-      setEspaciosSeleccionados(typeof value === 'string' ? value.split(',') : value);
-    };
-  
-    // Filtrar eventos según los espacios seleccionados
-    const eventosFiltrados = events.filter((event) => espaciosSeleccionados.includes(event.espacio));
-  
-
-
-  const handleClick = (property) => (event) => {
+  const handleClick = (property) => () => {
     const ruta = property;
-    console.log(ruta);
     navigate(ruta);
+  };
+
+
+  const handleDateClick = (info) => {
+    setSelectedDate(info.date);
+    setOpenDialog(true);
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+
+/*   const buildReservaObject = (data) => {
+    const nuevaReserva = {
+      ministerioId: data.ministerioId,
+      actividadId: data.actividadId,
+      espacioId: data.espacioId,
+      fecha: data.fecha,
+      horaInicio: data.horaInicio,
+      horaFin: data.horaFin,
+    };
+    return nuevaReserva;
+  }; */
+
+  const buildReservaObject = (data) => {
+
+    const fechaInicio = dayjs(data.fecha.$d)
+        .hour(data.horaInicio.$H)
+        .minute(data.horaInicio.$m)
+        .second(data.horaInicio.$s)
+        .toISOString(); // Convierte a formato ISO
+
+    const fechaFin = dayjs(data.fecha.$d)
+        .hour(data.horaFin.$H)
+        .minute(data.horaFin.$m)
+        .second(data.horaFin.$s)
+        .toISOString(); // Convierte a formato ISO
+
+    const reserva = {
+        espacioId: data.espacioId,
+        ministerioId: data.ministerioId,
+        actividadId: data.actividadId,
+        fechaInicio,
+        fechaFin,
+    };
+
+    console.log("Reserva construida:", reserva);
+    return reserva;
+};
+  
+  const handleSaveReserva = async (reservaData) => {
+
+    const nuevaReserva = buildReservaObject(reservaData);
+    try {
+      const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
+      if (!res.success) {
+        setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
+      }else {
+        await getReservas(); // Refrescar las reservas después de guardar
+        setOpenDialog(false); // Cerrar el diálogo
+      }  
+    } catch (error) {
+      console.error('Error al crear la reserva:', error);
+    }
   };
 
   return (
     <>
+      <ReservaDialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        onSave={handleSaveReserva}
+        ministerios={ministerios || []}
+        actividades={actividades || []}
+        espacios={espacios || []}
+        selectedDate={selectedDate}
+        errorMessage={errorMessage}
+      />
       <Box sx={{ flexGrow: 1, marginTop: '20px' }}>
 
         <Typography gutterBottom variant="h5" component="div">
@@ -167,16 +234,9 @@ export function HomePage() {
           )}
 
           {usuario.modulos.map((modulo) => (
-            <Grid item xs={3}>
+            <Grid item xs={3} key={modulo.codigo}>
               <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={handleClick(modulo.ruta)}>
                 <CardActionArea>
-                  {/* <CardMedia
-                    id={modulo.id}
-                    component="img"
-                    height="140"
-                    image={img2}
-                    alt="green iguana"
-                  /> */}
                   <CardContent>
                     <Typography gutterBottom variant="h6" component="div">
                       {modulo.descripcion}
@@ -196,22 +256,22 @@ export function HomePage() {
 
          {/* Select para filtrar espacios */}
          <FormControl sx={{ m: 1, width: 300 }}>
-          <InputLabel>Espacios</InputLabel>
-          <Select
-            multiple
-            value={espaciosSeleccionados}
-            onChange={handleChange}
-            renderValue={(selected) => selected.join(', ')}
-          >
-            {espaciosDisponibles.map((espacio) => (
-              <MenuItem key={espacio} value={espacio}>
-                <Checkbox checked={espaciosSeleccionados.includes(espacio)} />
-                <ListItemText primary={espacio} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
+            <InputLabel>Espacios</InputLabel>
+            <Select
+              multiple
+              value={espaciosSeleccionados}
+              onChange={handleChange}
+              renderValue={(selected) =>  selected.join(', ')}
+            >
+              {espaciosDisponibles.map((espacio) => (
+                <MenuItem key={espacio} value={espacio}>
+                  <Checkbox checked={espaciosSeleccionados.includes(espacio)} />
+                  <ListItemText primary={espacio} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin ]}
           initialView="dayGridMonth"
@@ -221,7 +281,7 @@ export function HomePage() {
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
           }}
           events={eventosFiltrados}
-          //editable={usuario.role.includes("admin")}
+          dateClick={handleDateClick}
         />
       </Box>
 
@@ -260,28 +320,9 @@ export function HomePage() {
         <Typography gutterBottom variant="h5" component="div">
           esto solo se ve si es algun tipo de administrador
         </Typography>
-          <MaterialTable />
+          {/* <MaterialTable /> */}
         </>
       )}
-
-
-
-      {/* {tasks.length === 0 && (
-        <div className="flex justify-center items-center p-10">
-          <div>
-            <ImFileEmpty className="text-6xl text-gray-400 m-auto my-2" />
-            <h1 className="font-bold text-xl">
-              No tasks yet, please add a new task
-            </h1>
-          </div>
-        </div>
-      )}
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
-        {tasks.map((task) => (
-          <TaskCard task={task} key={task._id} />
-        ))}
-      </div> */}
     </>
   );
 }

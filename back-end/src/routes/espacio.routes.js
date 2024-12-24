@@ -19,8 +19,8 @@ const jwtCheck = auth({
   tokenSigningAlg: "RS256",
 });
 
-// router.get('/', authenticateToken, getUsers);
-router.get("/get_espacios", jwtCheck, getEspacios);
+
+router.get("/get_espacios", getEspacios);
 router.get("/:id", getEspacioById);
 router.post("/nuevo_espacio", createEspacio);
 router.put("/editar_espacio/:id", updateEspacio);

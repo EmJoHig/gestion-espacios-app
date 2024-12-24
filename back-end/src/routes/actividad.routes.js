@@ -19,8 +19,7 @@ const jwtCheck = auth({
   tokenSigningAlg: "RS256",
 });
 
-// router.get('/', authenticateToken, getUsers);
-router.get("/get_actividades", jwtCheck, getActividades);
+router.get("/get_actividades", getActividades);
 router.get("/:id", getActividadById);
 router.post("/nueva_actividad", jwtCheck, createActividad);
 router.put("/editar_actividad/:id", jwtCheck, updateActividad);

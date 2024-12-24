@@ -37,13 +37,6 @@ export function MinisterioPage() {
         getMinisterios();
     }, []);
 
-    // const data = [
-    //     { id: 1, codigo: 'M1', descripcion: 'MINISTERIO 1' },
-    //     { id: 2, codigo: 'M2', descripcion: 'MINISTERIO DOS' },
-    //     { id: 3, codigo: 'M3', descripcion: 'MINISTERIO TRES' },
-    //     { id: 4, codigo: 'M4', descripcion: 'MINISTERIO CUATRO' },
-    // ];
-
     const [age, setAge] = React.useState('');
 
     const ChangeSelectMuni = (event) => {

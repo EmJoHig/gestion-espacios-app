@@ -86,16 +86,16 @@ Usuario.belongsTo(Ministerio, {
 
 
 // Hooks para encriptar la contraseña antes de guardar
-// Usuario.addHook('beforeCreate', async (user) => {
-//   if (user.password) {
-//     user.password = await user.encryptPassword(user.password);
-//   }
-// });
+ Usuario.addHook('beforeCreate', async (user) => {
+   if (user.password) {
+     user.password = await user.encryptPassword(user.password);
+   }
+ });
 
-// Usuario.addHook('beforeUpdate', async (user) => {
-//   if (user.password) {
-//     user.password = await user.encryptPassword(user.password);
-//   }
-// });
+ Usuario.addHook('beforeUpdate', async (user) => {
+   if (user.password) {
+     user.password = await user.encryptPassword(user.password);
+   }
+ });
 
 export default Usuario;
