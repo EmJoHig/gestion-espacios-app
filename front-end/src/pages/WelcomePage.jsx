@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, Fragment } from "react";
 import { useMinisterio } from "../context/ministerioContext";
+import { useUsuario } from "../context/usuarioContext";
 import Button from '@mui/material/Button';
 import MaterialAppBar from "../components/MaterialAppBar";
 import MaterialTable from "../components/MaterialTable";
@@ -10,6 +11,8 @@ import { useAuth0 } from "@auth0/auth0-react";
 function WelcomePage() {
 
   const { ministerios, getMinisterios } = useMinisterio();
+  const { getUsuarioAuth0 } = useUsuario();
+
   const navigate = useNavigate();
 
   //auth0
@@ -17,8 +20,9 @@ function WelcomePage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log("USUARIO DATOS AUTH0");
-      console.log(user);
+      //console.log("USUARIO DATOS AUTH0");
+      //console.log(user);
+      getUsuarioAuth0(user);
       navigate("/home");
     }
   }, [isAuthenticated]);

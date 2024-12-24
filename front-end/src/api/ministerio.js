@@ -29,3 +29,39 @@ export const updateMinisterioRequest = async (ministerio) => axios.put(`http://l
 export const deleteMinisterioRequest = async (id) => axios.delete(`http://localhost:3000/ministerio/eliminar_ministerio/${id}`);
 
 // export const getMinisterioRequest = async (id) => axios.get(`http://localhost:3000/ministerio/${id}`);
+
+
+export const asociarResponsableAMinistRequest = async (token, bodyUsuarioMinist) => {
+ 
+    // console.log('llega el body', bodyUsuarioRol);
+    try {
+        const response = await axios.post("http://localhost:3000/ministerio/asociar_responsable_ministerio", bodyUsuarioMinist, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        
+        return response;
+    } catch (error) {
+        console.error('Error createRolRequest: ', error);
+        throw error;
+    }
+}
+
+
+export const GetActividadesMinisterioRequest = async (token, bodyIdMinisterio) => {
+ 
+    console.log('llega el body', bodyIdMinisterio);
+    // try {
+    //     const response = await axios.post("http://localhost:3000/ministerio/get_actividades_de_ministerio", bodyIdMinisterio, {
+    //         headers: {
+    //             Authorization: `Bearer ${token}`,
+    //         },
+    //     });
+        
+    //     return response;
+    // } catch (error) {
+    //     console.error('Error createRolRequest: ', error);
+    //     throw error;
+    // }
+}

@@ -29,29 +29,32 @@ import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAuth0 } from "@auth0/auth0-react";
 
-import TablaAsociarRolUsuario from './TablaAsociarRolUsuario';
-import RenderizarDialogEditarRolUsuario from './RenderizarDialogEditarRolUsuario';
-import { useRol } from "../../context/rolContext";
+import TablaAsociarMinisteroUsuario from '../Ministerio/TablaAsociarMinisteroUsuario';
+import DialogEditarMinisterioUsuario from '../Ministerio/DialogEditarMinisterioUsuario';
+import { useMinisterio } from "../../context/ministerioContext";
 import { useUsuario } from "../../context/usuarioContext";
 
-export function AsociarRolesPage() {
+
+export function AsociarRespAMinisterioPage() {
 
     const { user } = useAuth0();
     const navigate = useNavigate();
 
-    const { roles, getRolesPorUsuario, createRol, updateRol, deleteRol, AsociarRolAlUsuario } = useRol();
+    // const { ministerios, getMinisterios, createMinisterio, updateMinisterio, deleteMinisterio, AsociarMinisterioAlUsuario } = useMinisterio();
     const { usuarios, getUsuarios, createUsuario, updateUsuario, deleteUsuario } = useUsuario();
 
+    const { ministerios, getMinisterios, AsociarResponsableAMinist } = useMinisterio();
+
     const [rolesUsuarioAUTH0, setRolesUsuarioAUTH0] = useState([]);
-    const [usuarioRolEdicion, setUsuarioRolEdicion] = React.useState(null);
+    const [usuarioMinisterioEdicion, setUsuarioMinisterioEdicion] = React.useState(null);
     const [openEdit, setOpenEdit] = React.useState(false);
 
-    const [idRolSelect, setRolSelect] = React.useState('');
+    const [idMinisterioSelect, setMinisterioSelect] = React.useState('');
 
 
     const bodyRequest = {
         idUsuario: null,
-        idRol: null
+        idMinisterio: null
     };
 
 
@@ -70,10 +73,10 @@ export function AsociarRolesPage() {
             label: 'Email',
         },
         {
-            id: 'rol',
+            id: 'ministerio',
             numeric: true,
             disablePadding: false,
-            label: 'Rol',
+            label: 'Ministerio',
         },
         {
             id: 'accion',
@@ -85,22 +88,22 @@ export function AsociarRolesPage() {
 
 
     useEffect(() => {
-        getRolesPorUsuario();
+        getMinisterios();
         getUsuarios();
-        if (user && user["https://gestion-espacios/roles"]) {
-            const rolesFromUser = user["https://gestion-espacios/roles"];
-            setRolesUsuarioAUTH0(rolesFromUser);
-        }
+        // if (user && user["https://gestion-espacios/roles"]) {
+        //     const rolesFromUser = user["https://gestion-espacios/roles"];
+        //     setRolesUsuarioAUTH0(rolesFromUser);
+        // }
     }, []);//[user]
 
 
     //metodo que envia los datos de la fila seleccionada para editar
     const handleObtenerRow = (usuario) => {
-        // console.log("Datos del usuario seleccionado:", usuario);
+        //console.log("Datos del usuario seleccionado:", usuario);
 
         //Datos del usuario seleccionado
-        setUsuarioRolEdicion(usuario);
-        setRolSelect(usuario.rolId ? usuario.rolId : "");
+        setUsuarioMinisterioEdicion(usuario);
+        setMinisterioSelect(usuario.ministerioId ? usuario.ministerioId : "");
         handleClickOpenEdit();
     };
 
@@ -114,18 +117,16 @@ export function AsociarRolesPage() {
         setOpenEdit(false);
     };
 
-    const handleSubmitEdit = async (rolid) => {
+    const handleSubmitEdit = async (ministerioid) => {
         try {
-            // console.log("rolid: ", rolid);
-            bodyRequest.idUsuario = usuarioRolEdicion.id;
-            bodyRequest.idRol = rolid;
-
+            bodyRequest.idUsuario = usuarioMinisterioEdicion.id;
+            bodyRequest.idMinisterio = ministerioid;
             // console.log("body a editar:", bodyRequest);
-            await AsociarRolAlUsuario(bodyRequest);
+            await AsociarResponsableAMinist(bodyRequest);
             await getUsuarios();
             handleCloseEdit();
         } catch (error) {
-            console.error('Error al editar el rol:', error);
+            console.error('Error al editar el ministerio:', error);
         }
     };
 
@@ -137,34 +138,34 @@ export function AsociarRolesPage() {
         <>
             <Box sx={{ marginTop: '50px' }}>
                 <Typography gutterBottom variant="h5" component="div">
-                    Asociar roles a usuarios
+                    ASOCIAR RESPONSABLE A MINISTERIO
                 </Typography>
                 <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
                     HOME
                 </Button>
-                <Button variant="contained" onClick={() => navigate("/rol")} style={{ marginRight: '20px' }}>
-                    ROLES
+                <Button variant="contained" onClick={() => navigate("/ministerio")} style={{ marginRight: '20px' }}>
+                    MINISTERIOS
                 </Button>
 
                 {/* <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>get users</Button> */}
 
                 {openEdit && (
-                    <RenderizarDialogEditarRolUsuario
+                    <DialogEditarMinisterioUsuario
                         usuario={null}
                         open={openEdit}
                         onClose={handleCloseEdit}
                         onSubmit={handleSubmitEdit}
-                        roles={roles}
-                        idRolSelect={idRolSelect}
-                        setRolSelect={setRolSelect}
+                        ministerios={ministerios}
+                        idMinisterioSelect={idMinisterioSelect}
+                        setMinisterioSelect={setMinisterioSelect}
                     />
                 )}
 
                 <Box sx={{ marginTop: '50px' }}>
-                    <TablaAsociarRolUsuario
+                    <TablaAsociarMinisteroUsuario
                         data={usuarios}
                         columnasTabla={columnas}
-                        nombreTabla={"Listado de Usuarios"}
+                        nombreTabla={"Usuarios"}
                         onEditClick={handleObtenerRow}
                     />
                 </Box>

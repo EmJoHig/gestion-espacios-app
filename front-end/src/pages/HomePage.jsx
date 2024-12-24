@@ -19,7 +19,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-
+import { useAuth0 } from "@auth0/auth0-react";
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -32,7 +32,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export function HomePage() {
   // const [usuario, setUsuario] = useState(null);
-  // const { isAuthenticated, logout } = useAuth();
+  const { user } = useAuth0();
 
   
   const navigate = useNavigate();
@@ -40,8 +40,15 @@ export function HomePage() {
   useEffect(() => {
     
     // setUsuario(_usuario);
-    // console.log(usuario);
+    // console.log("aca estoy en el home");
+    // console.log("user");
+    // console.log(user);
+
+
   }, []);
+
+
+
 
   const usuario = {
     username: "Belthier",
@@ -76,8 +83,18 @@ export function HomePage() {
       },
       {
         codigo: "7",
+        descripcion: "ABM Actividades",
+        ruta: "/actividad"
+      },
+      {
+        codigo: "8",
         descripcion: "ABM ROLES",
         ruta: "/rol"
+      },
+      {
+        codigo: "9",
+        descripcion: "USUARIOS",
+        ruta: "/usuarios"
       },
     ]
   };

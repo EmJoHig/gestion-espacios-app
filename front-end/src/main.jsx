@@ -34,13 +34,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Auth0Provider
       {...providerConfig}
-      // domain={domain}
-      // clientId={clientId}
       // redirectUri={window.location.origin}
       // onRedirectCallback={onRedirectCallback}
     >
       <App />
-
     </Auth0Provider>
   </React.StrictMode>,
 )

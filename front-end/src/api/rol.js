@@ -1,9 +1,26 @@
 import axios from "./axios";
 
-export const getRolesRequest = async (token) => {
+export const getRolesPorUsuarioRequest = async (token) => {
 
     try { 
-        const response = await axios.get("http://localhost:3000/rol/get_roles", {
+        const response = await axios.get("http://localhost:3000/rol/get_roles_por_usuario", {
+            headers: {
+                Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Error getRolesRequest: ', error);
+        throw error;
+    }
+
+};
+
+
+export const getRolesAUTH0Request = async (token) => {
+
+    try { 
+        const response = await axios.get("http://localhost:3000/rol/get_roles_auth0", {
             headers: {
                 Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
             },

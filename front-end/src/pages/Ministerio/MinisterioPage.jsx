@@ -293,7 +293,8 @@ export function MinisterioPage() {
                 </Button>
 
                 <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-                <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>Responsables por Ministerio</Button>
+                <Button variant="contained" onClick={() => navigate("/asociar-responsables")} style={{ marginLeft: '20px' }}>Asociar Responsables</Button>
+                <Button variant="contained" onClick={() => navigate("/asociar-actividades")} style={{ marginLeft: '20px' }}>Asociar Actividades a Ministerio</Button>
                 <RenderizarDialogNuevoMinist />
                 {openEdit && (
                     <RenderizarDialogEditarMinist ministerio={ministerioEdicion} />

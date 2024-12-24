@@ -6,6 +6,8 @@ import {
   createMinisterioRequest,
   updateMinisterioRequest,
   deleteMinisterioRequest,
+  asociarResponsableAMinistRequest,
+  GetActividadesMinisterioRequest
 } from "../api/ministerio";
 
 const MinisterioContext = createContext();
@@ -78,6 +80,42 @@ export function MinisterioProvider({ children }) {
   };
 
 
+
+  //ASOCIAR RESPONSABLE A MINISTERIO
+  const AsociarResponsableAMinist = async (bodyUsuaroMinist) => {
+    try {
+      
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token',
+      });
+
+      const res = await asociarResponsableAMinistRequest(token, bodyUsuaroMinist);
+      // console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  //ACTIVIDADES ASOCIADAS A MINISTERIO
+
+  const getActividadesMinisterio = async (bodyIdMinisterio) => {
+    try {
+      
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token',
+      });
+
+      const res = await GetActividadesMinisterioRequest(token, bodyIdMinisterio);
+      // console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
   return (
     <MinisterioContext.Provider
       value={{
@@ -87,6 +125,8 @@ export function MinisterioProvider({ children }) {
         createMinisterio,
         updateMinisterio,
         deleteMinisterio,
+        AsociarResponsableAMinist,
+        getActividadesMinisterio
       }}
     >
       {children}
