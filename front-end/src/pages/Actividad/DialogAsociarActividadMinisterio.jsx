@@ -28,36 +28,39 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
 import { useUsuario } from "../../context/usuarioContext";
+import { useActividad } from "../../context/actividadContext";
+
 import TablaAsociarActividadMinisterio from './TablaAsociarActividadMinisterio';
 
 function DialogAsociarActividadMinisterio({ open, onClose, onSubmit, ministerios }) {
 
-    const [actividades, setActividades] = useState([]);
+    const { getActividadesSinMinisterio } = useActividad();
 
+
+    const [actividadesSinMinist, setActividadesSinMinist] = useState([]);
+
+
+    //USE EFFECT ASINCRONO
     useEffect(() => {
-        const nuevasActividades = [];
-        for (let i = 1; i <= 5; i++) {
-            nuevasActividades.push({
-                id: i,
-                codigo: `ACT-${Math.floor(1000 + Math.random() * 9000)}`,
-                descripcion: `descripcion ${i} de la actividad ${i}`,
-                ministerioId: Math.floor(1 + Math.random() * 10),
-                ministerio: {
-                    id: Math.floor(1 + Math.random() * 10),
-                    descripcion: `Ministerio ${Math.floor(1 + Math.random() * 10)}`,
-                },
-            });
-        }
-        setActividades(nuevasActividades);
+        const obtenerActividadesSinMinisterio = async () => {
+            const _actsSinMinisterio = await getActividadesSinMinisterio();
+            if (_actsSinMinisterio)
+                setActividadesSinMinist(_actsSinMinisterio.data);
+            else
+                setActividadesSinMinist([]);
+        };
+        obtenerActividadesSinMinisterio();
     }, []);
+
+
 
 
     const columnas = [
         {
-            id: 'codigo',
+            id: 'nombre',
             numeric: false,
             disablePadding: true,
-            label: 'Codigo',
+            label: 'Nombre',
         },
         {
             id: 'descripcion',
@@ -101,7 +104,8 @@ function DialogAsociarActividadMinisterio({ open, onClose, onSubmit, ministerios
         //     !idsSeleccionados.includes(actividad.id)
         // );
 
-        console.log("ids Actividades seleccionadas: ", idsSeleccionados);
+        //console.log("ids Actividades seleccionadas: ", idsSeleccionados);
+        onSubmit(idsSeleccionados);
     };
 
     return (
@@ -116,7 +120,7 @@ function DialogAsociarActividadMinisterio({ open, onClose, onSubmit, ministerios
                     event.preventDefault();
                     const formData = new FormData(event.currentTarget);
                     const formJson = Object.fromEntries(formData.entries());
-                    console.log("formJson NUEVA act: ", formJson);
+                    //console.log("formJson NUEVA act: ", formJson);
                     // onSubmit(formJson);
                 },
             }}
@@ -140,24 +144,24 @@ function DialogAsociarActividadMinisterio({ open, onClose, onSubmit, ministerios
                         </FormControl>
                     </Grid> */}
                     <Box>
-                        {actividades != null && actividades.length > 0 ? (
+                        {actividadesSinMinist != null && actividadesSinMinist.length > 0 ? (
                             <Grid>
 
-                                {actividades.length === 0 && (
+                                {actividadesSinMinist.length === 0 && (
                                     <h1>no hay actividades</h1>
                                 )}
 
                                 <TablaAsociarActividadMinisterio
-                                    data={actividades}
+                                    data={actividadesSinMinist}
                                     columnasTabla={columnas}
-                                    nombreTabla={"Listado de actividades"}
+                                    nombreTabla={"Listado de actividades Sin Ministerio"}
                                     onEditClick={handleObtenerRow}
                                     onClickDeleteActividad={handleDeleteActividad}
                                     onActividadesSelected={onActividadesSelected}
                                 />
                             </Grid>
                         ) : (
-                            <h1>no hay actividades</h1>
+                            <h1>No hay actividades disponibles </h1>
                         )}
                     </Box>
                 </Grid>

@@ -27,6 +27,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import DialogEditarActividad from './DialogEditarActividad';
 import DialogAsociarActividadMinisterio from './DialogAsociarActividadMinisterio';
 import TablaActividades from './TablaActividades';
@@ -38,33 +40,51 @@ export function AsociarActMinisterioPage() {
 
     const navigate = useNavigate();
     const { ministerios, getMinisterios, getActividadesMinisterio } = useMinisterio();// ministerios
-    // const { actividades, getActividades, createActividad, updateActividad } = useActividad();// actividades
+    const { asociarActividadAMinisterio, quitarActividadAMinisterio } = useActividad();// actividades
     const [actividades, setActividades] = useState([]);
     const [idMinisterioSelect, setMinisterioSelect] = React.useState('');
     const [open, setOpen] = React.useState(false);
+
+    const [openBtnASociarAct, setOpenBtnASociarAct] = React.useState(false);
+
+
+    const [snackBarState, setSnackBarState] = React.useState({
+        open: false,
+        message: '',
+        severity: 'success', // Puede ser 'success', 'error', 'info', 'warning'
+    });
+
+
+    const openSnackBar = (message, severity) => {
+        setSnackBarState({
+            open: true,
+            message,
+            severity,
+        });
+    };
+
+    const closeSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackBarState({ ...snackBarState, open: false });
+    };
+
 
     const bodyRequest = {
         idMinisterio: null
     };
 
-    useEffect(() => {
-        // getActividades();
-        getMinisterios();
+    //body request para asociar actividades a ministerio
+    const bodyRequestAsocActMinist = {
+        idsActividades: null,
+        idMinisterio: null
+    };
 
-        const nuevasActividades = [];
-        for (let i = 1; i <= 5; i++) {
-            nuevasActividades.push({
-                id: i,
-                codigo: `ACT-${Math.floor(1000 + Math.random() * 9000)}`,
-                descripcion: `descripcion ${i} de la actividad ${i}`,
-                ministerioId: Math.floor(1 + Math.random() * 10),
-                ministerio: {
-                    id: Math.floor(1 + Math.random() * 10),
-                    descripcion: `Ministerio ${Math.floor(1 + Math.random() * 10)}`,
-                },
-            });
-        }
-        setActividades(nuevasActividades);
+
+
+    useEffect(() => {
+        getMinisterios();
     }, []);
 
 
@@ -79,44 +99,104 @@ export function AsociarActMinisterioPage() {
 
 
     // BUSQUEDA ACTIVIDADES DE MINISTERIO
-    const handleChangeMinisterio = (event) => {
+    const handleChangeMinisterio = async (event) => {
+
         setMinisterioSelect(event.target.value);
-        //busco las actividades asociadas al ministerio
         bodyRequest.idMinisterio = event.target.value;
-        getActividadesMinisterio(bodyRequest);
+
+        const resp = await getActividadesMinisterio(bodyRequest);
+
+        if (resp)
+        {
+            setActividades(resp.data);
+            setOpenBtnASociarAct(true);
+        }
+        else{
+            setActividades([]);
+            setOpenBtnASociarAct(false);
+        }
     }
 
-    const handleTEST = (act) => {
-        console.log("actividades", actividades);
-    };
 
     const handleAgregarActividadMinisterio = () => {
         setOpen(true);
         console.log("agregar actividad a ministerio");
-
     };
 
 
-    const handleSubmitAsociarActividad = async (actividadMinistJson) => {
+    const handleSubmitAsociarActividad = async (idActividades) => {
         try {
-            const { idActividad, idMinisterio } = actividadMinistJson;
-            console.log("actividadJson", actividadMinistJson);
+            //console.log("idActividades", idActividades);
+            const cantActs = idActividades.length;
 
-            // await createActividad(actividadJson);
-            // await getActividades();
+            bodyRequestAsocActMinist.idsActividades = idActividades;
+            bodyRequestAsocActMinist.idMinisterio = idMinisterioSelect;
+
+            const resp = await asociarActividadAMinisterio(bodyRequestAsocActMinist);
+
+            if (resp == "") {
+
+                bodyRequest.idMinisterio = idMinisterioSelect;
+                const resp = await getActividadesMinisterio(bodyRequest);
+
+                if (resp)
+                    setActividades(resp.data);
+                else
+                    setActividades([]);
+
+                openSnackBar('Se ascociaron ' + cantActs + ' actividades', 'success');
+            } else {
+                openSnackBar('Error al asociar las actividades.', 'error');
+            }
+
             handleClose();
         } catch (error) {
-            console.error('Error al crear el actividad:', error);
+            console.error('Error al asociar las actividades', error);
         }
     };
 
 
+
+
+    const handleQuitarActividadAMinisterio = async (idActividad) => {
+        try {
+            //console.log("idActividad", idActividad);
+
+            const body = {
+                idActividad: idActividad,
+                idMinisterio: idMinisterioSelect
+            };
+
+            const resp = await quitarActividadAMinisterio(body);
+
+            if (resp == "") {
+
+                bodyRequest.idMinisterio = idMinisterioSelect;
+                const resp = await getActividadesMinisterio(bodyRequest);
+
+                if (resp)
+                    setActividades(resp.data);
+                else
+                    setActividades([]);
+
+                openSnackBar('Se quito la actividad correctamente', 'success');
+            } else {
+                openSnackBar('Error al quitar la actividad.', 'error');
+            }
+
+            handleClose();
+        } catch (error) {
+            console.error('Error al quitar la actividad', error);
+        }
+    };
+
     return (
         <>
             <Box sx={{ marginTop: '50px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    Asociar actividades a Ministerio
+                <Typography gutterBottom variant="h5" component="div" style={{ marginBottom: '20px' }}>
+                    Administrar Actividades de Ministerios
                 </Typography>
+
                 <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
                     HOME
                 </Button>
@@ -124,6 +204,11 @@ export function AsociarActMinisterioPage() {
                 <Button variant="contained" onClick={() => navigate("/actividad")} style={{ marginRight: '20px' }}>
                     ACTIVIDADES
                 </Button>
+
+                <Button variant="contained" onClick={() => navigate("/ministerio")} style={{ marginRight: '20px' }}>
+                    MINISTERIOS
+                </Button>
+
                 {/* <Button variant="contained" onClick={() => handleTEST(null)}>Nuevo</Button> */}
             </Box>
             <Box sx={{ marginTop: '50px' }}>
@@ -145,18 +230,26 @@ export function AsociarActMinisterioPage() {
             </Box>
 
             {open && (
-                    <DialogAsociarActividadMinisterio
-                        // actividad={null}
-                        open={open}
-                        onClose={handleClose}
-                        onSubmit={handleSubmitAsociarActividad}
-                        ministerios={ministerios}
-                    // idMinisterioSelect={idMinisterioSelect}
-                    // setMinisterioSelect={setMinisterioSelect} 
-                    />
-                )}
+                <DialogAsociarActividadMinisterio
+                    // actividad={null}
+                    open={open}
+                    onClose={handleClose}
+                    onSubmit={handleSubmitAsociarActividad}
+                    ministerios={ministerios}
+                // idMinisterioSelect={idMinisterioSelect}
+                // setMinisterioSelect={setMinisterioSelect} 
+                />
+            )}
 
             <Box sx={{ marginTop: '50px' }}>
+
+                {openBtnASociarAct && (
+                    <Button variant="contained" onClick={() => handleAgregarActividadMinisterio()} style={{ marginBottom: '20px' }}>
+                        ASOCIAR ACTIVIDAD
+                    </Button>
+                )}
+
+
                 {actividades != null && actividades.length > 0 ? (
                     <>
                         <Stack direction="row" spacing={4} sx={{
@@ -166,9 +259,7 @@ export function AsociarActMinisterioPage() {
                             <Typography gutterBottom variant="h5" component="div">
                                 Listado actividades
                             </Typography>
-                            <Button variant="contained" onClick={() => handleAgregarActividadMinisterio()} style={{ marginLeft: '20px' }}>
-                                AGREGAR ACTIVIDAD
-                            </Button>
+
                         </Stack>
                         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
 
@@ -178,18 +269,18 @@ export function AsociarActMinisterioPage() {
 
                             {actividades.map((act) => (
                                 <Grid item xs={3} key={act.id} sx={{ marginTop: '50px' }}>
-                                    <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={() => handleTEST(null)}>
+                                    <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }}>
                                         <CardContent>
                                             <Typography gutterBottom variant="h6" component="div">
                                                 <b>{act.codigo}</b>
                                             </Typography>
                                             <br />
                                             <Typography gutterBottom variant="h6" component="div">
-                                                {act.descripcion}
+                                                {act.nombre}
                                             </Typography>
                                             <br />
-                                            <Button variant="contained" onClick={() => handleTEST(act.id)}>
-                                                QUITAR
+                                            <Button variant="contained" onClick={() => handleQuitarActividadAMinisterio(act.id)}>
+                                                QUITAR ACTIVIDAD
                                             </Button>
                                         </CardContent>
                                     </Card>
@@ -198,9 +289,24 @@ export function AsociarActMinisterioPage() {
                         </Grid>
                     </>
                 ) : (
-                    <h1>no hay actividades</h1>
+                    <h1>No hay actividades para el ministerio</h1>
                 )}
             </Box>
+
+            <Snackbar
+                open={snackBarState.open}
+                autoHideDuration={4000}
+                onClose={closeSnackBar}
+            >
+                <Alert
+                    onClose={closeSnackBar}
+                    severity={snackBarState.severity}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {snackBarState.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

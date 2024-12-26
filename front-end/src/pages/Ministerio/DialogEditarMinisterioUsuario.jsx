@@ -22,17 +22,19 @@ import TablaGenerica from '../../components/TablaGenerica';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
+
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import InputAdornment from '@mui/material/InputAdornment';
+
 import EditIcon from '@mui/icons-material/Edit';
 import { useUsuario } from "../../context/usuarioContext";
 
 
 function DialogEditarRolUsuario({ usuario, open, onClose, onSubmit, ministerios, idMinisterioSelect, setMinisterioSelect }) {
-console.log("DialogEditarRolUsuario");
-console.log("usuario", usuario);
 
     return (
         <Dialog
@@ -61,6 +63,19 @@ console.log("usuario", usuario);
                                 name="ministerioId"
                                 displayEmpty
                                 inputProps={{ 'aria-label': 'Without label' }}
+                                endAdornment={
+                                    ministerios.length > 0 && (
+                                      <InputAdornment sx={{ marginRight: "10px" }} position="end">
+                                        <IconButton
+                                          onClick={() => {
+                                            setMinisterioSelect("");
+                                          }}
+                                        >
+                                          <ClearIcon></ClearIcon>
+                                        </IconButton>
+                                      </InputAdornment>
+                                    )
+                                  }
                             >
                                 {ministerios.map((min) => (
                                     <MenuItem key={min.id} value={min.id}>{min.descripcion}</MenuItem>

@@ -162,7 +162,7 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEditClick }) {
+export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEditClick, onClickDeleteMinisterio }) {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
@@ -239,18 +239,18 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
 
     //ELIMINAR MINISTERIO
 
-    const handleEliminarMinisterio = async (id) => {
+    // const handleEliminarMinisterio = async (id) => {
 
-        try {
-            console.log("Eliminar Ministerio ID: ");
-            console.log(id);
-            await deleteMinisterio(id);
-            await getMinisterios();
-            console.log("Ministerio eliminado");
-        } catch (error) {
-            console.error('Error al editar el ministerio:', error);
-        }
-    }
+    //     try {
+    //         console.log("Eliminar Ministerio ID: ");
+    //         console.log(id);
+    //         await deleteMinisterio(id);
+    //         await getMinisterios();
+    //         console.log("Ministerio eliminado");
+    //     } catch (error) {
+    //         console.error('Error al editar el ministerio:', error);
+    //     }
+    // }
 
 
     return (
@@ -312,7 +312,7 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                             <IconButton aria-label="edit" onClick={() => onEditClick(row)}>
                                                 <EditIcon />
                                             </IconButton>
-                                            <IconButton aria-label="delete" onClick={() => handleEliminarMinisterio(row.id)}>
+                                            <IconButton aria-label="delete" onClick={() => onClickDeleteMinisterio(row.id)}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>

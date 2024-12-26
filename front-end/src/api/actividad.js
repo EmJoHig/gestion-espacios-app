@@ -64,3 +64,54 @@ export const deleteActividadRequest = async (token, id) => {
         throw error;
     }
 };
+
+
+export const asociarActividadAMinistRequest = async (token, actsMinisterioBody) => {
+
+    try {
+        const response = await axios.post("http://localhost:3000/actividad/asociar_actividad_a_ministerio", actsMinisterioBody, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response;
+    } catch (error) {
+        console.error('Error asociarResponsableAMinist: ', error);
+        throw error;
+    }
+}
+
+
+export const GetActividadesSinMinisterioRequest = async (token) => {
+    try {
+        const response = await axios.get("http://localhost:3000/actividad/get_actividades_sin_ministerio", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response;
+
+    } catch (error) {
+        console.error('Error fetching actividads:', error);
+        throw error;
+    }
+};
+
+
+export const quitarActividadAMinisterioRequest = async (token, actMinisterioBody) => {
+
+    try {
+        const response = await axios.post("http://localhost:3000/actividad/quitar_actividad_a_ministerio", actMinisterioBody, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response;
+    } catch (error) {
+        console.error('Error asociarResponsableAMinist: ', error);
+        throw error;
+    }
+}

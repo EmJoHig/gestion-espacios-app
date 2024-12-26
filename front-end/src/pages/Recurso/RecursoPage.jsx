@@ -24,14 +24,39 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 import TablaRecursos from './TablaRecursos';
 import { useRecurso } from "../../context/recursoContext";
 
 export function RecursoPage() {
 
-    const { recursos, getRecursos, createRecurso, updateRecurso } = useRecurso();
+    const { recursos, getRecursos, createRecurso, updateRecurso, deleteRecurso } = useRecurso();
     const navigate = useNavigate();
+
+    const [snackBarState, setSnackBarState] = React.useState({
+        open: false,
+        message: '',
+        severity: 'success', // Puede ser 'success', 'error', 'info', 'warning'
+    });
+
+
+    const openSnackBar = (message, severity) => {
+        setSnackBarState({
+            open: true,
+            message,
+            severity,
+        });
+    };
+
+    const closeSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackBarState({ ...snackBarState, open: false });
+    };
+
 
     useEffect(() => {
         getRecursos();
@@ -67,10 +92,11 @@ export function RecursoPage() {
 
     const [recursoEdicion, setRecursoEdicion] = React.useState(null);
 
-
+    const [recursoIdToDelete, setRecursoIdToDelete] = React.useState(null);
 
     const [open, setOpen] = React.useState(false);
     const [openEdit, setOpenEdit] = React.useState(false);
+    const [openConfirm, setOpenConfirm] = React.useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -84,11 +110,19 @@ export function RecursoPage() {
     const handleSubmit = async (recursoJson) => {
         try {
             const { nombre, descripcion, cantidad } = recursoJson;
-            await createRecurso(recursoJson);
+
+            const respCreate = await createRecurso(recursoJson);
+
+            if (respCreate == "") {
+                openSnackBar('El recurso se ha creado con éxito.', 'success');
+            } else {
+                openSnackBar('Error al crear el recurso.', 'error');
+            }
+
             await getRecursos();
             handleClose();
         } catch (error) {
-            console.error('Error al crear el recurso:', error);
+            openSnackBar('Error al crear el recurso.', 'error');
         }
     };
 
@@ -109,17 +143,20 @@ export function RecursoPage() {
             recursoEdicion.nombre = nombre;
             recursoEdicion.descripcion = descripcion;
             recursoEdicion.cantidad = cantidad;
-            await updateRecurso(recursoEdicion);
+
+            const respUpdate = await updateRecurso(recursoEdicion);
+
+            if (respUpdate == "") {
+                openSnackBar('El recurso se ha editado con éxito.', 'success');
+            } else {
+                openSnackBar('Error al editar el recurso.', 'error');
+            }
+
             await getRecursos();
             handleCloseEdit();
         } catch (error) {
-            console.error('Error al editar el recurso:', error);
+            openSnackBar('Error al editar el recurso.', 'error');
         }
-    };
-
-
-    const handleTEST = () => {
-        console.log("Recursos", recursos);
     };
 
 
@@ -176,7 +213,7 @@ export function RecursoPage() {
                             type="number"
                             slotProps={{
                                 inputLabel: {
-                                shrink: true,
+                                    shrink: true,
                                 },
                             }}
                             fullWidth
@@ -289,10 +326,69 @@ export function RecursoPage() {
     };
 
     // metodo que envia el id de la row seleccionada para eliminar
-    const handleDeleteRecurso = (idsRecursos) => {
-        console.log("Datos del recurso seleccionado:", idsRecursos);
+    const handleDeleteRecurso = async (idRecurso) => {
+        setRecursoIdToDelete(idRecurso);
+        setOpenConfirm(true);
+    };
+
+
+    const handleCloseConfirm = () => {
+        setOpenConfirm(false);
+    };
+
+
+    const EliminarRecursoRequest = async (idRecurso) => {
+        console.log("Eliminar recurso con id:", idRecurso);
+
+        try {
+            const respDelete = await deleteRecurso(idRecurso);
+
+            if (respDelete == "") {
+                openSnackBar('El recurso se ha eliminado con éxito.', 'success');
+            } else {
+                openSnackBar('Error al eliminar el recurso.', 'error');
+            }
+
+            await getRecursos();
+            handleCloseConfirm();
+        } catch (error) {
+            openSnackBar('Error al eliminar el recurso.', 'error');
+        }
 
     };
+
+
+
+
+    function RenderizarDialogConfirmar({ id }) {
+        return (
+            <>
+                <Dialog
+                    open={openConfirm}
+                    onClose={handleCloseConfirm}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">
+                        {"Eliminar Recurso"}
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Esta seguro que desea eliminar el recurso?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseConfirm}>CANCELAR</Button>
+                        <Button onClick={() => EliminarRecursoRequest(id)} autoFocus>
+                            CONFIRMAR
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </>
+        );
+    }
+
+
 
     return (
         <>
@@ -306,24 +402,44 @@ export function RecursoPage() {
                 </Button>
 
                 <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-                <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>Responsables por Recurso</Button>
+
+                {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={recursoIdToDelete} />}
+
+
                 {openEdit && (
                     <RenderizarDialogEditarRecurso recurso={recursoEdicion} />
                 )}
+                
                 <RenderizarDialogNuevoRecurso />
+
                 <Box sx={{ marginTop: '50px' }}>
                     <TablaRecursos
                         data={recursos}
                         columnasTabla={columnas}
                         nombreTabla={"Listado de Recursos"}
                         onEditClick={handleObtenerRow}
-                        // onClickDeleteRecurso={handleDeleteRecurso}
+                        onClickDeleteRecurso={handleDeleteRecurso}
                     />
                 </Box>
 
 
 
             </Box>
+
+            <Snackbar
+                open={snackBarState.open}
+                autoHideDuration={4000}
+                onClose={closeSnackBar}
+            >
+                <Alert
+                    onClose={closeSnackBar}
+                    severity={snackBarState.severity}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {snackBarState.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

@@ -325,7 +325,7 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                                 onClick={(event) => handleClick(event, row.id)}
                                             />
                                         </TableCell>
-                                        <TableCell id={row.codigo} align="center" > {row.codigo} </TableCell>
+                                        <TableCell id={row.nombre} align="center" > {row.nombre} </TableCell>
                                         <TableCell align="center">{row.descripcion}</TableCell>
                                         {/* <TableCell align="center" >{row.ministerio ? row.ministerio.descripcion : ""}</TableCell> */}
                                         {/* <TableCell align="center">

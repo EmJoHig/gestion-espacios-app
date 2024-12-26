@@ -48,7 +48,7 @@ function DialogNuevaActividad({ open, onClose, onSubmit, ministerios }) {
                     event.preventDefault();
                     const formData = new FormData(event.currentTarget);
                     const formJson = Object.fromEntries(formData.entries());
-                    console.log("formJson NUEVA act: ", formJson);
+                    //console.log("formJson NUEVA act: ", formJson);
                     onSubmit(formJson);
                 },
             }}

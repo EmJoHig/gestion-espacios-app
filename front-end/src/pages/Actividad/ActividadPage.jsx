@@ -260,7 +260,7 @@ export function ActividadPage() {
                 </Button>
 
                 <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-                <Button variant="contained" onClick={() => navigate("/asociar-actividades")} style={{ marginLeft: '20px' }}>Asociar Actividades a Ministerio</Button>
+                <Button variant="contained" onClick={() => navigate("/asociar-actividades")} style={{ marginLeft: '20px' }}>Administrar Actividades de Ministerios</Button>
 
 
                 {openEdit && (

@@ -6,6 +6,9 @@ import {
   createActividadRequest,
   updateActividadRequest,
   deleteActividadRequest,
+  asociarActividadAMinistRequest,
+  GetActividadesSinMinisterioRequest,
+  quitarActividadAMinisterioRequest
 } from "../api/actividad";
 
 const ActividadContext = createContext();
@@ -109,6 +112,72 @@ export function ActividadProvider({ children }) {
   };
 
 
+
+  const asociarActividadAMinisterio = async (actsMinisterioBody) => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await asociarActividadAMinistRequest(token, actsMinisterioBody);
+
+      if (res.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al eliminar la actividad";
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const getActividadesSinMinisterio = async () => {
+    try {
+    
+          const token = await getAccessTokenSilently({
+            audience: 'https://gestion-espacios/api', // USAR ESTE
+            // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token',
+          });
+    
+          const res = await GetActividadesSinMinisterioRequest(token);
+                    
+          if (res.status == 200) {
+            return res;
+          } else {
+            return null;
+          }
+    
+        } catch (error) {
+          console.log(error);
+        }
+  };
+
+
+  const quitarActividadAMinisterio = async (actMinisterioBody) => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await quitarActividadAMinisterioRequest(token, actMinisterioBody);
+
+      if (res.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al eliminar la actividad";
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+
   return (
     <ActividadContext.Provider
       value={{
@@ -118,6 +187,9 @@ export function ActividadProvider({ children }) {
         createActividad,
         updateActividad,
         deleteActividad,
+        asociarActividadAMinisterio,
+        getActividadesSinMinisterio,
+        quitarActividadAMinisterio
       }}
     >
       {children}

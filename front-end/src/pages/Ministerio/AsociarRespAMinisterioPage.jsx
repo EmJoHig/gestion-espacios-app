@@ -27,6 +27,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+
 import { useAuth0 } from "@auth0/auth0-react";
 
 import TablaAsociarMinisteroUsuario from '../Ministerio/TablaAsociarMinisteroUsuario';
@@ -39,6 +42,30 @@ export function AsociarRespAMinisterioPage() {
 
     const { user } = useAuth0();
     const navigate = useNavigate();
+
+    const [snackBarState, setSnackBarState] = React.useState({
+        open: false,
+        message: '',
+        severity: 'success', // Puede ser 'success', 'error', 'info', 'warning'
+    });
+
+
+    const openSnackBar = (message, severity) => {
+        setSnackBarState({
+            open: true,
+            message,
+            severity,
+        });
+    };
+
+    const closeSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackBarState({ ...snackBarState, open: false });
+    };
+
+
 
     // const { ministerios, getMinisterios, createMinisterio, updateMinisterio, deleteMinisterio, AsociarMinisterioAlUsuario } = useMinisterio();
     const { usuarios, getUsuarios, createUsuario, updateUsuario, deleteUsuario } = useUsuario();
@@ -120,9 +147,17 @@ export function AsociarRespAMinisterioPage() {
     const handleSubmitEdit = async (ministerioid) => {
         try {
             bodyRequest.idUsuario = usuarioMinisterioEdicion.id;
-            bodyRequest.idMinisterio = ministerioid;
-            // console.log("body a editar:", bodyRequest);
-            await AsociarResponsableAMinist(bodyRequest);
+            bodyRequest.idMinisterio = ministerioid === '' ? null : ministerioid;
+
+            //console.log("body a editar:", bodyRequest);
+
+            const respAsociar = await AsociarResponsableAMinist(bodyRequest);
+            if (respAsociar == "") {
+                openSnackBar('Se asigno el ministerio con éxito.', 'success');
+            } else {
+                openSnackBar('Error al asignar el ministerio a usuario.', 'error');
+            }
+
             await getUsuarios();
             handleCloseEdit();
         } catch (error) {
@@ -170,6 +205,21 @@ export function AsociarRespAMinisterioPage() {
                     />
                 </Box>
             </Box>
+
+            <Snackbar
+                open={snackBarState.open}
+                autoHideDuration={4000}
+                onClose={closeSnackBar}
+            >
+                <Alert
+                    onClose={closeSnackBar}
+                    severity={snackBarState.severity}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {snackBarState.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 }
