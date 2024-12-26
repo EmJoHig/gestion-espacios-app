@@ -21,8 +21,8 @@ Rol.init({
   },
   idRolAUTH0: {
     type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,  // Asegura que sea único para cada usuario
+    allowNull: true,
+    unique: false,  // Asegura que sea único para cada usuario
     field: 'id_rol_auth0'
   }
 }, {

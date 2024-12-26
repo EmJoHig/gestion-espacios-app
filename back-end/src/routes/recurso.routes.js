@@ -23,9 +23,9 @@ const jwtCheck = auth({
 // router.get('/', authenticateToken, getUsers);
 router.get('/get_recursos', jwtCheck, getRecursos);
 router.get('/:id', getRecursoById);
-router.post('/nuevo_recurso', createRecurso);
-router.put('/editar_recurso/:id', updateRecurso);
-router.delete('/eliminar_recurso/:id', deleteRecurso);
+router.post('/nuevo_recurso', jwtCheck, createRecurso);
+router.put('/editar_recurso/:id', jwtCheck, updateRecurso);
+router.delete('/eliminar_recurso/:id', jwtCheck, deleteRecurso);
 
 
 export default router;

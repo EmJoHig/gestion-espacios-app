@@ -25,7 +25,7 @@ Usuario.init({
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: false,
     trim: true,
     field: 'email'
   },
@@ -59,7 +59,7 @@ Usuario.init({
   idUsuarioAUTH0: {
     type: DataTypes.STRING,
     allowNull: true,
-    unique: true,  // Asegura que sea único para cada usuario
+    unique: false,  // Asegura que sea único para cada usuario
     field: 'id_usuario_auth0'
   }
 }, {

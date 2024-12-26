@@ -30,7 +30,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 
 const corsOptions = {
-  origin: 'http://127.0.0.1:5173',
+  origin: 'http://localhost:5173',
   credentials: true, // Habilitar el intercambio de cookies y otros datos de autenticación
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders:
@@ -39,8 +39,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 app.use((req, res, next) => {
-  console.log(`Request: ${req.method} ${req.url}`);
-  console.log(`Headers:`, req.headers);
+  //console.log(`Request: ${req.method} ${req.url}`);
+  //console.log(`Headers:`, req.headers);
   next();
 });
 
