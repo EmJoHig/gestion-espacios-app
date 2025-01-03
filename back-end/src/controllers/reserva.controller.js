@@ -28,11 +28,12 @@ export const getReservas = async (req, res) => {
     
         const reservasFormateadas = reservas.map((reserva) => {
             return {
-              fechaInicio: reserva.fechaInicio,
-              fechaFin: reserva.fechaFin,
-              Espacio: reserva.Espacio,
-              Ministerio: reserva.Ministerio,
-              Actividad: reserva.Actividad,
+                id: reserva.id,
+                fechaInicio: reserva.fechaInicio,
+                fechaFin: reserva.fechaFin,
+                Espacio: reserva.Espacio,
+                Ministerio: reserva.Ministerio,
+                Actividad: reserva.Actividad,
             };
           });
       

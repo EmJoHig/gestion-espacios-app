@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   getReservasRequest,
+  getReservaRequest,
   createReservaRequest,
   updateReservaRequest,
   deleteReservaRequest,
@@ -18,6 +19,7 @@ export const useReserva = () => {
 export function ReservaProvider({ children }) {
   const [reservas, setReservas] = useState([]);
   const { getAccessTokenSilently } = useAuth0();
+  const [reserva, setReserva] = useState([]);
 
 
   const getReservas = async () => {
@@ -32,6 +34,20 @@ export function ReservaProvider({ children }) {
       console.error('Error fetching reservas:', error);
     }
   };
+
+  const getReserva = async (id) => {
+    try {
+      
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+      const res = await getReservaRequest(token, id);
+      setReserva(res);
+    } catch (error) {
+      console.error('Error fetching reservas:', error);
+    }
+  };
+
 
 
   const createReserva = async (reserva) => {
@@ -72,7 +88,9 @@ export function ReservaProvider({ children }) {
     <ReservaContext.Provider
       value={{
         reservas,
+        reserva,
         getReservas,
+        getReserva,
         createReserva,
         updateReserva,
         deleteReserva,

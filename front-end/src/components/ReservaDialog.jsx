@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -13,18 +13,69 @@ import {
   Typography,
   Grid,
 } from '@mui/material';
-import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
-export default function ReservaDialog({ open, onClose, onSave, ministerios, actividades, espacios, selectedDate, errorMessage  }) {
+import dayjs from 'dayjs';
+
+
+export default function ReservaDialog({ open, onClose, onSave, ministerios, actividades, espacios, selectedDate, errorMessage, isEditing }) {
       // Estados para los selectores
   const [selectedMinisterio, setSelectedMinisterio] = useState('');
   const [selectedActividad, setSelectedActividad] = useState('');
   const [actividadesFiltradas, setActividadesFiltradas] = useState([]);
   const [selectedEspacio, setSelectedEspacio] = useState('');
-  const [valueFecha, setValueFecha] = useState(null);
-  const [horaInicio, setHoraInicio] = useState(null);
-  const [horaFin, setHoraFin] = useState(null);
+  const [fechaHoraInicio, setFechaHoraInicio] = useState(null);
+  const [fechaHoraFin, setFechaHoraFin] = useState(null);
+
+
+  useEffect(() => {
+    if (selectedDate) {
+      // Precargamos los valores del formulario con los datos de la reserva seleccionada
+      console.log("Dialog - selectedDate: ",selectedDate)
+      setSelectedMinisterio(selectedDate.ministerioId || ""); // Ajusta según tu estructura
+      setSelectedActividad(selectedDate.actividadId || "");
+      setSelectedEspacio(selectedDate.espacioId || "");
+      setFechaHoraInicio(selectedDate.fechaInicio ? dayjs(selectedDate.fechaInicio) : null);
+      setFechaHoraFin(selectedDate.fechaFin ? dayjs(selectedDate.fechaFin) : null);
+  
+      if (selectedDate.ministerioId) {
+        const actividadesRelacionadas = actividades.filter(
+          (actividad) => actividad.ministerioId === selectedDate.ministerioId
+        );
+        setActividadesFiltradas(actividadesRelacionadas);
+      }
+    }
+  }, [selectedDate, actividades]);
+
+
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const reserva = {
+      id: selectedDate?.id,
+      ministerioId: selectedMinisterio,
+      actividadId: selectedActividad,
+      espacioId: selectedEspacio,
+      fechaHoraInicio: fechaHoraInicio ? fechaHoraInicio.toISOString() : null,
+      fechaHoraFin: fechaHoraFin ? fechaHoraFin.toISOString() : null,
+    };
+    onSave(reserva);
+  };
+
+  
+
+  const handleFechaHoraInicioChange = (newValue) => {
+    if (newValue && newValue.isValid()) {  // Verifica si el nuevo valor es válido
+      setFechaHoraInicio(newValue);
+  
+      // Si se selecciona una fecha y hora de inicio, establecemos la fecha y hora de fin como una hora más
+      const nuevaFechaHoraFin = newValue.add(1, 'hour'); // Sumar 1 hora
+      setFechaHoraFin(nuevaFechaHoraFin);
+    } else {
+      console.log("Fecha de inicio inválida");
+    }
+  };
   
 
   const handleEspacioChange = (event) => {
@@ -47,24 +98,9 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
     console.log("act: ",actividadesRelacionadas)
   };
 
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const reserva = {
-      espacioId: selectedEspacio,
-      ministerioId: selectedMinisterio,
-      actividadId: selectedActividad,
-      fecha: valueFecha,
-      horaInicio,
-      horaFin,
-    };
-    console.log("1-Reserva enviada:", reserva);
-    onSave(reserva);
-  };
-
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ component: 'form', onSubmit: handleSubmit }}>
-      <DialogTitle>Nueva Reserva</DialogTitle>
+      <DialogTitle>{isEditing ? "Editar Reserva" : "Crear Nueva Reserva"}</DialogTitle>
       {errorMessage && (
                         <Typography color="error" variant="body2" style={{ marginBottom: '10px' }}>
                             {errorMessage}
@@ -122,38 +158,35 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Typography>Fecha de Reserva</Typography>
+            <Typography>Fecha y Hora de Inicio</Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker label="Seleccionar Día" value={valueFecha} onChange={setValueFecha} fullWidth
-                    InputLabelProps={{
-                        shrink: true
-                    }} />
-            </LocalizationProvider>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography>Hora de Inicio</Typography>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <TimePicker
-                label="Hora Inicio"
-                value={horaInicio}
-                onChange={(newValue) => {
-                  setHoraInicio(newValue);
-                  setHoraFin(newValue?.add(1, 'hour'));
-                }}
+              <DateTimePicker
+                label="Seleccionar Fecha y Hora de Inicio"
+                value={fechaHoraInicio}
+                onChange={handleFechaHoraInicioChange}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
               />
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={6}>
-            <Typography>Hora de Fin</Typography>
+          <Grid item xs={12}>
+            <Typography>Fecha y Hora de Fin</Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <TimePicker label="Hora Fin" value={horaFin} onChange={setHoraFin} />
+              <DateTimePicker
+                label="Seleccionar Fecha y Hora de Fin"
+                value={fechaHoraFin}
+                onChange={setFechaHoraFin}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+              />
             </LocalizationProvider>
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancelar</Button>
-        <Button type="submit">Guardar</Button>
+        {/* <Button onClick={handleSubmit}>{isEditing ? "Modificar" : "Guardar"}</Button> */}
+        {isEditing ? <Button onClick={handleSubmit}>Modificar</Button> : <Button onClick={handleSubmit}>Guardar</Button>}
       </DialogActions>
     </Dialog>
   );

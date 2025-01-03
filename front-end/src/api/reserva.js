@@ -11,6 +11,7 @@ export const getReservasRequest = async (token) => {
 
           // Mapear los datos a un formato compatible con FullCalendar
       const eventosMapped = responseReservas.data.map((reserva) => ({
+        id: reserva.id,
         title: `${reserva.Actividad.nombre} - ${reserva.Espacio.nombre} - ${reserva.Ministerio.codigo}`, // Título del evento
         start: reserva.fechaInicio, // Fecha de inicio
         end: reserva.fechaFin, // Fecha de fin
@@ -33,14 +34,25 @@ export const getReservasRequest = async (token) => {
 
 
 
-//export const createReservaRequest = async (reserva) => axios.post("http://localhost:3000/reserva/nueva_reserva", reserva);
+    export const getReservaRequest = async (token, id) => {
+      try {
+        const reserva = await axios.get(`http://localhost:3000/reserva/${id}`, {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+        });
+        return reserva.data
+      } catch (error) {
+        console.error('Error al obtener la reserva:', error);
+      }
+    };
 
 export const createReservaRequest = async (reserva) => {
   try {
       const response = await axios.post("http://localhost:3000/reserva/nueva_reserva", reserva);
       return {
         success: true,
-        message: response.data.message
+        message: response.data
       }
   } catch (error) {
       // Manejo del error

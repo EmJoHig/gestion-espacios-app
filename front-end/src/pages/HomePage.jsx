@@ -32,13 +32,14 @@ export function HomePage() {
   const [eventos, setEventos] = useState([]);
   const [espaciosDisponibles, setEspaciosDisponibles] = useState([]);
   const [espaciosSeleccionados, setEspaciosSeleccionados] = useState([]);
-  const { reservas, getReservas, createReserva } = useReserva();
+  const { reservas, reserva, getReserva,  getReservas, createReserva, updateReserva } = useReserva();
   const { espacios, getEspacios } = useEspacio();
   const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
   const { actividades, getActividades } = useActividad();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   
   const navigate = useNavigate();
 
@@ -54,6 +55,8 @@ export function HomePage() {
     setEventos(reservas)
     setEspaciosDisponibles(espacios.map((espacio) => espacio.nombre))
   }, [reservas, espacios]);
+
+  console.log(reservas)
   
   useEffect(() => {
     // Cuando se cargan los espacios disponibles, seleccionarlos todos por defecto
@@ -61,6 +64,11 @@ export function HomePage() {
       setEspaciosSeleccionados(espaciosDisponibles);
     }
   }, [espaciosDisponibles]);
+
+
+  useEffect(() => {
+      setSelectedDate(reserva)
+  }, [reserva]);
 
   const usuario = {
     username: "Belthier",
@@ -140,44 +148,36 @@ export function HomePage() {
 
   const handleDialogClose = () => {
     setOpenDialog(false);
+    setIsEditing(false);
+    setErrorMessage('')
   };
 
-/*   const buildReservaObject = (data) => {
-    const nuevaReserva = {
-      ministerioId: data.ministerioId,
-      actividadId: data.actividadId,
-      espacioId: data.espacioId,
-      fecha: data.fecha,
-      horaInicio: data.horaInicio,
-      horaFin: data.horaFin,
-    };
-    return nuevaReserva;
-  }; */
 
   const buildReservaObject = (data) => {
 
-    const fechaInicio = dayjs(data.fecha.$d)
-        .hour(data.horaInicio.$H)
-        .minute(data.horaInicio.$m)
-        .second(data.horaInicio.$s)
-        .toISOString(); // Convierte a formato ISO
-
-    const fechaFin = dayjs(data.fecha.$d)
-        .hour(data.horaFin.$H)
-        .minute(data.horaFin.$m)
-        .second(data.horaFin.$s)
-        .toISOString(); // Convierte a formato ISO
 
     const reserva = {
+        id: data.id,
         espacioId: data.espacioId,
         ministerioId: data.ministerioId,
         actividadId: data.actividadId,
-        fechaInicio,
-        fechaFin,
+        fechaInicio: data.fechaHoraInicio,
+        fechaFin: data.fechaHoraFin,
     };
 
     console.log("Reserva construida:", reserva);
     return reserva;
+};
+
+console.log("isE :", isEditing)
+
+const handleSaveOrUpdateReserva = (reserva) => {
+  console.log("es actualización: ",isEditing)
+  if (isEditing) {
+    handleUpdateReserva(reserva);
+  } else {
+    handleSaveReserva(reserva);
+  }
 };
   
   const handleSaveReserva = async (reservaData) => {
@@ -196,16 +196,42 @@ export function HomePage() {
     }
   };
 
+  const handleUpdateReserva = async (reservaData) => {
+    try {
+        const updatedReserva = buildReservaObject(reservaData);
+        const res = await updateReserva(reservaData.id, updatedReserva); // Suponiendo que tienes una función updateReserva
+        if (!res.success) {
+            setErrorMessage(res.message || "No se pudo actualizar la reserva. Intente nuevamente.");
+        } else {
+            await getReservas(); // Refrescar las reservas
+            setOpenDialog(false); // Cerrar el diálogo
+        }
+    } catch (error) {
+        console.error('Error al actualizar la reserva:', error);
+    }
+};
+
+  const handleEventClick = (info) => {
+    const selectedReserva = reservas.find((res) => res.id === parseInt(info.event.id));
+    getReserva(parseInt(info.event.id));
+    if (selectedReserva) {
+        setSelectedDate(selectedReserva);
+        setIsEditing(true);
+        setOpenDialog(true);
+    }
+  };
+
   return (
     <>
       <ReservaDialog
         open={openDialog}
         onClose={handleDialogClose}
-        onSave={handleSaveReserva}
+        onSave={handleSaveOrUpdateReserva}
         ministerios={ministerios || []}
         actividades={actividades || []}
         espacios={espacios || []}
         selectedDate={selectedDate}
+        isEditing={isEditing}
         errorMessage={errorMessage}
       />
       <Box sx={{ flexGrow: 1, marginTop: '20px' }}>
@@ -270,6 +296,7 @@ export function HomePage() {
           }}
           events={eventosFiltrados}
           dateClick={handleDateClick}
+          eventClick={handleEventClick}
         />
       </Box>
 
