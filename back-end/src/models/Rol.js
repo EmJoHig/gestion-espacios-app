@@ -19,6 +19,12 @@ Rol.init({
     allowNull: false,
     trim: true,
   },
+  idRolAUTH0: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: false,  // Asegura que sea único para cada usuario
+    field: 'id_rol_auth0'
+  }
 }, {
   sequelize: db2,
   modelName: 'Rol',

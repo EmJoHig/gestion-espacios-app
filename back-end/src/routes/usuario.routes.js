@@ -7,10 +7,13 @@ import { auth } from "express-oauth2-jwt-bearer";
 
 const { Router } = pkg;
 import {
+  createUser,
   getUsers,
   getUserById,
   updateUser,
   deleteUser,
+  validarUsuarioAUTH0,
+  getUsersAUTH0,
 } from "../controllers/users.controller.js";
 const router = express.Router();
 
@@ -20,11 +23,16 @@ const jwtCheck = auth({
   tokenSigningAlg: "RS256",
 });
 
-// router.get('/', authenticateToken, getUsers);
+router.post('/nuevo_usuario', createUser);
 router.get("/get_usuarios", jwtCheck, getUsers);
 router.get("/get_usuario/:id", jwtCheck, getUserById);
 router.patch("/editar-usuario/:id", jwtCheck, updateUser);
 router.delete("/eliminar-usuario/:id", jwtCheck, deleteUser);
+
+router.post('/validar_usuario_auth0', jwtCheck, validarUsuarioAUTH0);
+
+router.get("/get_usuarios_auth0", jwtCheck, getUsersAUTH0);
+
 
 // router.get('/perfil-usuario', requiresAuth(), (req, res) => {
 //   res.send(JSON.stringify(req.oidc.user));

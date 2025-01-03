@@ -25,3 +25,41 @@ export const updateUsuarioRequest = async (usuario) => axios.put(`/usuarios/${us
 export const deleteUsuarioRequest = async (id) => axios.delete(`/usuarios/${id}`);
 
 export const getUsuarioRequest = async (id) => axios.get(`/usuarios/${id}`);
+
+
+// CHEQUEA QUE EL USUARIO ESTE EN MI BD, SINO ESTA, LO CREA
+export const getUsuarioAuth0Request = async (token, UsuarioAUTH0) => {
+
+    const data = {
+        UsuarioAUTH0
+    };
+    try {
+        const response = await axios.post("http://localhost:3000/usuarios/validar_usuario_auth0", data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        
+        return response;
+    } catch (error) {
+        console.error('Error createRolRequest: ', error);
+        throw error;
+    }
+}
+
+
+export const getUsuariosAUTH0Request = async (token) => {
+
+    try { 
+        const response = await axios.get("http://localhost:3000/usuarios/get_usuarios_auth0", {
+            headers: {
+                Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Error getRolesRequest: ', error);
+        throw error;
+    }
+
+};

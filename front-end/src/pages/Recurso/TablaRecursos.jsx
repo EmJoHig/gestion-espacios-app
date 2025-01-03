@@ -162,7 +162,7 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEditClick }) {
+export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEditClick, onClickDeleteRecurso }) {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
@@ -239,18 +239,25 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
 
     //ELIMINAR MINISTERIO
 
-    const handleEliminarRecurso = async (id) => {
+    // const handleEliminarRecurso = async (id) => {
 
-        try {
-            console.log("Eliminar Recurso ID: ");
-            console.log(id);
-            await deleteRecurso(id);
-            await getRecursos();
-            console.log("Recurso eliminado");
-        } catch (error) {
-            console.error('Error al editar el recurso:', error);
-        }
-    }
+    //     try {
+    //         console.log("Eliminar Recurso ID: ");
+    //         console.log(id);
+
+    //         const respDelete = await deleteRecurso(id);
+
+    //         if(respDelete == ""){
+    //             openSnackBar('El recurso se ha creado con éxito.', 'success');
+    //         } else {
+    //             openSnackBar('Error al crear el recurso.', 'error');
+    //         }
+
+    //         await getRecursos();
+    //     } catch (error) {
+    //         openSnackBar('Error al crear el recurso.', 'error');
+    //     }
+    // }
 
 
     return (
@@ -295,7 +302,7 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                             <IconButton aria-label="edit" onClick={() => onEditClick(row)}>
                                                 <EditIcon />
                                             </IconButton>
-                                            <IconButton aria-label="delete" onClick={() => handleEliminarRecurso(row.id)}>
+                                            <IconButton aria-label="delete" onClick={() => onClickDeleteRecurso(row.id)}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>

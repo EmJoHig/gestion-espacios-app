@@ -8,4 +8,7 @@ export const rolSchema = z.object({
   description: z.string({
     required_error: "Se requiere descripcion",
   }),
+  idRolAUTH0: z.string({
+    required_error: "idrolAUTH0 es requerido",
+  }),
 });

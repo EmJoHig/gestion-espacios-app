@@ -25,7 +25,7 @@ import { useMinisterio } from "../context/ministerioContext.jsx";
 import { useActividad } from "../context/actividadContext.jsx";
 import ReservaDialog from '../components/ReservaDialog';
 import dayjs from "dayjs";
-
+import { useAuth0 } from "@auth0/auth0-react";
 
 export function HomePage() {
 
@@ -41,6 +41,8 @@ export function HomePage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   
+  const { user } = useAuth0();
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -103,8 +105,18 @@ export function HomePage() {
       },
       {
         codigo: "7",
+        descripcion: "ABM Actividades",
+        ruta: "/actividad"
+      },
+      {
+        codigo: "8",
         descripcion: "ABM ROLES",
         ruta: "/rol"
+      },
+      {
+        codigo: "9",
+        descripcion: "USUARIOS",
+        ruta: "/usuarios"
       },
     ]
   };

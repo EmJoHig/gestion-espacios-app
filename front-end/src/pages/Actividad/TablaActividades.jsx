@@ -21,7 +21,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { visuallyHidden } from '@mui/utils';
 
-import { useMinisterio } from "../../context/ministerioContext";
+import { useActividad } from "../../context/actividadContext";
 
 
 function descendingComparator(a, b, orderBy) {
@@ -140,7 +140,7 @@ function EnhancedTableToolbar(props) {
                     id="tableTitle"
                     component="div"
                 >
-                    {/* Listado Ministerios */}
+                    {/* Listado Actividads */}
                     {nombreTablaParam}
                 </Typography>
             )}
@@ -162,7 +162,7 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEditClick, onClickDeleteMinisterio }) {
+export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEditClick, onClickDeleteActividad }) {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
@@ -170,11 +170,11 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-    const {ministerios, getMinisterios, deleteMinisterio } = useMinisterio();
+    const { actividades, getActividades, deleteActividad } = useActividad();
 
 
     useEffect(() => {
-        // getMinisterios();
+        // getActividads();
     }, [data]);
 
 
@@ -237,22 +237,6 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
     );
 
 
-    //ELIMINAR MINISTERIO
-
-    // const handleEliminarMinisterio = async (id) => {
-
-    //     try {
-    //         console.log("Eliminar Ministerio ID: ");
-    //         console.log(id);
-    //         await deleteMinisterio(id);
-    //         await getMinisterios();
-    //         console.log("Ministerio eliminado");
-    //     } catch (error) {
-    //         console.error('Error al editar el ministerio:', error);
-    //     }
-    // }
-
-
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
@@ -288,36 +272,17 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                         selected={isItemSelected}
                                         sx={{ cursor: 'pointer' }}
                                     >
-                                        {/* <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                        onClick={(event) => handleClick(event, row.id)}
-                      />
-                    </TableCell> */}
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="normal"
-                                            align="center"
-                                        >
-                                            {row.codigo}
-                                        </TableCell>
+                                        <TableCell id={row.id} align="center" > {row.nombre} </TableCell>
                                         <TableCell align="center">{row.descripcion}</TableCell>
+                                        <TableCell component="th" align="center" >{row.ministerio ? row.ministerio.descripcion : ""}</TableCell>
                                         <TableCell align="center">
                                             <IconButton aria-label="edit" onClick={() => onEditClick(row)}>
                                                 <EditIcon />
                                             </IconButton>
-                                            <IconButton aria-label="delete" onClick={() => onClickDeleteMinisterio(row.id)}>
+                                            <IconButton aria-label="delete" onClick={() => onClickDeleteActividad(row.id)}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>
-                                        {/* <TableCell align="right">{row.fat}</TableCell>
-                    <TableCell align="right">{row.carbs}</TableCell> */}
                                     </TableRow>
                                 );
                             })}

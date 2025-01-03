@@ -24,7 +24,7 @@ Reserva.init({
   },
   ministerioId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'ministerio', // Asegúrate de que este modelo exista y tenga su tabla
       key: 'id',

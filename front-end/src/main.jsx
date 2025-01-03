@@ -25,7 +25,7 @@ const providerConfig = {
   onRedirectCallback,
   authorizationParams: {
     redirect_uri: window.location.origin, 
-    //audience: "https://gestion-espacios/api",//"https://dev-zgzo7qc6w6kujif0.us.auth0.com",
+    audience: "https://gestion-espacios/api",//"https://dev-zgzo7qc6w6kujif0.us.auth0.com",
   },
 };
 
@@ -34,13 +34,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Auth0Provider
       {...providerConfig}
-      // domain={domain}
-      // clientId={clientId}
       // redirectUri={window.location.origin}
       // onRedirectCallback={onRedirectCallback}
     >
       <App />
-
     </Auth0Provider>
   </React.StrictMode>,
 )

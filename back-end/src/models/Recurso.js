@@ -28,7 +28,7 @@ Recurso.init(
         model: Espacio,
         key: "id",
       },
-      allowNull: false,
+      allowNull: true,
       field: "id_espacio", // Acá defino el nombre real de la columna en la BD.
     },
   },

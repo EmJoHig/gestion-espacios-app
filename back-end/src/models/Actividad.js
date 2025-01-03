@@ -25,7 +25,7 @@ Actividad.init(
         model: Ministerio,
         key: "id",
       },
-      allowNull: false,
+      allowNull: true,
       field: "id_ministerio", // Acá defino el nombre real de la columna en la BD.
     },
   },

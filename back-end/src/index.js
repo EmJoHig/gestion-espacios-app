@@ -17,29 +17,25 @@ async function main() {
     await db2.authenticate();
     console.log("conexion exitosa");
 
+    // Sincroniza todos los modelos con la base de datos
+    await db2.sync({ alter: true });
+
+
     await Rol.sync({ alter: false });
-    console.log("Tabla 'rol' sincronizada");
 
     await Usuario.sync({ alter: false }); // alter en false para no pisar las tablas
-    console.log("Tabla 'users' sincronizada");
 
     await Ministerio.sync({ alter: false });
-    console.log("Tabla 'ministerio' sincronizada");
 
     await Recurso.sync({ alter: false });
-    console.log("Tabla 'Recurso' sincronizada");
 
     await Espacio.sync({ alter: false });
-    console.log("Tabla 'Espacio' sincronizada");
 
     await Actividad.sync({ alter: false });
-    console.log("Tabla 'Actividad' sincronizada");
 
     await Reserva.sync({ alter: false });
-    console.log("Tabla 'Reserva' sincronizada");
 
     await SolicitudReserva.sync({ alter: false });
-    console.log("Tabla 'SolicitudReserva' sincronizada");
 
 
   } catch (error) {

@@ -24,14 +24,38 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 import TablaMinisterios from './TablaMinisterios';
 import { useMinisterio } from "../../context/ministerioContext";
 
 export function MinisterioPage() {
 
-    const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
+    const { ministerios, getMinisterios, createMinisterio, updateMinisterio, deleteMinisterio } = useMinisterio();
     const navigate = useNavigate();
+
+    const [snackBarState, setSnackBarState] = React.useState({
+        open: false,
+        message: '',
+        severity: 'success', // Puede ser 'success', 'error', 'info', 'warning'
+    });
+
+
+    const openSnackBar = (message, severity) => {
+        setSnackBarState({
+            open: true,
+            message,
+            severity,
+        });
+    };
+
+    const closeSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackBarState({ ...snackBarState, open: false });
+    };
 
     useEffect(() => {
         getMinisterios();
@@ -68,10 +92,11 @@ export function MinisterioPage() {
 
     const [ministerioEdicion, setMinisterioEdicion] = React.useState(null);
 
-
+    const [ministerioIdToDelete, setMinisterioIdToDelete] = React.useState(null);
 
     const [open, setOpen] = React.useState(false);
     const [openEdit, setOpenEdit] = React.useState(false);
+    const [openConfirm, setOpenConfirm] = React.useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -85,7 +110,16 @@ export function MinisterioPage() {
     const handleSubmit = async (ministJson) => {
         try {
             const { codigo, descripcion } = ministJson;
-            await createMinisterio(ministJson);
+
+            const respCreate = await createMinisterio(ministJson);
+
+            if (respCreate == "") {
+                openSnackBar('El ministerio se ha creado con éxito.', 'success');
+            } else {
+                openSnackBar('Error al crear el ministerio.', 'error');
+            }
+
+
             await getMinisterios();
             handleClose();
         } catch (error) {
@@ -109,7 +143,14 @@ export function MinisterioPage() {
             const { codigo, descripcion } = ministJson;
             ministerioEdicion.codigo = codigo;
             ministerioEdicion.descripcion = descripcion;
-            await updateMinisterio(ministerioEdicion);
+            const respEdit = await updateMinisterio(ministerioEdicion);
+
+            if (respEdit == "") {
+                openSnackBar('El ministerio se ha editado con éxito.', 'success');
+            } else {
+                openSnackBar('Error al editar el ministerio.', 'error');
+            }
+
             await getMinisterios();
             handleCloseEdit();
         } catch (error) {
@@ -269,10 +310,65 @@ export function MinisterioPage() {
     };
 
     // metodo que envia el id de la row seleccionada para eliminar
-    const handleDeleteMinisterio = (idsMinisterios) => {
-        console.log("Datos del ministerio seleccionado:", idsMinisterios);
-
+    const handleDeleteMinisterio = (idsMinisterio) => {
+        setMinisterioIdToDelete(idsMinisterio);
+        setOpenConfirm(true);
     };
+
+    const handleCloseConfirm = () => {
+        setOpenConfirm(false);
+    };
+
+    const EliminarMinisterioRequest = async (idMinist) => {
+
+        try {
+
+            const respDelete = await deleteMinisterio(idMinist);
+
+            if (respDelete == "") {
+                openSnackBar('El ministerio se ha eliminado con éxito.', 'success');
+            } else {
+                openSnackBar('Error al eliminar el ministerio.', 'error');
+            }
+
+            await getMinisterios();
+            handleCloseConfirm();
+        } catch (error) {
+            console.error('Error al editar el ministerio:', error);
+        }
+    };
+
+
+
+    function RenderizarDialogConfirmar({ id }) {
+        return (
+            <>
+                <Dialog
+                    open={openConfirm}
+                    onClose={handleCloseConfirm}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">
+                        {"Eliminar Ministerio"}
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Esta seguro que desea eliminar el ministerio?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseConfirm}>CANCELAR</Button>
+                        <Button onClick={() => EliminarMinisterioRequest(id)} autoFocus>
+                            CONFIRMAR
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </>
+        );
+    }
+
+
 
     return (
         <>
@@ -286,24 +382,46 @@ export function MinisterioPage() {
                 </Button>
 
                 <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-                <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>Responsables por Ministerio</Button>
+                <Button variant="contained" onClick={() => navigate("/asociar-responsables")} style={{ marginLeft: '20px' }}>Asociar Responsables</Button>
+                <Button variant="contained" onClick={() => navigate("/asociar-actividades")} style={{ marginLeft: '20px' }}>Administrar Actividades de Ministerios</Button>
+
+                {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={ministerioIdToDelete} />}
+
                 <RenderizarDialogNuevoMinist />
+
                 {openEdit && (
                     <RenderizarDialogEditarMinist ministerio={ministerioEdicion} />
                 )}
+
                 <Box sx={{ marginTop: '50px' }}>
                     <TablaMinisterios
                         data={ministerios}
                         columnasTabla={columnas}
                         nombreTabla={"Listado de Ministerios"}
                         onEditClick={handleObtenerRow}
-                        // onClickDeleteMinisterio={handleDeleteMinisterio}
+                        onClickDeleteMinisterio={handleDeleteMinisterio}
                     />
                 </Box>
 
 
 
             </Box>
+
+
+            <Snackbar
+                open={snackBarState.open}
+                autoHideDuration={4000}
+                onClose={closeSnackBar}
+            >
+                <Alert
+                    onClose={closeSnackBar}
+                    severity={snackBarState.severity}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {snackBarState.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

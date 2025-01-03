@@ -2,16 +2,20 @@ import { createContext, useContext, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   getActividadesRequest,
+  // getActividadRequest,
   createActividadRequest,
   updateActividadRequest,
   deleteActividadRequest,
-} from "../api/actividad.js";
+  asociarActividadAMinistRequest,
+  GetActividadesSinMinisterioRequest,
+  quitarActividadAMinisterioRequest
+} from "../api/actividad";
 
 const ActividadContext = createContext();
 
 export const useActividad = () => {
   const context = useContext(ActividadContext);
-  if (!context) throw new Error("useActividad must be used within a ActividadProvider");
+  if (!context) throw new Error("useActividades must be used within a ActividadProvider");
   return context;
 };
 
@@ -21,24 +25,45 @@ export function ActividadProvider({ children }) {
 
 
   const getActividades = async () => {
+    // const res = await getActividadesRequest();
+    // setActividades(res.data);
     try {
-      
+
       const token = await getAccessTokenSilently({
         audience: 'https://gestion-espacios/api',
       });
+
       const res = await getActividadesRequest(token);
       setActividades(res.data);
-      console.log(res.data)
     } catch (error) {
       console.error('Error fetching actividades:', error);
     }
   };
 
+  //   const getActividad = async (id) => {
+  //     try {
+  //       const res = await getActividadRequest(id);
+  //       return res.data;
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
 
   const createActividad = async (actividad) => {
     try {
-      const res = await createActividadRequest(actividad);
-      console.log(res.data);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await createActividadRequest(token, actividad);
+
+      if (res.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al eliminar la actividad";
+      }
+
     } catch (error) {
       console.log(error);
     }
@@ -46,9 +71,21 @@ export function ActividadProvider({ children }) {
 
 
 
-  const updateActividad = async (id, actividad) => {
+  const updateActividad = async (actividad) => {
     try {
-      await updateActividadRequest(id, actividad);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const resp = await updateActividadRequest(token, actividad);
+
+      if (resp.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al editar la actividad";
+      }
+
     } catch (error) {
       console.error(error);
     }
@@ -57,12 +94,88 @@ export function ActividadProvider({ children }) {
 
   const deleteActividad = async (id) => {
     try {
-      const res = await deleteActividadRequest(id);
-      console.log(res);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await deleteActividadRequest(token, id);
+      if (res.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al eliminar la actividad";
+      }
+
     } catch (error) {
       console.log(error);
     }
   };
+
+
+
+  const asociarActividadAMinisterio = async (actsMinisterioBody) => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await asociarActividadAMinistRequest(token, actsMinisterioBody);
+
+      if (res.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al eliminar la actividad";
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const getActividadesSinMinisterio = async () => {
+    try {
+    
+          const token = await getAccessTokenSilently({
+            audience: 'https://gestion-espacios/api', // USAR ESTE
+            // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token',
+          });
+    
+          const res = await GetActividadesSinMinisterioRequest(token);
+                    
+          if (res.status == 200) {
+            return res;
+          } else {
+            return null;
+          }
+    
+        } catch (error) {
+          console.log(error);
+        }
+  };
+
+
+  const quitarActividadAMinisterio = async (actMinisterioBody) => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await quitarActividadAMinisterioRequest(token, actMinisterioBody);
+
+      if (res.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al eliminar la actividad";
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
 
   return (
@@ -70,9 +183,13 @@ export function ActividadProvider({ children }) {
       value={{
         actividades,
         getActividades,
+        // getActividad,
         createActividad,
         updateActividad,
         deleteActividad,
+        asociarActividadAMinisterio,
+        getActividadesSinMinisterio,
+        quitarActividadAMinisterio
       }}
     >
       {children}

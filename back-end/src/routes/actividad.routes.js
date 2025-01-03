@@ -5,10 +5,13 @@ import { auth } from "express-oauth2-jwt-bearer";
 const { Router } = pkg;
 import {
   getActividades,
-  getActividadById,
+  // getActividadById,
   createActividad,
   updateActividad,
   deleteActividad,
+  asociarActividadAMinisterio,
+  getActividadesSinMinisterio,
+  quitarActividadAMinisterio,
 } from "../controllers/actividad.controller.js";
 
 const router = express.Router();
@@ -19,10 +22,13 @@ const jwtCheck = auth({
   tokenSigningAlg: "RS256",
 });
 
-router.get("/get_actividades", getActividades);
-router.get("/:id", getActividadById);
-router.post("/nueva_actividad", createActividad);
-router.put("/editar_actividad/:id", updateActividad);
-router.delete("/eliminar_actividad/:id", deleteActividad);
+router.get("/get_actividades", jwtCheck, getActividades);
+// router.get("/:id", jwtCheck, getActividadById);
+router.post("/nueva_actividad", jwtCheck, createActividad);
+router.put("/editar_actividad/:id", jwtCheck, updateActividad);
+router.delete("/eliminar_actividad/:id", jwtCheck, deleteActividad);
+router.post("/asociar_actividad_a_ministerio", jwtCheck, asociarActividadAMinisterio);
+router.get("/get_actividades_sin_ministerio", jwtCheck, getActividadesSinMinisterio);
+router.post("/quitar_actividad_a_ministerio", jwtCheck, quitarActividadAMinisterio);
 
 export default router;

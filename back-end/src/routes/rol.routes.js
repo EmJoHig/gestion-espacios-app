@@ -9,7 +9,8 @@ import {
     createRol,
     updateRol,
     deleteRol,
-    asociarRolAlUsuario
+    asociarRolAlUsuario,
+    getRolesAUTH0
 } from "../controllers/rol.controller.js";
 
 const router = express.Router();
@@ -21,7 +22,9 @@ const jwtCheck = auth({
   });
 
 
-router.get('/get_roles', jwtCheck, getRolesPorUsuario);
+router.get('/get_roles_por_usuario', jwtCheck, getRolesPorUsuario);
+router.get('/get_roles_auth0', jwtCheck, getRolesAUTH0);
+
 // router.get('/get_roles', getRoles);
 router.get('/:id', getRolById);
 router.post('/nuevo_rol', jwtCheck, createRol);

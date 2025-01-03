@@ -1,7 +1,8 @@
 import { createContext, useContext, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
-  getRolesRequest,
+  getRolesPorUsuarioRequest,
+  getRolesAUTH0Request,
   // getRolRequest,
   createRolRequest,
   updateRolRequest,
@@ -24,7 +25,7 @@ export function RolProvider({ children }) {
   const { getAccessTokenSilently } = useAuth0();
 
 
-  const getRoles = async () => {    
+  const getRolesPorUsuario = async () => {    
     try {
       
       const token = await getAccessTokenSilently({
@@ -32,21 +33,40 @@ export function RolProvider({ children }) {
         // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
       });
 
-      const res = await getRolesRequest(token);
-      setRoles(res.data);
+      const res = await getRolesPorUsuarioRequest(token);
+      //setRoles(res.data);
     } catch (error) {
       console.error('Error fetching roles:', error);
     }
   };
 
-  //   const getRol = async (id) => {
-  //     try {
-  //       const res = await getRolRequest(id);
-  //       return res.data;
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
+
+  // obtiene usuarios de AUTH0
+  const getRolesAUTH0 = async () => {
+
+    try {
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
+      });
+
+      const resp = await getRolesAUTH0Request(token);
+      
+      if (resp.status === 200) {
+
+        setRoles(resp.data.data);
+
+        return "";
+      } else {
+        return "hubo un error al obtener usuarios de auth0";
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+
+  };
+
 
   const createRol = async (idUsuarioAuth0, rol) => {
     try {
@@ -57,7 +77,13 @@ export function RolProvider({ children }) {
       });
 
       const res = await createRolRequest(token, idUsuarioAuth0, rol);
-      // console.log(res.data);
+
+      if (res.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al crear el rol context";
+      }
+
     } catch (error) {
       console.log(error);
     }
@@ -73,7 +99,14 @@ export function RolProvider({ children }) {
         // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token',
       });
 
-      await updateRolRequest(token, rol);
+      const resp = await updateRolRequest(token, rol);
+
+      if (resp.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al editar el rol";
+      }
+
     } catch (error) {
       console.error(error);
     }
@@ -88,8 +121,14 @@ export function RolProvider({ children }) {
         // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
       });
 
-      const res = await deleteRolRequest(token, id);
-      
+      const resp = await deleteRolRequest(token, id);
+
+      if (resp.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al eliminar el rol";
+      }
+
     } catch (error) {
       console.log(error);
     }
@@ -117,8 +156,8 @@ export function RolProvider({ children }) {
     <RolContext.Provider
       value={{
         roles,
-        getRoles,
-        // getRol,
+        getRolesPorUsuario,
+        getRolesAUTH0,
         createRol,
         updateRol,
         deleteRol,

@@ -5,6 +5,8 @@ import {
   getUsuariosRequest,
   getUsuarioRequest,
   updateUsuarioRequest,
+  getUsuarioAuth0Request,
+  getUsuariosAUTH0Request,
 } from "../api/usuario";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -45,8 +47,8 @@ export function UsuarioProvider({ children }) {
 
   const deleteUsuario = async (id) => {
     try {
-      const res = await deleteUsuarioRequest(id);
-      if (res.status === 204) setUsuarios(usuarios.filter((usuario) => usuario._id !== id));
+      // const res = await deleteUsuarioRequest(id);
+      // if (res.status === 204) setUsuarios(usuarios.filter((usuario) => usuario._id !== id));
     } catch (error) {
       console.log(error);
     }
@@ -54,8 +56,8 @@ export function UsuarioProvider({ children }) {
 
   const createUsuario = async (usuario) => {
     try {
-      const res = await createUsuarioRequest(usuario);
-      console.log(res.data);
+      // const res = await createUsuarioRequest(usuario);
+      // console.log(res.data);
     } catch (error) {
       console.log(error);
     }
@@ -78,6 +80,64 @@ export function UsuarioProvider({ children }) {
     }
   };
 
+
+  //chequea que el usuario logueado este en auth0, sino lo esta lo crea en mi bd
+  const getUsuarioAuth0 = async (usuario) => {
+
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
+      });
+
+      const resp = await getUsuarioAuth0Request(token, usuario);
+
+      if (resp.status === 200) {
+        return "";
+      } else {
+        return "hubo un error al obtenr usuario auth0 el rol";
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+
+  };
+
+
+
+  // obtiene usuarios de AUTH0
+  const getUsuariosAUTH0 = async () => {
+
+    try {
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
+      });
+
+      const resp = await getUsuariosAUTH0Request(token);
+      
+      console.log("resp");
+      console.log(resp.data);
+
+      if (resp.status === 200) {
+
+        setUsuarios(resp.data.data);
+
+        return "";
+      } else {
+        return "hubo un error al obtener usuarios de auth0";
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+
+  };
+
+
+
   return (
     <UsuarioContext.Provider
       value={{
@@ -87,6 +147,8 @@ export function UsuarioProvider({ children }) {
         createUsuario,
         getUsuario,
         updateUsuario,
+        getUsuarioAuth0,
+        getUsuariosAUTH0,
       }}
     >
       {children}

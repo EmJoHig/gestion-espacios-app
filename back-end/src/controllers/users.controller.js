@@ -1,21 +1,15 @@
 import Usuario from "../models/Usuario.js";
 import Rol from "../models/Rol.js";
+import Ministerio from "../models/Ministerio.js";
 import bcrypt from "bcryptjs";
+import axios from "axios";
 
 export const getUsers = async (req, res) => {
   try {
     // const users = await Usuario.find();
     // const users = await Usuario.findAll();
 
-    const users = await Usuario.findAll({
-      include: [
-        {
-          model: Rol,
-          as: "rol", // alias
-          // attributes: ['id', 'name'],
-        },
-      ],
-    });
+    const users = await Usuario.findAll({ include: [{ model: Rol, as: 'rol', }, { model: Ministerio, as: 'ministerio' }] });
 
     res.status(200).json(users);
   } catch (error) {
@@ -92,5 +86,108 @@ export const deleteUser = async (req, res) => {
     res
       .status(500)
       .json({ message: "Ha ocurrido un error al eliminar el usuario" });
+  }
+};
+
+
+export const createUser = async (req, res) => {
+  try {
+
+    const { userData } = req.body;
+
+    console.log("userData");
+    console.log(userData);
+
+    // const nuevoRol = await Usuario.create({ nombreUsuario: userData.username, email: userData.email, idUsuarioAUTH0: userData.auth0_user_id });
+
+    // if (nuevoRol != null) {
+    //   res.status(200).json(nuevoRol);
+    // } else {
+    //   res.status(500).json({ message: 'Ha ocurrido un error al asociar el Rol al Usuario' });
+    // }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Ha ocurrido un error al crear el usuario' });
+  }
+
+}
+
+
+
+export const validarUsuarioAUTH0 = async (req, res) => {
+  try {
+
+    const { UsuarioAUTH0 } = req.body;
+
+    console.log("UsuarioAUTH0");
+    console.log(UsuarioAUTH0);
+
+    const _usuario = await Usuario.findOne({ where: { idUsuarioAUTH0: UsuarioAUTH0.sub } });
+
+
+    // si no existe, lo creo
+    if (!_usuario) {
+
+      console.log("entra a crear usuario ");
+
+      const nuevoUsuario = await Usuario.create({ nombreUsuario: UsuarioAUTH0.name, email: UsuarioAUTH0.email, idUsuarioAUTH0: UsuarioAUTH0.sub });
+
+      if (nuevoUsuario != null) {
+        res.status(200).json({ message: "" });
+      } else {
+        res.status(500).json({ message: 'Ha ocurrido un error al crear Usuario' });
+      }
+
+    } else {
+      res.status(200).json({ message: 'ya esta creado' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Ha ocurrido un error al crear el usuario' });
+  }
+
+}
+
+
+export const getUsersAUTH0 = async (req, res) => {
+  try {
+
+    const responseAUTH0 = await axios.post(`https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token`, {
+      client_id: "MReNmdTUf5BlAdAZuUr3uc65GTcaTklw",
+      client_secret: "e9U8ISCwqcZX9BCIIysJtk23D6XUziqHdLWhhv0jV6csW4_C9deHZ_q45nGLZCBP",
+      audience: "https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/",// llamo al audience de el management api
+      grant_type: 'client_credentials',
+    });
+
+    if (responseAUTH0.status != 200) {
+      return res.status(500).json({ message: 'Ha ocurrido un error al obtener el token' });
+    }
+    else {
+      const tokenAdmin = responseAUTH0.data.access_token;
+      const response = await axios.get(
+        'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/users',
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenAdmin}`,
+          }
+        }
+      );
+
+      if (response != null && (response.status == 200 || response.status == 201 || response.status == 204)) {
+        // console.log("response");
+        // console.log(response);
+
+        res.status(200).json({data: response.data, status: response.status});
+      } else {
+        res.status(500).json({ message: 'Ha ocurrido un error al actualizar el Rol en AUTH0' });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Ha ocurrido un error al obtener los usuarios" });
   }
 };

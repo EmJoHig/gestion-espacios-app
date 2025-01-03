@@ -25,7 +25,7 @@ export function RecursoProvider({ children }) {
     // const res = await getRecursosRequest();
     // setRecursos(res.data);
     try {
-      
+
       const token = await getAccessTokenSilently({
         audience: 'https://gestion-espacios/api',
       });
@@ -48,8 +48,18 @@ export function RecursoProvider({ children }) {
 
   const createRecurso = async (recurso) => {
     try {
-      const res = await createRecursoRequest(recurso);
-      // console.log(res.data);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await createRecursoRequest(token, recurso);
+
+      if (res.status == 200) {
+        return "";
+      } else {
+        return "Error al crear el recurso";
+      }
     } catch (error) {
       console.log(error);
     }
@@ -57,9 +67,22 @@ export function RecursoProvider({ children }) {
 
 
 
-  const updateRecurso = async (id, recurso) => {
+  const updateRecurso = async (recurso) => {
     try {
-      await updateRecursoRequest(id, recurso);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+      
+      const res = await updateRecursoRequest(token, recurso);
+
+      if (res.status == 200) {
+        return "";
+      } else {
+        return "Error al editar el recurso";
+      }
+
+
     } catch (error) {
       console.error(error);
     }
@@ -68,10 +91,17 @@ export function RecursoProvider({ children }) {
 
   const deleteRecurso = async (id) => {
     try {
-      const res = await deleteRecursoRequest(id);
-      console.log("response delete minist");
-      console.log(res);
-      // if (res.status === 204) setRecursos(recursos.filter((recurso) => recurso._id !== id));
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await deleteRecursoRequest(token, id);
+      if (res.status == 200) {
+        return "";
+      } else {
+        return "Error al eliminar el recurso";
+      }
     } catch (error) {
       console.log(error);
     }

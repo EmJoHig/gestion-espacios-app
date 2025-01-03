@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 export const getRecursos = async (req, res) => {
     try {
         const recursos = await Recurso.findAll();
-        
+
         res.status(200).json(recursos);
     } catch (error) {
         console.error(error);
@@ -41,10 +41,15 @@ export const createRecurso = async (req, res) => {
             cantidad
         });
 
-        res.status(201).json(nuevoRecurso);     
+        if (nuevoRecurso === null) {
+            return res.status(400).json({ message: 'No se pudo crear el Recurso' });
+        } else {
+            return res.status(200).json({ message: 'El Recurso se guardo con exito' });
+        }
+
     } catch (error) {
         console.error('Error al crear el recurso:', error);
-        res.status(500).json({ message: 'Ha ocurrido un error al crear el Recurso' });
+        res.status(500).json({ message: 'Error al crear el recurso' });
     }
 };
 
@@ -66,11 +71,16 @@ export const updateRecurso = async (req, res) => {
         if (descripcion) updates.descripcion = descripcion;
         if (cantidad) updates.cantidad = cantidad;
 
-        await Recurso.update(updates, {
+        const _editRecurso = await Recurso.update(updates, {
             where: { id: id }
         });
 
-        res.status(200).json(recurso);
+        if (_editRecurso === null) {
+            return res.status(400).json({ message: 'No se pudo editar el Recurso' });
+        } else {
+            return res.status(200).json({ message: 'El Recurso se edito con exito' });
+        }
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Ha ocurrido un error al actualizar el Recurso' });
@@ -80,14 +90,21 @@ export const updateRecurso = async (req, res) => {
 export const deleteRecurso = async (req, res) => {
     try {
         const { id } = req.params;
-        const recurso = await Recurso.destroy({
+
+
+        console.log("Eliminar recurso con id:", id);
+
+
+        const recursoDelete = await Recurso.destroy({
             where: { id: id }
         })
-        if (!recurso) {
-            return res.status(404).json({ message: 'Recurso no encontrado' });
-        }
         
-        res.status(200).json(recurso);
+        if (recursoDelete === null) {
+            return res.status(400).json({ message: 'No se pudo eliminar el Recurso' });
+        } else {
+            return res.status(200).json({ message: 'El Recurso se elimino con exito' });
+        }
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Ha ocurrido un error al eliminar el Recurso' });

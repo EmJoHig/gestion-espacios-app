@@ -27,6 +27,12 @@ import { ReservasPage } from "./pages/Reserva/ReservasPage";
 import { RolPage } from "./pages/Rol/RolPage";
 import { RecursoPage } from "./pages/Recurso/RecursoPage";
 import { AsociarRolesPage } from "./pages/Rol/AsociarRolesPage";
+import { AsociarRespAMinisterioPage } from "./pages/Ministerio/AsociarRespAMinisterioPage";
+import { ActividadPage } from "./pages/Actividad/ActividadPage";
+import { AsociarActMinisterioPage } from "./pages/Actividad/AsociarActMinisterioPage";
+
+import { UsuarioPage } from "./pages/Usuario/UsuarioPage";
+import { EspacioPage } from "./pages/Espacio/EspacioPage";
 
 
 function App() {
@@ -53,17 +59,21 @@ function App() {
 
                           <Route element={<ProtectedRoute />}>
 
-                            <Route path="/home" element={<HomePage />} />
-                            <Route path="/ministerio" element={<MinisterioPage />} />
-                            <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
-                            <Route path="/reservas" element={<ReservasPage />} />
-                            <Route path="/rol" element={<RolPage />} />
-                            <Route path="/asociar-roles" element={<AsociarRolesPage />} />
-                            <Route path="/recurso" element={<RecursoPage />} />
-
-                            {/* <Route path="/add-task" element={<TaskFormPage />} />
-                            <Route path="/tasks/:id" element={<TaskFormPage />} />
-                            <Route path="/profile" element={<h1>Profile</h1>} /> */}
+                        <Route path="/home" element={<HomePage />} />
+                        <Route path="/ministerio" element={<MinisterioPage />} />
+                        <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
+                        <Route path="/reservas" element={<ReservasPage />} />
+                        <Route path="/espacio" element={<EspacioPage/>} />
+                        <Route path="/rol" element={<RolPage />} />
+                        <Route path="/asociar-roles" element={<AsociarRolesPage />} />
+                        <Route path="/recurso" element={<RecursoPage />} />
+                        <Route path="/asociar-responsables" element={<AsociarRespAMinisterioPage />} />
+                        <Route path="/actividad" element={<ActividadPage />} />
+                        <Route path="/asociar-actividades" element={<AsociarActMinisterioPage />} />
+                        <Route path="/usuarios" element={<UsuarioPage />} />
+                        {/* <Route path="/add-task" element={<TaskFormPage />} />
+                      <Route path="/tasks/:id" element={<TaskFormPage />} />
+                      <Route path="/profile" element={<h1>Profile</h1>} /> */}
 
                           </Route>
                         </Routes>

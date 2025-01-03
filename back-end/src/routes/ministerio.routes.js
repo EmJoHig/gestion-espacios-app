@@ -9,6 +9,8 @@ import {
     createMinisterio,
     updateMinisterio,
     deleteMinisterio,
+    asociarResponsableAMinist,
+    getActividadesPorMinisterio
 } from "../controllers/ministerio.controller.js";
 
 const router = express.Router();
@@ -21,11 +23,13 @@ const jwtCheck = auth({
 
 
 // router.get('/', authenticateToken, getUsers);
-router.get('/get_ministerios', getMinisterios);
-router.get('/:id', getMinisterioById);
-router.post('/nuevo_ministerio', createMinisterio);
-router.put('/editar_ministerio/:id', updateMinisterio);
-router.delete('/eliminar_ministerio/:id', deleteMinisterio);
+router.get('/get_ministerios',jwtCheck, getMinisterios);
+router.get('/get_ministerio_por_id/:id', jwtCheck, getMinisterioById);
+router.post('/nuevo_ministerio', jwtCheck, createMinisterio);
+router.put('/editar_ministerio/:id', jwtCheck, updateMinisterio);
+router.delete('/eliminar_ministerio/:id', jwtCheck, deleteMinisterio);
+router.post('/asociar_responsable_ministerio', jwtCheck, asociarResponsableAMinist);
+router.get('/get_actividades_de_ministerio', jwtCheck, getActividadesPorMinisterio);
 
 
 export default router;
