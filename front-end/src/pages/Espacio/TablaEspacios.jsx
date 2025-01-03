@@ -1,24 +1,51 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
-import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const TablaEspacio = ({ columns, initialRows, entityName }) => {
-  const [rows, setRows] = useState(initialRows);
+const TablaEspacio = ({ columns, rows: initialRows, entityName }) => {
+  const [rows, setRows] = useState(initialRows); // Inicialización de las filas
+  const [searchValue, setSearchValue] = useState(""); // Valor del buscador
+  const [filteredRows, setFilteredRows] = useState(initialRows); // Filas filtradas
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [isEditable, setIsEditable] = useState(false);
+
+  // Filtrar las filas según el valor del buscador
+  const handleSearch = (event) => {
+    const value = event.target.value.toLowerCase();
+    setSearchValue(value);
+    const filtered = initialRows.filter(
+      row => row.name.toLowerCase().includes(value) || row.status.toLowerCase().includes(value)
+    );
+    setFilteredRows(filtered);
+  };
+
+  const handleDialogClose = (dialogType) => {
+    switch (dialogType) {
+      case "delete":
+        setOpenDeleteDialog(false);
+        break;
+      case "edit":
+        setOpenEditDialog(false);
+        break;
+      case "view":
+        setOpenViewDialog(false);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const updateRow = (updatedRow) => {
+    setRows((prevRows) => prevRows.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
+    setFilteredRows((prevFilteredRows) => prevFilteredRows.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
+  };
 
   const handleDeleteClick = (row) => {
     setSelectedRow(row);
@@ -27,74 +54,102 @@ const TablaEspacio = ({ columns, initialRows, entityName }) => {
 
   const handleEditClick = (row) => {
     setSelectedRow(row);
+    setIsEditable(true);
     setOpenEditDialog(true);
   };
 
   const handleViewClick = (row) => {
     setSelectedRow(row);
-    setOpenViewDialog(true);
     setIsEditable(false);
+    setOpenViewDialog(true);
   };
 
   const handleConfirmDelete = () => {
-    setRows(rows.filter((row) => row.id !== selectedRow.id));
-    setOpenDeleteDialog(false);
+    setRows((prevRows) => prevRows.filter((row) => row.id !== selectedRow.id));
+    setFilteredRows((prevFilteredRows) => prevFilteredRows.filter((row) => row.id !== selectedRow.id));
+    handleDialogClose("delete");
   };
 
   const handleEditSubmit = () => {
-    setRows(rows.map((row) => (row.id === selectedRow.id ? selectedRow : row)));
-    setOpenEditDialog(false);
-    setOpenViewDialog(false);
+    updateRow(selectedRow);
+    handleDialogClose("edit");
+    handleDialogClose("view");
   };
 
   const handleFieldChange = (field) => (event) => {
     setSelectedRow({ ...selectedRow, [field]: event.target.value });
   };
 
-  return (
-    <Box sx={{ height: 500, width: '100%' }}>
-      <DataGrid
-            rows={rows}
-            columns={[
-                ...columns,
-                {
-                    field: 'acciones',
-                    headerName: 'Acciones',
-                    type: 'actions',
-                    width: 200,
-                    getActions: (params) => [
-                        <GridActionsCellItem
-                            key={`view-${params.id}`}
-                            icon={<VisibilityIcon />}
-                            label="Ver"
-                            onClick={() => handleViewClick(params.row)}
-                        />,
-                        <GridActionsCellItem
-                            key={`edit-${params.id}`}
-                            icon={<EditIcon />}
-                            label="Editar"
-                            onClick={() => handleEditClick(params.row)}
-                        />,
-                        <GridActionsCellItem
-                            key={`delete-${params.id}`}
-                            icon={<DeleteIcon />}
-                            label="Eliminar"
-                            onClick={() => handleDeleteClick(params.row)}
-                        />,
-                    ],
-                },
-            ]}
-        />
+  const DynamicTextField = ({ columns, row, onChange, readOnly }) => (
+    <>
+      {columns
+        .filter((col) => col.field !== "acciones")
+        .map((col) => (
+          <TextField
+            key={col.field}
+            margin="dense"
+            label={col.headerName}
+            fullWidth
+            type={col.type === "number" ? "number" : "text"}
+            value={row?.[col.field] || ""}
+            onChange={onChange(col.field)}
+            InputProps={{
+              readOnly,
+            }}
+          />
+        ))}
+    </>
+  );
 
+  return (
+    <Box sx={{ height: 500, width: "100%" }}>
+      <TextField
+        placeholder="Buscar espacio"
+        fullWidth
+        value={searchValue}
+        onChange={handleSearch}
+      />
+      <DataGrid
+        rows={filteredRows} // Usar las filas filtradas
+        columns={[
+          ...columns,
+          {
+            field: "acciones",
+            headerName: "Acciones",
+            type: "actions",
+            width: 200,
+            getActions: (params) => [
+              <GridActionsCellItem
+                key={`view-${params.id}`}
+                icon={<VisibilityIcon />}
+                label="Ver"
+                onClick={() => handleViewClick(params.row)}
+              />,
+              <GridActionsCellItem
+                key={`edit-${params.id}`}
+                icon={<EditIcon />}
+                label="Editar"
+                onClick={() => handleEditClick(params.row)}
+              />,
+              <GridActionsCellItem
+                key={`delete-${params.id}`}
+                icon={<DeleteIcon />}
+                label="Eliminar"
+                onClick={() => handleDeleteClick(params.row)}
+              />,
+            ],
+          },
+        ]}
+      />
 
       {/* Diálogo para confirmar eliminación */}
-      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+      <Dialog open={openDeleteDialog} onClose={() => handleDialogClose("delete")}>
         <DialogTitle>Confirmar Eliminación</DialogTitle>
         <DialogContent>
-          Estás seguro que desea eliminar {entityName} "{selectedRow?.name}"?
+          ¿Estás seguro que deseas eliminar {entityName} "{selectedRow?.name}"?
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)}>Cancelar</Button>
+          <Button onClick={() => handleDialogClose("delete")}>Cancelar</Button>
           <Button onClick={handleConfirmDelete} color="error">
             Eliminar
           </Button>
@@ -102,25 +157,13 @@ const TablaEspacio = ({ columns, initialRows, entityName }) => {
       </Dialog>
 
       {/* Diálogo para editar */}
-      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+      <Dialog open={openEditDialog} onClose={() => handleDialogClose("edit")}>
         <DialogTitle>Editar {entityName}</DialogTitle>
         <DialogContent>
-          {columns
-            .filter((col) => col.field !== 'actions')
-            .map((col) => (
-              <TextField
-                key={col.field}
-                margin="dense"
-                label={col.headerName}
-                fullWidth
-                type={col.type === 'number' ? 'number' : 'text'}
-                value={selectedRow?.[col.field] || ''}
-                onChange={handleFieldChange(col.field)}
-              />
-            ))}
+          <DynamicTextField columns={columns} row={selectedRow} onChange={handleFieldChange} readOnly={false} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)}>Cancelar</Button>
+          <Button onClick={() => handleDialogClose("edit")}>Cancelar</Button>
           <Button onClick={handleEditSubmit} color="primary">
             Guardar
           </Button>
@@ -128,35 +171,18 @@ const TablaEspacio = ({ columns, initialRows, entityName }) => {
       </Dialog>
 
       {/* Diálogo para visualizar */}
-      <Dialog open={openViewDialog} onClose={() => setOpenViewDialog(false)}>
+      <Dialog open={openViewDialog} onClose={() => handleDialogClose("view")}>
         <DialogTitle>Ver {entityName}</DialogTitle>
         <DialogContent>
-          {columns
-            .filter((col) => col.field !== 'actions')
-            .map((col) => (
-              <TextField
-                key={col.field}
-                margin="dense"
-                label={col.headerName}
-                fullWidth
-                type={col.type === 'number' ? 'number' : 'text'}
-                value={selectedRow?.[col.field] || ''}
-                onChange={handleFieldChange(col.field)}
-                InputProps={{
-                  readOnly: !isEditable,
-                }}
-              />
-            ))}
+          <DynamicTextField columns={columns} row={selectedRow} onChange={handleFieldChange} readOnly={!isEditable} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenViewDialog(false)}>Salir</Button>
-          <Button
-            onClick={() => setIsEditable(true)}
-            color="primary"
-            disabled={isEditable}
-          >
-            Editar
-          </Button>
+          <Button onClick={() => handleDialogClose("view")}>Salir</Button>
+          {!isEditable && (
+            <Button onClick={() => setIsEditable(true)} color="primary">
+              Editar
+            </Button>
+          )}
           {isEditable && (
             <Button onClick={handleEditSubmit} color="primary">
               Guardar
@@ -171,8 +197,9 @@ const TablaEspacio = ({ columns, initialRows, entityName }) => {
 // Validación de propiedades con PropTypes
 TablaEspacio.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.object).isRequired,
-  initialRows: PropTypes.array.isRequired,
+  rows: PropTypes.array.isRequired,
   entityName: PropTypes.string.isRequired,
 };
 
 export default TablaEspacio;
+
