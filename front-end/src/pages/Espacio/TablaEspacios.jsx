@@ -1,27 +1,59 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect,useState } from "react";
 import PropTypes from "prop-types";
-import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, FormControl } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useEspacio } from "../../context/espacioContext";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
-const TablaEspacio = ({ columns, rows: initialRows, entityName }) => {
-  const [rows, setRows] = useState(initialRows); // Inicialización de las filas
+const TablaEspacio = ({ columns, rows: espacios, entityName , onEdit}) => {
+  const [rows, setRows] = useState(espacios); // Inicialización de las filas
   const [searchValue, setSearchValue] = useState(""); // Valor del buscador
-  const [filteredRows, setFilteredRows] = useState(initialRows); // Filas filtradas
+  const [filteredRows, setFilteredRows] = useState(espacios); // Filas filtradas
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [isEditable, setIsEditable] = useState(false);
 
+  const [snackBarState, setSnackBarState] = React.useState({
+        open: false,
+        message: '',
+        severity: 'success', // Puede ser 'success', 'error', 'info', 'warning'
+  }); 
+
+  const openSnackBar = (message, severity) => {
+    setSnackBarState({
+        open: true,
+        message,
+        severity,
+    });
+  };
+
+  const closeSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+        return;
+    }
+    setSnackBarState({ ...snackBarState, open: false });
+  };
+  
+  const {deleteEspacio} = useEspacio();
+
+  //Para que cuando entre desde un link o recargue la pagina muestre los datos.
+  useEffect(() => {
+    setFilteredRows(espacios);
+  }, [espacios]);
+  
+
   // Filtrar las filas según el valor del buscador
   const handleSearch = (event) => {
     const value = event.target.value.toLowerCase();
     setSearchValue(value);
-    const filtered = initialRows.filter(
-      row => row.name.toLowerCase().includes(value) || row.status.toLowerCase().includes(value)
+    const filtered = espacios.filter(
+      row => row.nombre.toLowerCase().includes(value) 
     );
     setFilteredRows(filtered);
   };
@@ -42,38 +74,33 @@ const TablaEspacio = ({ columns, rows: initialRows, entityName }) => {
     }
   };
 
-  const updateRow = (updatedRow) => {
-    setRows((prevRows) => prevRows.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
-    setFilteredRows((prevFilteredRows) => prevFilteredRows.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
-  };
 
   const handleDeleteClick = (row) => {
     setSelectedRow(row);
     setOpenDeleteDialog(true);
   };
 
-  const handleEditClick = (row) => {
-    setSelectedRow(row);
-    setIsEditable(true);
-    setOpenEditDialog(true);
-  };
-
   const handleViewClick = (row) => {
     setSelectedRow(row);
-    setIsEditable(false);
     setOpenViewDialog(true);
   };
 
-  const handleConfirmDelete = () => {
-    setRows((prevRows) => prevRows.filter((row) => row.id !== selectedRow.id));
-    setFilteredRows((prevFilteredRows) => prevFilteredRows.filter((row) => row.id !== selectedRow.id));
-    handleDialogClose("delete");
-  };
+  const handleConfirmDelete = async() => {
+    try {
+      const respuesta = await deleteEspacio(selectedRow.id);
+      if (respuesta!="") {
+        setRows((prevRows) => prevRows.filter((row) => row.id !== selectedRow.id));
+        setFilteredRows((prevFilteredRows) => prevFilteredRows.filter((row) => row.id !== selectedRow.id));
+        handleDialogClose("delete");
+        openSnackBar('El espacio se ha eliminado con éxito.', 'success');
+      }else {
+        openSnackBar('Hubo un error al eliminar el espacio.', 'error');
+      }
+      
+    } catch (error) {
+      console.error(error);
+    }
 
-  const handleEditSubmit = () => {
-    updateRow(selectedRow);
-    handleDialogClose("edit");
-    handleDialogClose("view");
   };
 
   const handleFieldChange = (field) => (event) => {
@@ -84,22 +111,32 @@ const TablaEspacio = ({ columns, rows: initialRows, entityName }) => {
     <>
       {columns
         .filter((col) => col.field !== "acciones")
-        .map((col) => (
-          <TextField
-            key={col.field}
-            margin="dense"
-            label={col.headerName}
-            fullWidth
-            type={col.type === "number" ? "number" : "text"}
-            value={row?.[col.field] || ""}
-            onChange={onChange(col.field)}
-            InputProps={{
-              readOnly,
-            }}
-          />
-        ))}
+        .map((col) => {
+          const value = row?.[col.field];
+          // Manejar campos que son objetos
+          const displayValue =
+            typeof value === "object" && value !== null
+              ? value.nombre || JSON.stringify(value)
+              : value;
+  
+          return (
+            <TextField
+              key={col.field}
+              margin="dense"
+              label={col.headerName}
+              fullWidth
+              type={col.type === "number" ? "number" : "text"}
+              value={displayValue || ""}
+              onChange={onChange(col.field)}
+              InputProps={{
+                readOnly,
+              }}
+            />
+          );
+        })}
     </>
   );
+  
 
   return (
     <Box sx={{ height: 500, width: "100%" }}>
@@ -129,7 +166,7 @@ const TablaEspacio = ({ columns, rows: initialRows, entityName }) => {
                 key={`edit-${params.id}`}
                 icon={<EditIcon />}
                 label="Editar"
-                onClick={() => handleEditClick(params.row)}
+                onClick={() => onEdit(params.row.id)}
               />,
               <GridActionsCellItem
                 key={`delete-${params.id}`}
@@ -146,26 +183,12 @@ const TablaEspacio = ({ columns, rows: initialRows, entityName }) => {
       <Dialog open={openDeleteDialog} onClose={() => handleDialogClose("delete")}>
         <DialogTitle>Confirmar Eliminación</DialogTitle>
         <DialogContent>
-          ¿Estás seguro que deseas eliminar {entityName} "{selectedRow?.name}"?
+          ¿Estás seguro que deseas eliminar el {entityName}: "{selectedRow?.nombre}"?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleDialogClose("delete")}>Cancelar</Button>
-          <Button onClick={handleConfirmDelete} color="error">
+          <Button onClick={handleConfirmDelete} variant="contained" color="error">
             Eliminar
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Diálogo para editar */}
-      <Dialog open={openEditDialog} onClose={() => handleDialogClose("edit")}>
-        <DialogTitle>Editar {entityName}</DialogTitle>
-        <DialogContent>
-          <DynamicTextField columns={columns} row={selectedRow} onChange={handleFieldChange} readOnly={false} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => handleDialogClose("edit")}>Cancelar</Button>
-          <Button onClick={handleEditSubmit} color="primary">
-            Guardar
           </Button>
         </DialogActions>
       </Dialog>
@@ -177,19 +200,24 @@ const TablaEspacio = ({ columns, rows: initialRows, entityName }) => {
           <DynamicTextField columns={columns} row={selectedRow} onChange={handleFieldChange} readOnly={!isEditable} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleDialogClose("view")}>Salir</Button>
-          {!isEditable && (
-            <Button onClick={() => setIsEditable(true)} color="primary">
-              Editar
-            </Button>
-          )}
-          {isEditable && (
-            <Button onClick={handleEditSubmit} color="primary">
-              Guardar
-            </Button>
-          )}
+          <Button variant="outlined" onClick={() => handleDialogClose("view")}>Salir</Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackBarState.open}
+        autoHideDuration={4000}
+        onClose={closeSnackBar}
+        >
+        <Alert
+          onClose={closeSnackBar}
+          severity={snackBarState.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+          >
+          {snackBarState.message}
+        </Alert>
+      </Snackbar>                            
     </Box>
   );
 };
