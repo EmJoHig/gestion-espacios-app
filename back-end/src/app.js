@@ -16,7 +16,7 @@ import actividadRoutes from "./routes/actividad.routes.js";
 import reservaRoutes from "./routes/reserva.routes.js";
 import solicitudReservaRoutes from "./routes/solicitudReserva.routes.js";
 import espacioRoutes from "./routes/espacio.routes.js";
-
+import estadoRoutes from "./routes/estado.routes.js";
 
 import "./config/passport.js";
 import bodyParser from "body-parser";
@@ -28,7 +28,6 @@ import { auth } from "express-oauth2-jwt-bearer";
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-
 const corsOptions = {
   origin: 'http://127.0.0.1:5173',
   credentials: true, // Habilitar el intercambio de cookies y otros datos de autenticación
@@ -37,14 +36,12 @@ const corsOptions = {
     "Authorization, Origin, X-Requested-With, Content-Type, Accept",
 };
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use((req, res, next) => {
   //console.log(`Request: ${req.method} ${req.url}`);
   //console.log(`Headers:`, req.headers);
   next();
 });
-
-
 
 app.use(
   bodyParser.urlencoded({
@@ -81,12 +78,12 @@ app.use((req, res, next) => {
 app.use("/usuarios", usuarioRoutes);
 app.use("/ministerio", ministerioRoutes);
 app.use("/rol", rolRoutes);
+app.use("/estado", estadoRoutes);
 app.use("/recurso", recursoRoutes);
-app.use("/actividad", actividadRoutes)
-app.use("/espacio", espacioRoutes)
-app.use("/reserva", reservaRoutes)
-app.use("/solicitudreserva", solicitudReservaRoutes)
-
+app.use("/actividad", actividadRoutes);
+app.use("/espacio", espacioRoutes);
+app.use("/reserva", reservaRoutes);
+app.use("/solicitudreserva", solicitudReservaRoutes);
 
 // static files
 app.use(express.static(join(__dirname, "public")));

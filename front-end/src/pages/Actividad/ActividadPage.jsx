@@ -75,6 +75,7 @@ export function ActividadPage() {
         getActividades();
         getMinisterios();
     }, []);
+    console.log(actividades);
 
 
 
