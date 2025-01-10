@@ -30,7 +30,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: 'http://127.0.0.1:5173',
   credentials: true, // Habilitar el intercambio de cookies y otros datos de autenticación
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders:

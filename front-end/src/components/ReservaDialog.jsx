@@ -17,6 +17,7 @@ import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import dayjs from 'dayjs';
+import { Close } from '@mui/icons-material';
 
 
 export default function ReservaDialog({ open, onClose, onSave, ministerios, actividades, espacios, selectedDate, errorMessage, isEditing }) {
@@ -27,12 +28,14 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
   const [selectedEspacio, setSelectedEspacio] = useState('');
   const [fechaHoraInicio, setFechaHoraInicio] = useState(null);
   const [fechaHoraFin, setFechaHoraFin] = useState(null);
+  const [editable, setEditable] = useState(false); // Controla si los campos están habilitados
 
 
   useEffect(() => {
     if (selectedDate) {
       // Precargamos los valores del formulario con los datos de la reserva seleccionada
       console.log("Dialog - selectedDate: ",selectedDate)
+      console.log("dayjs selctdDate.fechaInicio", dayjs(selectedDate.fechaInicio))
       setSelectedMinisterio(selectedDate.ministerioId || ""); // Ajusta según tu estructura
       setSelectedActividad(selectedDate.actividadId || "");
       setSelectedEspacio(selectedDate.espacioId || "");
@@ -49,7 +52,6 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
   }, [selectedDate, actividades]);
 
 
-
   const handleSubmit = (event) => {
     event.preventDefault();
     const reserva = {
@@ -61,9 +63,21 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
       fechaHoraFin: fechaHoraFin ? fechaHoraFin.toISOString() : null,
     };
     onSave(reserva);
+    //onClose()
+    setEditable(false); // Bloquea campos nuevamente tras guardar
   };
 
+  const handleModify = () => {
+    setEditable(true); // Habilita campos para edición
+  };
+
+  const handleClose = () => {
+    onClose();
+    setEditable(false);
+  };
   
+  console.log("isEditing", isEditing)
+  console.log("editable", editable)
 
   const handleFechaHoraInicioChange = (newValue) => {
     if (newValue && newValue.isValid()) {  // Verifica si el nuevo valor es válido
@@ -82,6 +96,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
     setSelectedEspacio(event.target.value);
   };
 
+
   const handleActividadChange = (event) => {
     setSelectedActividad(event.target.value);
   };
@@ -99,8 +114,8 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
   };
 
   return (
-    <Dialog open={open} onClose={onClose} PaperProps={{ component: 'form', onSubmit: handleSubmit }}>
-      <DialogTitle>{isEditing ? "Editar Reserva" : "Crear Nueva Reserva"}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} PaperProps={{ component: 'form', onSubmit: handleSubmit }}>
+      <DialogTitle>{isEditing ? (editable ? "Editar Reserva" : "Visualizar Reserva") : "Crear Nueva Reserva"}</DialogTitle>
       {errorMessage && (
                         <Typography color="error" variant="body2" style={{ marginBottom: '10px' }}>
                             {errorMessage}
@@ -108,7 +123,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
                     )}
       <DialogContent>
                             {/* Selector de Ministerios */}
-                            <FormControl fullWidth margin="normal">
+                            <FormControl fullWidth margin="normal" disabled={isEditing && !editable}>
                         <InputLabel id="ministerio-label">Ministerio</InputLabel>
                         <Select
                             labelId="ministerio-label"
@@ -124,7 +139,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
                     </FormControl>
 
                     {/* Selector de Actividades */}
-                    <FormControl fullWidth margin="normal" disabled={!selectedMinisterio}>
+                    <FormControl fullWidth margin="normal" disabled={(isEditing && !editable) || !selectedMinisterio}>
                         <InputLabel id="actividad-label">Actividad</InputLabel>
                         <Select
                             labelId="actividad-label"
@@ -141,7 +156,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
 
                     {/* Selector de Espacios */}
 
-        <FormControl fullWidth margin="normal">
+        <FormControl fullWidth margin="normal" disabled={isEditing && !editable}>
           <InputLabel id="espacio-label">Espacio</InputLabel>
           <Select
             labelId="espacio-label"
@@ -158,7 +173,6 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Typography>Fecha y Hora de Inicio</Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateTimePicker
                 label="Seleccionar Fecha y Hora de Inicio"
@@ -166,11 +180,11 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
                 onChange={handleFechaHoraInicioChange}
                 fullWidth
                 InputLabelProps={{ shrink: true }}
+                disabled={isEditing && !editable}
               />
             </LocalizationProvider>
           </Grid>
           <Grid item xs={12}>
-            <Typography>Fecha y Hora de Fin</Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateTimePicker
                 label="Seleccionar Fecha y Hora de Fin"
@@ -178,15 +192,18 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
                 onChange={setFechaHoraFin}
                 fullWidth
                 InputLabelProps={{ shrink: true }}
+                disabled={isEditing && !editable}
               />
             </LocalizationProvider>
           </Grid>
         </Grid>
       </DialogContent>
+      {!isEditing || editable ? <span/> : (
+          <Button onClick={handleModify} type="button">Modificar</Button>
+        )}
       <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
-        {/* <Button onClick={handleSubmit}>{isEditing ? "Modificar" : "Guardar"}</Button> */}
-        {isEditing ? <Button onClick={handleSubmit}>Modificar</Button> : <Button onClick={handleSubmit}>Guardar</Button>}
+        <Button onClick={handleClose}>Cancelar</Button>
+          <Button onClick={handleSubmit} disabled={isEditing && !editable}>Guardar</Button>
       </DialogActions>
     </Dialog>
   );

@@ -72,8 +72,30 @@ export const createReservaRequest = async (reserva) => {
   }
 };
 
-export const updateReservaRequest = async (reserva) => axios.put(`http://localhost:3000/reserva/editar_reserva/${reserva.id}`, reserva);
+export const updateReservaRequest = async (reserva) => {
+  try {
+    const response = await axios.put(`http://localhost:3000/reserva/editar_reserva/${reserva.id}`, reserva);
+    console.log("reponse: ", response)
+    return {
+      success: true,
+      message: response.data
+    }
+  }catch (error) {
+    // Manejo del error
+    if (error.response) {
+        // Error de respuesta del servidor
+        return {
+            success: false,
+            message: error.response.data.message || 'Error al actualizar la reserva.',
+        };
+    } else {
+        // Otro tipo de error (network, etc.)
+        return {
+            success: false,
+            message: 'Error de conexión. Por favor, inténtalo más tarde.',
+        };
+    }
+  }
+};
 
 export const deleteReservaRequest = async (id) => axios.delete(`http://localhost:3000/reserva/eliminar_reserva/${id}`);
-
-

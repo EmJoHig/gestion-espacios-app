@@ -63,11 +63,15 @@ export function ReservaProvider({ children }) {
 
 
 
-  const updateReserva = async (id, reserva) => {
+  const updateReserva = async (reserva) => {
+    console.log("reserva: ", reserva)
     try {
-      await updateReservaRequest(id, reserva);
+      const res = await updateReservaRequest(reserva);
+      console.log("context: ",res)
+      return res
     } catch (error) {
-      console.error(error);
+      console.error("er",error);
+      return error
     }
   };
 

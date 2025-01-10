@@ -154,8 +154,26 @@ export function HomePage() {
 
 
   const handleDateClick = (info) => {
-    setSelectedDate(info.date);
-    setOpenDialog(true);
+    const fechaInicio = new Date(info.date); // Crear una nueva fecha basada en info.date
+    fechaInicio.setHours(10, 0, 0, 0); // Ajustar el horario a 12:00 AM
+  
+    const fechaFin = new Date(fechaInicio); // Clonar fechaInicio
+    fechaFin.setHours(fechaInicio.getHours() + 1); // Sumar una hora para el final
+  
+    // Crear el objeto reserva
+    const reserva = {
+      id: null, // Puedes asignar null si es una nueva reserva
+      espacioId: null, // Define el espacioId según tu lógica
+      ministerioId: null, // Define el ministerioId según tu lógica
+      actividadId: null, // Define la actividadId según tu lógica
+      fechaInicio: fechaInicio.toISOString(), // Convertir a formato ISO
+      fechaFin: fechaFin.toISOString(), // Convertir a formato ISO
+    };
+  
+    console.log("Nueva reserva: ", reserva); // Para verificar el objeto creado
+  
+    setSelectedDate(reserva); // Actualizar el estado con la nueva reserva
+    setOpenDialog(true); // Abrir el diálogo
   };
 
   const handleDialogClose = () => {
@@ -210,8 +228,11 @@ const handleSaveOrUpdateReserva = (reserva) => {
 
   const handleUpdateReserva = async (reservaData) => {
     try {
+        console.log("reservaData: ", reservaData)
         const updatedReserva = buildReservaObject(reservaData);
-        const res = await updateReserva(reservaData.id, updatedReserva); // Suponiendo que tienes una función updateReserva
+        //console.log("aca: ",updateReserva)
+        const res = await updateReserva(updatedReserva); // Suponiendo que tienes una función updateReserva
+        console.log("res", res)
         if (!res.success) {
             setErrorMessage(res.message || "No se pudo actualizar la reserva. Intente nuevamente.");
         } else {
