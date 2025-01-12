@@ -170,7 +170,7 @@ export default function PrimarySearchAppBar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
+          {/* <IconButton
             size="large"
             edge="start"
             color="inherit"
@@ -178,15 +178,15 @@ export default function PrimarySearchAppBar() {
             sx={{ mr: 2 }}
           >
             <MenuIcon />
-          </IconButton>
-          <Typography
+          </IconButton> */}
+          {/* <Typography
             variant="h6"
             noWrap
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
             logo ReservApp
-          </Typography>
+          </Typography> */}
           <Box sx={{ flexGrow: 1 }} />
 
 
@@ -198,11 +198,12 @@ export default function PrimarySearchAppBar() {
                   variant="h6"
                   noWrap
                   sx={{ display: { xs: 'none', sm: 'block' } }}
+                  style={{ marginTop: "10px" }}
                 >
                   {user.name}
                 </Typography>
 
-                <IconButton
+                {/* <IconButton
                   size="large"
                   aria-label="show 17 new notifications"
                   color="inherit"
@@ -210,7 +211,7 @@ export default function PrimarySearchAppBar() {
                   <Badge badgeContent={17} color="error">
                     <NotificationsIcon />
                   </Badge>
-                </IconButton>
+                </IconButton> */}
                 <IconButton
                   size="large"
                   edge="end"
@@ -238,9 +239,7 @@ export default function PrimarySearchAppBar() {
             </>
           ) : (
             <>
-              <Button color="inherit" onClick={() => loginWithRedirect()}>Login</Button>
-
-              {/* <Button color="inherit" href="http://localhost:3000/login">Register</Button> */}
+              {/* <Button color="inherit" onClick={() => loginWithRedirect()}>Login</Button> */}
             </>
           )}
 
