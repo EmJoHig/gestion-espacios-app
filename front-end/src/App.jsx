@@ -32,6 +32,7 @@ import { ActividadPage } from "./pages/Actividad/ActividadPage";
 import { AsociarActMinisterioPage } from "./pages/Actividad/AsociarActMinisterioPage";
 
 import { UsuarioPage } from "./pages/Usuario/UsuarioPage";
+import { EspacioPage } from "./pages/Espacio/EspacioPage";
 
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
                         <Route path="/ministerio" element={<MinisterioPage />} />
                         <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
                         <Route path="/reservas" element={<ReservasPage />} />
+                        <Route path="/espacio" element={<EspacioPage/>} />
                         <Route path="/rol" element={<RolPage />} />
                         <Route path="/asociar-roles" element={<AsociarRolesPage />} />
                         <Route path="/recurso" element={<RecursoPage />} />

@@ -32,14 +32,15 @@ export function HomePage() {
   const [eventos, setEventos] = useState([]);
   const [espaciosDisponibles, setEspaciosDisponibles] = useState([]);
   const [espaciosSeleccionados, setEspaciosSeleccionados] = useState([]);
-  const { reservas, getReservas, createReserva } = useReserva();
+  const { reservas, reserva, getReserva,  getReservas, createReserva, updateReserva } = useReserva();
   const { espacios, getEspacios } = useEspacio();
   const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
   const { actividades, getActividades } = useActividad();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
-
+  const [isEditing, setIsEditing] = useState(false);
+  
   const { user } = useAuth0();
 
   const navigate = useNavigate();
@@ -57,12 +58,18 @@ export function HomePage() {
     setEspaciosDisponibles(espacios.map((espacio) => espacio.nombre))
   }, [reservas, espacios]);
 
+  console.log(reservas)
+  
   useEffect(() => {
     // Cuando se cargan los espacios disponibles, seleccionarlos todos por defecto
     if (espaciosDisponibles.length > 0) {
       setEspaciosSeleccionados(espaciosDisponibles);
     }
   }, [espaciosDisponibles]);
+
+  useEffect(() => {
+    setSelectedDate(reserva)
+}, [reserva]);
 
 
   // modulos
@@ -119,52 +126,62 @@ export function HomePage() {
 
 
   const handleDateClick = (info) => {
-    setSelectedDate(info.date);
-    setOpenDialog(true);
+    const fechaInicio = new Date(info.date); // Crear una nueva fecha basada en info.date
+    fechaInicio.setHours(10, 0, 0, 0); // Ajustar el horario a 12:00 AM
+  
+    const fechaFin = new Date(fechaInicio); // Clonar fechaInicio
+    fechaFin.setHours(fechaInicio.getHours() + 1); // Sumar una hora para el final
+  
+    // Crear el objeto reserva
+    const reserva = {
+      id: null, // Puedes asignar null si es una nueva reserva
+      espacioId: null, // Define el espacioId según tu lógica
+      ministerioId: null, // Define el ministerioId según tu lógica
+      actividadId: null, // Define la actividadId según tu lógica
+      fechaInicio: fechaInicio.toISOString(), // Convertir a formato ISO
+      fechaFin: fechaFin.toISOString(), // Convertir a formato ISO
+    };
+  
+    console.log("Nueva reserva: ", reserva); // Para verificar el objeto creado
+  
+    setSelectedDate(reserva); // Actualizar el estado con la nueva reserva
+    setOpenDialog(true); // Abrir el diálogo
   };
 
   const handleDialogClose = () => {
     setOpenDialog(false);
+    setIsEditing(false);
+    setErrorMessage('')
   };
 
-  /*   const buildReservaObject = (data) => {
-      const nuevaReserva = {
-        ministerioId: data.ministerioId,
-        actividadId: data.actividadId,
-        espacioId: data.espacioId,
-        fecha: data.fecha,
-        horaInicio: data.horaInicio,
-        horaFin: data.horaFin,
-      };
-      return nuevaReserva;
-    }; */
 
   const buildReservaObject = (data) => {
 
-    const fechaInicio = dayjs(data.fecha.$d)
-      .hour(data.horaInicio.$H)
-      .minute(data.horaInicio.$m)
-      .second(data.horaInicio.$s)
-      .toISOString(); // Convierte a formato ISO
-
-    const fechaFin = dayjs(data.fecha.$d)
-      .hour(data.horaFin.$H)
-      .minute(data.horaFin.$m)
-      .second(data.horaFin.$s)
-      .toISOString(); // Convierte a formato ISO
 
     const reserva = {
-      espacioId: data.espacioId,
-      ministerioId: data.ministerioId,
-      actividadId: data.actividadId,
-      fechaInicio,
-      fechaFin,
+        id: data.id,
+        espacioId: data.espacioId,
+        ministerioId: data.ministerioId,
+        actividadId: data.actividadId,
+        fechaInicio: data.fechaHoraInicio,
+        fechaFin: data.fechaHoraFin,
     };
 
     console.log("Reserva construida:", reserva);
     return reserva;
-  };
+};
 
+console.log("isE :", isEditing)
+
+const handleSaveOrUpdateReserva = (reserva) => {
+  console.log("es actualización: ",isEditing)
+  if (isEditing) {
+    handleUpdateReserva(reserva);
+  } else {
+    handleSaveReserva(reserva);
+  }
+};
+  
   const handleSaveReserva = async (reservaData) => {
 
     const nuevaReserva = buildReservaObject(reservaData);
@@ -181,16 +198,45 @@ export function HomePage() {
     }
   };
 
+  const handleUpdateReserva = async (reservaData) => {
+    try {
+        console.log("reservaData: ", reservaData)
+        const updatedReserva = buildReservaObject(reservaData);
+        //console.log("aca: ",updateReserva)
+        const res = await updateReserva(updatedReserva); // Suponiendo que tienes una función updateReserva
+        console.log("res", res)
+        if (!res.success) {
+            setErrorMessage(res.message || "No se pudo actualizar la reserva. Intente nuevamente.");
+        } else {
+            await getReservas(); // Refrescar las reservas
+            setOpenDialog(false); // Cerrar el diálogo
+        }
+    } catch (error) {
+        console.error('Error al actualizar la reserva:', error);
+    }
+};
+
+  const handleEventClick = (info) => {
+    const selectedReserva = reservas.find((res) => res.id === parseInt(info.event.id));
+    getReserva(parseInt(info.event.id));
+    if (selectedReserva) {
+        setSelectedDate(selectedReserva);
+        setIsEditing(true);
+        setOpenDialog(true);
+    }
+  };
+
   return (
     <>
       <ReservaDialog
         open={openDialog}
         onClose={handleDialogClose}
-        onSave={handleSaveReserva}
+        onSave={handleSaveOrUpdateReserva}
         ministerios={ministerios || []}
         actividades={actividades || []}
         espacios={espacios || []}
         selectedDate={selectedDate}
+        isEditing={isEditing}
         errorMessage={errorMessage}
       />
       <Box sx={{ flexGrow: 1, marginTop: '20px' }}>
@@ -326,6 +372,7 @@ export function HomePage() {
           }}
           events={eventosFiltrados}
           dateClick={handleDateClick}
+          eventClick={handleEventClick}
         />
       </Box>
 

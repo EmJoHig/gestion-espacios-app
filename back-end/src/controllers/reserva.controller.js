@@ -28,11 +28,12 @@ export const getReservas = async (req, res) => {
     
         const reservasFormateadas = reservas.map((reserva) => {
             return {
-              fechaInicio: reserva.fechaInicio,
-              fechaFin: reserva.fechaFin,
-              Espacio: reserva.Espacio,
-              Ministerio: reserva.Ministerio,
-              Actividad: reserva.Actividad,
+                id: reserva.id,
+                fechaInicio: reserva.fechaInicio,
+                fechaFin: reserva.fechaFin,
+                Espacio: reserva.Espacio,
+                Ministerio: reserva.Ministerio,
+                Actividad: reserva.Actividad,
             };
           });
       
@@ -120,30 +121,68 @@ export const createReserva = async (req, res) => {
 export const updateReserva = async (req, res) => {
     try {
         const { id } = req.params;
-        const { espacioId, ministerioId, actividaId, fechaInicio, fechaFin } = req.body;
+        const { espacioId, ministerioId, actividadId, fechaInicio, fechaFin } = req.body;
 
         const reserva = await Reserva.findByPk(id);
         if (!reserva) {
-            return res.status(404).json({ message: 'Reserva no encontrado' });
+            return res.status(404).json({ message: 'Reserva no encontrada' });
         }
 
-        const updates = {};
-        //USO TODAS LAS PROPIEDADES PORQUE EL PUT SOLO DEJA ACTUALIZAR TODO EL OBJETO
-        if (id) updates.id = reserva.id;
-        if (espacioId) updates.espacioId = espacioId;
-        if (ministerioId) updates.ministerioId = ministerioId;
-        if (actividaId) updates.actividaId = actividaId;
-        if (fechaInicio) updates.fechaInicio = fechaInicio;
-        if (fechaFin) updates.fechaFin = fechaFin;
-
-        // await Esácop.update(updates)
-        await Reserva.update(updates, {
-            where: { id: id }
+        // Verificar si ya existe una reserva para el mismo espacio en el rango de fechas
+        const reservasConflicto = await Reserva.findOne({
+            where: {
+                id: { [Op.ne]: id }, // Excluir la reserva que se está actualizando
+                espacioId: espacioId || reserva.espacioId, // Usar el nuevo espacioId o el actual
+                [Op.or]: [
+                    {
+                        fechaInicio: {
+                            [Op.between]: [fechaInicio || reserva.fechaInicio, fechaFin || reserva.fechaFin],
+                        },
+                    },
+                    {
+                        fechaFin: {
+                            [Op.between]: [fechaInicio || reserva.fechaInicio, fechaFin || reserva.fechaFin],
+                        },
+                    },
+                    {
+                        [Op.and]: [
+                            {
+                                fechaInicio: {
+                                    [Op.lte]: fechaInicio || reserva.fechaInicio,
+                                },
+                            },
+                            {
+                                fechaFin: {
+                                    [Op.gte]: fechaFin || reserva.fechaFin,
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
         });
 
-        res.status(200).json(reserva);
+        if (reservasConflicto) {
+            return res.status(400).json({ message: 'Ya existe una reserva para este espacio en el rango de fechas indicado.' });
+        }
+
+        // Actualizar la reserva
+        const updates = {
+            espacioId: espacioId || reserva.espacioId,
+            ministerioId: ministerioId || reserva.ministerioId,
+            actividadId: actividadId || reserva.actividadId,
+            fechaInicio: fechaInicio || reserva.fechaInicio,
+            fechaFin: fechaFin || reserva.fechaFin,
+        };
+
+        await Reserva.update(updates, {
+            where: { id: id },
+        });
+
+        const reservaActualizada = await Reserva.findByPk(id); // Obtener la reserva actualizada
+        res.status(200).json(reservaActualizada);
     } catch (error) {
-        console.error(error);
+        console.error('Error al actualizar la reserva:', error);
         res.status(500).json({ message: 'Ha ocurrido un error al actualizar la Reserva' });
     }
 };

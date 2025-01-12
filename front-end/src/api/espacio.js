@@ -4,10 +4,11 @@ import axios from "./axios";
 export const getEspaciosRequest = async (token) => {
     try {
       const responseEspacios = await axios.get('http://localhost:3000/espacio/get_espacios', {
-        headers: {
+/*         headers: {
             Authorization: `Bearer ${token}`,
-        },
+        }, */
     });
+      console.log("espacio: ", responseEspacios)
       return responseEspacios
     } catch (error) {
       console.error('Error al obtener los espacios:', error);
