@@ -9,7 +9,7 @@ EstadoEspacio.init(
 
     nombre: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       trim: true,
     },
   },

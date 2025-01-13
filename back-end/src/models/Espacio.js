@@ -26,7 +26,7 @@ Espacio.init(
         model: EstadoEspacio,
         key: "id",
       },
-      allowNull: false,
+      allowNull: true,
       field: "id_estado",
     },
   },

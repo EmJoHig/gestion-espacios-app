@@ -67,37 +67,23 @@ export const createReserva = async (req, res) => {
         const { espacioId, ministerioId, actividadId, fechaInicio, fechaFin } = req.body;
 
        // Verificar si ya existe una reserva para el mismo espacio en el rango de fechas
-       const reservasConflicto = await Reserva.findOne({
+        const reservasConflicto = await Reserva.findOne({
             where: {
-                espacioId,
+                espacioId: { [Op.ne]: espacioId }, // Excluir la reserva que se está actualizando
+                espacioId: espacioId || reserva.espacioId, // Usar el nuevo espacioId o el actual
                 [Op.or]: [
                     {
                         fechaInicio: {
-                            [Op.between]: [fechaInicio, fechaFin],
+                            [Op.lt]: fechaFin || reserva.fechaFin, // Fecha de inicio antes de la nueva fecha de fin
                         },
-                    },
-                    {
                         fechaFin: {
-                            [Op.between]: [fechaInicio, fechaFin],
+                            [Op.gt]: fechaInicio || reserva.fechaInicio, // Fecha de fin después de la nueva fecha de inicio
                         },
-                    },
-                    {
-                        [Op.and]: [
-                            {
-                                fechaInicio: {
-                                    [Op.lte]: fechaInicio,
-                                },
-                            },
-                            {
-                                fechaFin: {
-                                    [Op.gte]: fechaFin,
-                                },
-                            },
-                        ],
                     },
                 ],
             },
         });
+
 
         if (reservasConflicto) {
             return res.status(400).json({ message: 'Ya existe una reserva para este espacio en el rango de fechas indicado.' });
@@ -131,32 +117,16 @@ export const updateReserva = async (req, res) => {
         // Verificar si ya existe una reserva para el mismo espacio en el rango de fechas
         const reservasConflicto = await Reserva.findOne({
             where: {
-                id: { [Op.ne]: id }, // Excluir la reserva que se está actualizando
+                espacioId: { [Op.ne]: espacioId }, // Excluir la reserva que se está actualizando
                 espacioId: espacioId || reserva.espacioId, // Usar el nuevo espacioId o el actual
                 [Op.or]: [
                     {
                         fechaInicio: {
-                            [Op.between]: [fechaInicio || reserva.fechaInicio, fechaFin || reserva.fechaFin],
+                            [Op.lt]: fechaFin || reserva.fechaFin, // Fecha de inicio antes de la nueva fecha de fin
                         },
-                    },
-                    {
                         fechaFin: {
-                            [Op.between]: [fechaInicio || reserva.fechaInicio, fechaFin || reserva.fechaFin],
+                            [Op.gt]: fechaInicio || reserva.fechaInicio, // Fecha de fin después de la nueva fecha de inicio
                         },
-                    },
-                    {
-                        [Op.and]: [
-                            {
-                                fechaInicio: {
-                                    [Op.lte]: fechaInicio || reserva.fechaInicio,
-                                },
-                            },
-                            {
-                                fechaFin: {
-                                    [Op.gte]: fechaFin || reserva.fechaFin,
-                                },
-                            },
-                        ],
                     },
                 ],
             },
