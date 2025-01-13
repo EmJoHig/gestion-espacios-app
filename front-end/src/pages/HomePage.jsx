@@ -49,7 +49,7 @@ export function HomePage() {
     getEspacios();
     getActividades();
     getMinisterios();
-    getReservas();  
+    getReservas();
 
   }, []);
 
@@ -67,61 +67,33 @@ export function HomePage() {
     }
   }, [espaciosDisponibles]);
 
-
   useEffect(() => {
-      setSelectedDate(reserva)
-  }, [reserva]);
+    setSelectedDate(reserva)
+}, [reserva]);
 
-  const usuario = {
-    username: "Belthier",
-    email: "prueba.gmail.com",
-    password: "12345678",
-    role: "admin-espacio-reserv",
-    modulos: [
-      {
-        codigo: "2",
-        descripcion: "ABM Reservas",
-        ruta: "/reservas"
-      },
-      {
-        codigo: "3",
-        descripcion: "ABM Espacios",
-        ruta: "/espacio"
-      },
-      {
-        codigo: "4",
-        descripcion: "ABM RECURSOS",
-        ruta: "/recurso"
-      },
-      {
-        codigo: "5",
-        descripcion: "Solicitudes de Reservas",
-        ruta: "/solicitudes-reservas"
-      },
-      {
-        codigo: "6",
-        descripcion: "ABM Ministerios",
-        ruta: "/ministerio"
-      },
-      {
-        codigo: "7",
-        descripcion: "ABM Actividades",
-        ruta: "/actividad"
-      },
-      {
-        codigo: "8",
-        descripcion: "ABM ROLES",
-        ruta: "/rol"
-      },
-      {
-        codigo: "9",
-        descripcion: "USUARIOS",
-        ruta: "/usuarios"
-      },
-    ]
-  };
 
-  
+  // modulos
+  const modulos = [
+    { codigo: "2", descripcion: "RESERVAS", ruta: "/reservas", rolesPermitidos: ["ADMIN", "RESPONSABLE"] },
+    { codigo: "3", descripcion: "ESPACIOS", ruta: "/espacio", rolesPermitidos: ["ADMIN"] },
+    { codigo: "4", descripcion: "RECURSOS", ruta: "/recurso", rolesPermitidos: ["ADMIN"] },
+    { codigo: "5", descripcion: "SOLICITUDES DE RESERVA", ruta: "/solicitudes-reservas", rolesPermitidos: ["ADMIN", "RESPONSABLE"] },
+    { codigo: "6", descripcion: "MINISTERIOS", ruta: "/ministerio", rolesPermitidos: ["ADMIN"] },
+    { codigo: "7", descripcion: "ACTIVIDADES", ruta: "/actividad", rolesPermitidos: ["ADMIN"] },
+    { codigo: "8", descripcion: "ROLES", ruta: "/rol", rolesPermitidos: ["ADMIN"] },
+    { codigo: "9", descripcion: "USUARIOS", ruta: "/usuarios", rolesPermitidos: ["ADMIN"] },
+  ];
+
+  const modulosFiltrados = modulos.filter((modulo) => {
+    if (modulo.rolesPermitidos) {
+      return modulo.rolesPermitidos.some((rol) =>
+        user["https://gestion-espacios/roles"]?.includes(rol)
+      );
+    }
+    return true;
+  });
+
+
 
   const [age, setAge] = React.useState('');
 
@@ -136,7 +108,7 @@ export function HomePage() {
     espaciosSeleccionados.includes(evento.title.split(" - ")[1])
   );
 
-    // Manejar el cambio en el filtro de espacios
+  // Manejar el cambio en el filtro de espacios
   const handleChange = (event) => {
     const {
       target: { value },
@@ -217,10 +189,10 @@ const handleSaveOrUpdateReserva = (reserva) => {
       const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
       if (!res.success) {
         setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
-      }else {
+      } else {
         await getReservas(); // Refrescar las reservas después de guardar
         setOpenDialog(false); // Cerrar el diálogo
-      }  
+      }
     } catch (error) {
       console.error('Error al crear la reserva:', error);
     }
@@ -276,7 +248,7 @@ const handleSaveOrUpdateReserva = (reserva) => {
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
 
 
-          {usuario.modulos.length === 0 && (
+          {/* {usuario.modulos.length === 0 && (
             <h1>no hay modulos</h1>
           )}
 
@@ -292,35 +264,106 @@ const handleSaveOrUpdateReserva = (reserva) => {
                 </CardActionArea>
               </Card>
             </Grid>
+          ))} */}
+
+          {modulosFiltrados.map((modulo) => (
+            // <Grid item xs={3} key={modulo.codigo}>
+            //   <Card
+            //     sx={{ maxWidth: "100%", textAlign: "center", backgroundColor: "#90caf9" }}
+            //     onClick={handleClick(modulo.ruta)}
+            //   >
+            //     <CardActionArea>
+            //       <CardContent>
+            //         <Typography gutterBottom variant="h6" component="div">
+            //           {modulo.descripcion}
+            //         </Typography>
+            //       </CardContent>
+            //     </CardActionArea>
+            //   </Card>
+            // </Grid>
+
+
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              lg={3}
+              key={modulo.codigo}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <Card
+                sx={{
+                  width: "100%",
+                  maxWidth: "300px",
+                  textAlign: "center",
+                  backgroundColor: "#1976d2",
+                  color: "#fff",
+                  borderRadius: "12px",
+                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+                  transition: "transform 0.3s, box-shadow 0.3s",
+                  "&:hover": {
+                    transform: "scale(1.03)",
+                    boxShadow: "0px 6px 15px rgba(0, 0, 0, 0.3)",
+                  },
+                }}
+                onClick={handleClick(modulo.ruta)}
+              >
+                <CardActionArea>
+                  <CardContent
+                    sx={{
+                      p: 3,
+                    }}
+                  >
+                    <Typography
+                      gutterBottom
+                      variant="h6"
+                      component="div"
+                      sx={{
+                        fontWeight: "bold",
+                        fontSize: { xs: "16px", sm: "18px", md: "20px" },
+                      }}
+                    >
+                      {modulo.descripcion}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
           ))}
+
+
         </Grid>
       </Box>
 
-      <Box sx={{ width: '100%', marginTop: '50px' }}>
+      <Box sx={{ width: '100%', marginTop: '50px', marginBottom: '100px' }}>
         <Typography gutterBottom variant="h5">
           Calendario de Reservas
         </Typography>
 
-         {/* Select para filtrar espacios */}
-         <FormControl sx={{ m: 1, width: 300 }}>
-            <InputLabel>Espacios</InputLabel>
-            <Select
-              multiple
-              value={espaciosSeleccionados}
-              onChange={handleChange}
-              renderValue={(selected) =>  selected.join(', ')}
-            >
-              {espaciosDisponibles.map((espacio) => (
-                <MenuItem key={espacio} value={espacio}>
-                  <Checkbox checked={espaciosSeleccionados.includes(espacio)} />
-                  <ListItemText primary={espacio} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          
+        {/* Select para filtrar espacios */}
+        <FormControl sx={{ m: 1, width: 300 }}>
+          <InputLabel>Espacios</InputLabel>
+          <Select
+            multiple
+            value={espaciosSeleccionados}
+            onChange={handleChange}
+            renderValue={(selected) => selected.join(', ')}
+          >
+            {espaciosDisponibles.map((espacio) => (
+              <MenuItem key={espacio} value={espacio}>
+                <Checkbox checked={espaciosSeleccionados.includes(espacio)} />
+                <ListItemText primary={espacio} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin ]}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           headerToolbar={{
             left: 'prev,next today',
@@ -333,44 +376,6 @@ const handleSaveOrUpdateReserva = (reserva) => {
         />
       </Box>
 
-      <Box sx={{ width: '100%', marginTop: '50px' }}>
-
-        <Typography gutterBottom variant="h5" component="div">
-          Ministerios y responsables
-        </Typography>
-
-        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-          <Grid item xs={4}>
-            <div>
-              <FormControl sx={{ width: '100%', marginBottom: 2 }} variant="standard">
-                <Select
-                  value={age}
-                  onChange={ChangeSelectMuni}
-                  displayEmpty
-                  inputProps={{ 'aria-label': 'Without label' }}
-                >
-                  <MenuItem value="">
-                    <em>TODOS</em>
-                  </MenuItem>
-                  <MenuItem value={10}>MINISTERIO UNO</MenuItem>
-                  <MenuItem value={20}>MINISTERIO DOS</MenuItem>
-                  <MenuItem value={30}>MINISTERIO TRES</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-          </Grid>
-        </Grid>
-      </Box>
-
-
-      {usuario.role.includes("admin") && (
-        <>
-        <Typography gutterBottom variant="h5" component="div">
-          esto solo se ve si es algun tipo de administrador
-        </Typography>
-          {/* <MaterialTable /> */}
-        </>
-      )}
     </>
   );
 }

@@ -3,6 +3,8 @@ import { useEffect, Fragment } from "react";
 import { useMinisterio } from "../context/ministerioContext";
 import { useUsuario } from "../context/usuarioContext";
 import Button from '@mui/material/Button';
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 import MaterialAppBar from "../components/MaterialAppBar";
 import MaterialTable from "../components/MaterialTable";
 //auth0
@@ -28,28 +30,36 @@ function WelcomePage() {
   }, [isAuthenticated]);
 
 
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f5f5f5",
+        }}
+      >
+        <Box textAlign="center">
+          <CircularProgress size={80} thickness={4} />
+          <Box mt={2}>
+            <h2 style={{ fontFamily: "Arial, sans-serif", color: "#1976d2" }}>
+              Cargando, por favor espera...
+            </h2>
+          </Box>
+        </Box>
+      </Box>
+    );
   }
 
   return (
-    // <section className="flex justify-center items-center">
-    //   <header className="bg-zinc-800 p-10">
-
-    //     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
-    //       {ministerios.map((ministerio) => (
-    //         <div className="bg-zinc-500 text-white p-4 rounded-md">
-    //           <h1>{ministerio.descripcion}</h1>
-    //           <p>{ministerio.codigo}</p>
-    //         </div>
-    //       ))}
-
-    //     </div>
-    //   </header>
-    // </section>
-
     <>
-      <div className="min-h-full">
+      {/* <div className="min-h-full">
         <header className="bg-white shadow">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">PAGINA DE INICIO</h1>
@@ -57,9 +67,78 @@ function WelcomePage() {
         </header>
         <main>
           {JSON.stringify(user)}
-          <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">{/* Your content */}</div>
+          <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8"></div>
         </main>
-      </div>
+      </div> */}
+
+
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "linear-gradient(135deg, #90caf9, #42a5f5)",
+          padding: 3,
+        }}
+      >
+        <Box
+          sx={{
+            textAlign: "center",
+            backgroundColor: "#ffffff",
+            padding: 5,
+            borderRadius: "16px",
+            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.2)",
+            maxWidth: "500px",
+            width: "100%",
+          }}
+        >
+          <img
+            src="https://via.placeholder.com/150"
+            alt="Logo"
+            style={{ marginBottom: "1.5rem", borderRadius: "50%" }}
+          />
+          <h1
+            style={{
+              fontSize: "2.8rem",
+              color: "#1976d2",
+              marginBottom: "1rem",
+              fontWeight: "bold",
+              fontFamily: "Arial, sans-serif",
+            }}
+          >
+            ¡Bienvenido!
+          </h1>
+          <p
+            style={{
+              fontSize: "1rem",
+              color: "#555",
+              marginBottom: "1.5rem",
+              lineHeight: "1.5",
+            }}
+          >
+            Accede a todas las funcionalidades de nuestra plataforma con tu cuenta.
+            Por favor, inicia sesión para continuar.
+          </p>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            sx={{
+              padding: "10px 20px",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              textTransform: "none",
+              borderRadius: "8px",
+            }}
+            onClick={loginWithRedirect}
+          >
+            Iniciar Sesión
+          </Button>
+        </Box>
+      </Box>
+
     </>
   );
 }
