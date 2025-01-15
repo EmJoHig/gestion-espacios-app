@@ -364,7 +364,7 @@ export const asociarRolAlUsuario = async (req, res) => {
             }
         }
 
-        const usuario = await Usuario.findOne({ where: { id: idUsuario } });
+        const usuario = await Usuario.findOne({ where: { id: idUsuario } }); 
 
         if (!usuario) {
             return res.status(404).json({ message: 'usuario no encontrado' });
