@@ -394,7 +394,7 @@ export const asociarRolAlUsuario = async (req, res) => {
                         'Cache-control': 'no-cache'
                     },
                 }
-            );
+            ); 
 
             if (response != null && (response.status == 200 || response.status == 204)) {
 
