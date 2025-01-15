@@ -375,7 +375,7 @@ export const asociarRolAlUsuario = async (req, res) => {
             client_secret: "e9U8ISCwqcZX9BCIIysJtk23D6XUziqHdLWhhv0jV6csW4_C9deHZ_q45nGLZCBP",
             audience: "https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/",// llamo al audience de el management api
             grant_type: 'client_credentials',
-        });
+        }); 
 
         if (responseAUTH0.status != 200) {
             return res.status(500).json({ message: 'Ha ocurrido un error al obtener el token' });
