@@ -317,9 +317,51 @@ export const asociarRolAlUsuario = async (req, res) => {
         //  idRol: es el id de auth0
         const { idUsuario, idRol } = req.body;
         
-        const rol = await Rol.findOne({ where: { idRolAUTH0: idRol } });
+        let rol = await Rol.findOne({ where: { idRolAUTH0: idRol } });
+
+        // SI EL ROL DE AUTH0 NO SE ENCUENTRA EN MI BD, LO CREO :)
         if (!rol) {
-            return res.status(404).json({ message: 'Rol no encontrado' });
+
+            const responseAUTH0 = await axios.post(`https://dev-zgzo7qc6w6kujif0.us.auth0.com/oauth/token`, {
+                client_id: "MReNmdTUf5BlAdAZuUr3uc65GTcaTklw",
+                client_secret: "e9U8ISCwqcZX9BCIIysJtk23D6XUziqHdLWhhv0jV6csW4_C9deHZ_q45nGLZCBP",
+                audience: "https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/",// llamo al audience de el management api
+                grant_type: 'client_credentials',
+              });
+          
+              if (responseAUTH0.status != 200) {
+                return res.status(500).json({ message: 'Ha ocurrido un error al obtener el token' });
+              }
+              else {
+
+                const tokenAdmin = responseAUTH0.data.access_token;
+
+                const responseGetRolAuth0 = await axios.get(
+                  `https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/roles/${idRol}`,
+                  {
+                    headers: {
+                      'Authorization': `Bearer ${tokenAdmin}`,
+                    }
+                  }
+                );
+
+                if(responseGetRolAuth0){
+
+                    const nuevoRolBD = await Rol.create({
+                        name: responseGetRolAuth0.data.name,
+                        description: responseGetRolAuth0.data.description,
+                        idRolAUTH0: responseGetRolAuth0.data.id
+                    });
+
+                    if(nuevoRolBD){
+                        rol = nuevoRolBD;
+                    }else{
+                        return res.status(500).json({ message: 'Ha ocurrido un error al crear el Rol en la bd' });
+                    }                    
+                }else{
+                    return res.status(500).json({ message: 'Ha ocurrido un error al obtener el Rol en AUTH0' });
+                }
+            }
         }
 
         const usuario = await Usuario.findOne({ where: { id: idUsuario } });
@@ -339,7 +381,9 @@ export const asociarRolAlUsuario = async (req, res) => {
             return res.status(500).json({ message: 'Ha ocurrido un error al obtener el token' });
         }
         else {
+
             const tokenAdmin = responseAUTH0.data.access_token;
+
             const response = await axios.post(
                 `https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/users/${usuario.idUsuarioAUTH0}/roles`,
                 { roles: [rol.idRolAUTH0] },
