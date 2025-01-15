@@ -17,6 +17,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import TablaGenerica from '../../components/TablaGenerica';
 import TextField from '@mui/material/TextField';
@@ -42,11 +44,33 @@ export function AsociarRolesPage() {
     const { roles, getRolesPorUsuario, createRol, updateRol, deleteRol, AsociarRolAlUsuario } = useRol();
     const { usuarios, getUsuarios, createUsuario, updateUsuario, deleteUsuario } = useUsuario();
 
-    const [rolesUsuarioAUTH0, setRolesUsuarioAUTH0] = useState([]);
+    // const [rolesUsuarioAUTH0, setRolesUsuarioAUTH0] = useState([]);
     const [usuarioRolEdicion, setUsuarioRolEdicion] = React.useState(null);
     const [openEdit, setOpenEdit] = React.useState(false);
 
     const [idRolSelect, setRolSelect] = React.useState('');
+
+    const [snackBarState, setSnackBarState] = React.useState({
+        open: false,
+        message: '',
+        severity: 'success', // Puede ser 'success', 'error', 'info', 'warning'
+    });
+
+    const openSnackBar = (message, severity) => {
+        setSnackBarState({
+            open: true,
+            message,
+            severity,
+        });
+    };
+
+    const closeSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackBarState({ ...snackBarState, open: false });
+    };
+
 
 
     const bodyRequest = {
@@ -87,10 +111,10 @@ export function AsociarRolesPage() {
     useEffect(() => {
         getRolesPorUsuario();
         getUsuarios();
-        if (user && user["https://gestion-espacios/roles"]) {
-            const rolesFromUser = user["https://gestion-espacios/roles"];
-            setRolesUsuarioAUTH0(rolesFromUser);
-        }
+        // if (user && user["https://gestion-espacios/roles"]) {
+        //     const rolesFromUser = user["https://gestion-espacios/roles"];
+        //     setRolesUsuarioAUTH0(rolesFromUser);
+        // }
     }, []);//[user]
 
 
@@ -116,22 +140,24 @@ export function AsociarRolesPage() {
 
     const handleSubmitEdit = async (rolid) => {
         try {
-            // console.log("rolid: ", rolid);
+
             bodyRequest.idUsuario = usuarioRolEdicion.id;
             bodyRequest.idRol = rolid;
 
-            // console.log("body a editar:", bodyRequest);
-            await AsociarRolAlUsuario(bodyRequest);
+            const resp = await AsociarRolAlUsuario(bodyRequest);
+            if (resp === "") {
+                openSnackBar('Se asocio el rol con exito.', 'success');
+            } else {
+                openSnackBar(resp, 'error');
+            }
+
             await getUsuarios();
             handleCloseEdit();
         } catch (error) {
-            console.error('Error al editar el rol:', error);
+            openSnackBar('Error al asociar el rol: '+ error, 'success');
         }
     };
 
-    const handleTEST = () => {
-        console.log("USUARIOS", usuarios);
-    };
 
     return (
         <>
@@ -146,7 +172,6 @@ export function AsociarRolesPage() {
                     ROLES
                 </Button>
 
-                {/* <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>get users</Button> */}
 
                 {openEdit && (
                     <RenderizarDialogEditarRolUsuario
@@ -169,6 +194,21 @@ export function AsociarRolesPage() {
                     />
                 </Box>
             </Box>
+
+            <Snackbar
+                open={snackBarState.open}
+                autoHideDuration={4000}
+                onClose={closeSnackBar}
+            >
+                <Alert
+                    onClose={closeSnackBar}
+                    severity={snackBarState.severity}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {snackBarState.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

@@ -145,7 +145,13 @@ export function RolProvider({ children }) {
       });
 
       const res = await asociarRolAlUsuarioRequest(token, bodyUsuaroRol);
-      // console.log(res.data);
+      
+      if (res.status === 200) {
+        return "";
+      } else {
+        return "Hubo un error al asociar el rol al usuario";
+      }
+
     } catch (error) {
       console.log(error);
     }
