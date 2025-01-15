@@ -58,7 +58,7 @@ export function HomePage() {
     setEspaciosDisponibles(espacios.map((espacio) => espacio.nombre))
   }, [reservas, espacios]);
 
-  console.log(reservas)
+  // console.log(reservas)
   
   useEffect(() => {
     // Cuando se cargan los espacios disponibles, seleccionarlos todos por defecto
@@ -142,7 +142,7 @@ export function HomePage() {
       fechaFin: fechaFin.toISOString(), // Convertir a formato ISO
     };
   
-    console.log("Nueva reserva: ", reserva); // Para verificar el objeto creado
+    // console.log("Nueva reserva: ", reserva); // Para verificar el objeto creado
   
     setSelectedDate(reserva); // Actualizar el estado con la nueva reserva
     setOpenDialog(true); // Abrir el diálogo
@@ -167,14 +167,14 @@ export function HomePage() {
         fechaFin: data.fechaHoraFin,
     };
 
-    console.log("Reserva construida:", reserva);
+    // console.log("Reserva construida:", reserva);
     return reserva;
 };
 
-console.log("isE :", isEditing)
+// console.log("isE :", isEditing)
 
 const handleSaveOrUpdateReserva = (reserva) => {
-  console.log("es actualización: ",isEditing)
+  // console.log("es actualización: ",isEditing)
   if (isEditing) {
     handleUpdateReserva(reserva);
   } else {
@@ -200,11 +200,11 @@ const handleSaveOrUpdateReserva = (reserva) => {
 
   const handleUpdateReserva = async (reservaData) => {
     try {
-        console.log("reservaData: ", reservaData)
+        // console.log("reservaData: ", reservaData)
         const updatedReserva = buildReservaObject(reservaData);
         //console.log("aca: ",updateReserva)
         const res = await updateReserva(updatedReserva); // Suponiendo que tienes una función updateReserva
-        console.log("res", res)
+        // console.log("res", res)
         if (!res.success) {
             setErrorMessage(res.message || "No se pudo actualizar la reserva. Intente nuevamente.");
         } else {
@@ -239,11 +239,11 @@ const handleSaveOrUpdateReserva = (reserva) => {
         isEditing={isEditing}
         errorMessage={errorMessage}
       />
-      <Box sx={{ flexGrow: 1, marginTop: '20px' }}>
+      <Box sx={{ flexGrow: 1, marginTop: '50px' }}>
 
-        <Typography gutterBottom variant="h5" component="div">
+        {/* <Typography gutterBottom variant="h5" component="div">
           Modulos
-        </Typography>
+        </Typography> */}
 
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
 

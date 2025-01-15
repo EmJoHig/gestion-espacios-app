@@ -36,7 +36,7 @@ export function EspacioPage() {
 
     // Funcion que redirige al home.
     const backHome = () => {
-        navigate("/");
+        navigate("/home");
       };
 
     const [snackBarState, setSnackBarState] = React.useState({
