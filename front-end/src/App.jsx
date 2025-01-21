@@ -15,6 +15,7 @@ import { RecursoProvider } from "./context/recursoContext";
 import { ReservaProvider } from "./context/reservaContext";
 import { EspacioProvider } from "./context/espacioContext";
 import { ActividadProvider } from "./context/actividadContext";
+import { SolicitudProvider } from "./context/solicitudContext";
 
 // vistas
 import WelcomePage from "./pages/WelcomePage";
@@ -38,56 +39,58 @@ import { EspacioPage } from "./pages/Espacio/EspacioPage";
 function App() {
   return (
     // <AuthProvider>
-    <RecursoProvider>
-      <MinisterioProvider>
-        <RolProvider>
-          <UsuarioProvider>
-            <ReservaProvider>
-              <EspacioProvider>
-                <ActividadProvider>
-                  <BrowserRouter>
-                    <CssBaseline />
+    <SolicitudProvider>
+      <RecursoProvider>
+        <MinisterioProvider>
+          <RolProvider>
+            <UsuarioProvider>
+              <ReservaProvider>
+                <EspacioProvider>
+                  <ActividadProvider>
+                    <BrowserRouter>
+                      <CssBaseline />
 
-                    <main className="">
-                      <MaterialAppBar />
+                      <main className="">
+                        <MaterialAppBar />
 
-                      <Container fixed>
-                        <Routes>
-                          <Route path="/" element={<WelcomePage />} />
-                          {/* <Route path="/login" element={<LoginPage />} /> */}
-                          {/* <Route path="/register" element={<RegisterPage />} /> */}
+                        <Container fixed>
+                          <Routes>
+                            <Route path="/" element={<WelcomePage />} />
+                            {/* <Route path="/login" element={<LoginPage />} /> */}
+                            {/* <Route path="/register" element={<RegisterPage />} /> */}
 
-                          <Route element={<ProtectedRoute />}>
+                            <Route element={<ProtectedRoute />}>
 
-                        <Route path="/home" element={<HomePage />} />
-                        <Route path="/ministerio" element={<MinisterioPage />} />
-                        <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
-                        <Route path="/reservas" element={<ReservasPage />} />
-                        <Route path="/espacio" element={<EspacioPage/>} />
-                        <Route path="/rol" element={<RolPage />} />
-                        <Route path="/asociar-roles" element={<AsociarRolesPage />} />
-                        <Route path="/recurso" element={<RecursoPage />} />
-                        <Route path="/asociar-responsables" element={<AsociarRespAMinisterioPage />} />
-                        <Route path="/actividad" element={<ActividadPage />} />
-                        <Route path="/asociar-actividades" element={<AsociarActMinisterioPage />} />
-                        <Route path="/usuarios" element={<UsuarioPage />} />
-                        {/* <Route path="/add-task" element={<TaskFormPage />} />
+                              <Route path="/home" element={<HomePage />} />
+                              <Route path="/ministerio" element={<MinisterioPage />} />
+                              <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
+                              <Route path="/reservas" element={<ReservasPage />} />
+                              <Route path="/espacio" element={<EspacioPage />} />
+                              <Route path="/rol" element={<RolPage />} />
+                              <Route path="/asociar-roles" element={<AsociarRolesPage />} />
+                              <Route path="/recurso" element={<RecursoPage />} />
+                              <Route path="/asociar-responsables" element={<AsociarRespAMinisterioPage />} />
+                              <Route path="/actividad" element={<ActividadPage />} />
+                              <Route path="/asociar-actividades" element={<AsociarActMinisterioPage />} />
+                              <Route path="/usuarios" element={<UsuarioPage />} />
+                              {/* <Route path="/add-task" element={<TaskFormPage />} />
                       <Route path="/tasks/:id" element={<TaskFormPage />} />
                       <Route path="/profile" element={<h1>Profile</h1>} /> */}
 
-                          </Route>
-                        </Routes>
-                      </Container>
+                            </Route>
+                          </Routes>
+                        </Container>
 
-                    </main>
-                  </BrowserRouter>
-                </ActividadProvider>
-              </EspacioProvider>
-            </ReservaProvider>
-          </UsuarioProvider>
-        </RolProvider>
-      </MinisterioProvider>
-    </RecursoProvider>
+                      </main>
+                    </BrowserRouter>
+                  </ActividadProvider>
+                </EspacioProvider>
+              </ReservaProvider>
+            </UsuarioProvider>
+          </RolProvider>
+        </MinisterioProvider>
+      </RecursoProvider>
+    </SolicitudProvider>
     // </AuthProvider>
   );
 }

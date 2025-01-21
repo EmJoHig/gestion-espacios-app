@@ -15,6 +15,10 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -23,6 +27,8 @@ import { useReserva } from "../context/reservaContext";
 import { useEspacio } from "../context/espacioContext";
 import { useMinisterio } from "../context/ministerioContext.jsx";
 import { useActividad } from "../context/actividadContext.jsx";
+import { useSolicitud } from "../context/solicitudContext";
+
 import ReservaDialog from '../components/ReservaDialog';
 import dayjs from "dayjs";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -32,15 +38,38 @@ export function HomePage() {
   const [eventos, setEventos] = useState([]);
   const [espaciosDisponibles, setEspaciosDisponibles] = useState([]);
   const [espaciosSeleccionados, setEspaciosSeleccionados] = useState([]);
-  const { reservas, reserva, getReserva,  getReservas, createReserva, updateReserva } = useReserva();
-  const { espacios, getEspacios } = useEspacio();
+  const { reservas, reserva, getReserva, getReservas, createReserva, updateReserva } = useReserva();
+  const { espacios, getEspacios, getEspacio } = useEspacio();
   const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
   const { actividades, getActividades } = useActividad();
+  const { createSolicitud } = useSolicitud();
+
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  
+
+  //snackbar
+  const [snackBarState, setSnackBarState] = React.useState({
+    open: false,
+    message: '',
+    severity: 'success', // Puede ser 'success', 'error', 'info', 'warning'
+  });
+  const openSnackBar = (message, severity) => {
+    setSnackBarState({
+      open: true,
+      message,
+      severity,
+    });
+  };
+  const closeSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackBarState({ ...snackBarState, open: false });
+  };
+  //snackbar
+
   const { user } = useAuth0();
 
   const navigate = useNavigate();
@@ -59,7 +88,7 @@ export function HomePage() {
   }, [reservas, espacios]);
 
   // console.log(reservas)
-  
+
   useEffect(() => {
     // Cuando se cargan los espacios disponibles, seleccionarlos todos por defecto
     if (espaciosDisponibles.length > 0) {
@@ -69,7 +98,7 @@ export function HomePage() {
 
   useEffect(() => {
     setSelectedDate(reserva)
-}, [reserva]);
+  }, [reserva]);
 
 
   // modulos
@@ -128,10 +157,10 @@ export function HomePage() {
   const handleDateClick = (info) => {
     const fechaInicio = new Date(info.date); // Crear una nueva fecha basada en info.date
     fechaInicio.setHours(10, 0, 0, 0); // Ajustar el horario a 12:00 AM
-  
+
     const fechaFin = new Date(fechaInicio); // Clonar fechaInicio
     fechaFin.setHours(fechaInicio.getHours() + 1); // Sumar una hora para el final
-  
+
     // Crear el objeto reserva
     const reserva = {
       id: null, // Puedes asignar null si es una nueva reserva
@@ -141,9 +170,9 @@ export function HomePage() {
       fechaInicio: fechaInicio.toISOString(), // Convertir a formato ISO
       fechaFin: fechaFin.toISOString(), // Convertir a formato ISO
     };
-  
+
     // console.log("Nueva reserva: ", reserva); // Para verificar el objeto creado
-  
+
     setSelectedDate(reserva); // Actualizar el estado con la nueva reserva
     setOpenDialog(true); // Abrir el diálogo
   };
@@ -159,39 +188,70 @@ export function HomePage() {
 
 
     const reserva = {
-        id: data.id,
-        espacioId: data.espacioId,
-        ministerioId: data.ministerioId,
-        actividadId: data.actividadId,
-        fechaInicio: data.fechaHoraInicio,
-        fechaFin: data.fechaHoraFin,
+      id: data.id,
+      espacioId: data.espacioId,
+      ministerioId: data.ministerioId,
+      actividadId: data.actividadId,
+      fechaInicio: data.fechaHoraInicio,
+      fechaFin: data.fechaHoraFin,
     };
 
     // console.log("Reserva construida:", reserva);
     return reserva;
-};
+  };
 
-// console.log("isE :", isEditing)
+  // console.log("isE :", isEditing)
 
-const handleSaveOrUpdateReserva = (reserva) => {
-  // console.log("es actualización: ",isEditing)
-  if (isEditing) {
-    handleUpdateReserva(reserva);
-  } else {
-    handleSaveReserva(reserva);
-  }
-};
-  
+  const handleSaveOrUpdateReserva = (reserva) => {
+    // console.log("es actualización: ",isEditing)
+    if (isEditing) {
+      handleUpdateReserva(reserva);
+    } else {
+      handleSaveReserva(reserva);
+    }
+  };
+
   const handleSaveReserva = async (reservaData) => {
 
     const nuevaReserva = buildReservaObject(reservaData);
     try {
-      const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
-      if (!res.success) {
-        setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
-      } else {
-        await getReservas(); // Refrescar las reservas después de guardar
-        setOpenDialog(false); // Cerrar el diálogo
+
+      //primero chequeo que al guardar, el espacio sea tipo AULA, si es asi, guardo la reserva, sino SOLICITUD
+
+      const respGetEspacio = await getEspacio(nuevaReserva.espacioId);
+
+      // SI EL ESPACIO ES DE TIPO AULA, CREO DIRECTO LA RESERVA
+      if (respGetEspacio && respGetEspacio.tipoEspacio.nombre === "AULA") {
+        
+        const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
+        if (!res.success) {
+          setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
+          openSnackBar('No se pudo crear la RESERVA. Intente nuevamente.', 'error');
+        } else {
+          openSnackBar('Se creó la RESERVA con exito.', 'success');
+          await getReservas(); // Refrescar las reservas después de guardar
+          setOpenDialog(false); // Cerrar el diálogo
+        }
+      }else{
+        // SINO, CREO UNA SOLICITUD DE RESERVA
+        const nuevaSolicitud= {
+          id: null,
+          espacioId: nuevaReserva.espacioId,
+          ministerioId: nuevaReserva.ministerioId,
+          actividadId: nuevaReserva.actividadId,
+          fechaInicio: nuevaReserva.fechaInicio,
+          fechaFin: nuevaReserva.fechaFin,
+        };
+
+        const res = await createSolicitud(nuevaSolicitud); 
+
+        if (res == "") {
+          openSnackBar('Se creó la SOLICITUD de RESERVA con exito.', 'success');
+          await getReservas();
+          setOpenDialog(false);
+        } else {
+          setErrorMessage(res.message || "No se pudo crear la solicitud. Intente nuevamente.");
+        }
       }
     } catch (error) {
       console.error('Error al crear la reserva:', error);
@@ -200,29 +260,29 @@ const handleSaveOrUpdateReserva = (reserva) => {
 
   const handleUpdateReserva = async (reservaData) => {
     try {
-        // console.log("reservaData: ", reservaData)
-        const updatedReserva = buildReservaObject(reservaData);
-        //console.log("aca: ",updateReserva)
-        const res = await updateReserva(updatedReserva); // Suponiendo que tienes una función updateReserva
-        // console.log("res", res)
-        if (!res.success) {
-            setErrorMessage(res.message || "No se pudo actualizar la reserva. Intente nuevamente.");
-        } else {
-            await getReservas(); // Refrescar las reservas
-            setOpenDialog(false); // Cerrar el diálogo
-        }
+      // console.log("reservaData: ", reservaData)
+      const updatedReserva = buildReservaObject(reservaData);
+      //console.log("aca: ",updateReserva)
+      const res = await updateReserva(updatedReserva); // Suponiendo que tienes una función updateReserva
+      // console.log("res", res)
+      if (!res.success) {
+        setErrorMessage(res.message || "No se pudo actualizar la reserva. Intente nuevamente.");
+      } else {
+        await getReservas(); // Refrescar las reservas
+        setOpenDialog(false); // Cerrar el diálogo
+      }
     } catch (error) {
-        console.error('Error al actualizar la reserva:', error);
+      console.error('Error al actualizar la reserva:', error);
     }
-};
+  };
 
   const handleEventClick = (info) => {
     const selectedReserva = reservas.find((res) => res.id === parseInt(info.event.id));
     getReserva(parseInt(info.event.id));
     if (selectedReserva) {
-        setSelectedDate(selectedReserva);
-        setIsEditing(true);
-        setOpenDialog(true);
+      setSelectedDate(selectedReserva);
+      setIsEditing(true);
+      setOpenDialog(true);
     }
   };
 
@@ -376,6 +436,20 @@ const handleSaveOrUpdateReserva = (reserva) => {
         />
       </Box>
 
+      <Snackbar
+        open={snackBarState.open}
+        autoHideDuration={4000}
+        onClose={closeSnackBar}
+      >
+        <Alert
+          onClose={closeSnackBar}
+          severity={snackBarState.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackBarState.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
