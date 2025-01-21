@@ -1,11 +1,14 @@
 import Espacio from "../models/Espacio.js";
 import bcrypt from "bcryptjs";
 import EstadoEspacio from "../models/EstadoEspacio.js";
+import TipoEspacio from "../models/TipoEspacio.js";
 
 export const getEspacios = async (req, res) => {
   try {
     const espacios = await Espacio.findAll({
-      include: [{ model: EstadoEspacio, as: "estado" }],
+      include: [{ model: EstadoEspacio, as: "estado" },
+        { model: TipoEspacio, as: 'tipoEspacio' },
+      ],
     });
     // Enviar una respuesta al cliente
     res.status(200).json(espacios);
@@ -19,26 +22,30 @@ export const getEspacios = async (req, res) => {
 
 export const getEspacioById = async (req, res) => {
   try {
-    const { id } = req.params;
+      const { id } = req.params;
 
-    const espacio = await Espacio.findByPk(id);
-    if (!espacio) {
-      return res.status(404).json({ message: "Espacio no encontrado" });
-    }
+      const espacio = await Espacio.findByPk(id, {
+        include: [
+            { model: EstadoEspacio, as: "estado" },
+            { model: TipoEspacio, as: 'tipoEspacio' },
+        ],
+    });
 
-    res.status(200).json(espacio);
+      if (!espacio) {
+          return res.status(404).json({ message: 'Espacio no encontrado' });
+      }
+
+      res.status(200).json(espacio);
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "Ha ocurrido un error al obtener el Espacio" });
+      console.error(error);
+      res.status(500).json({ message: 'Ha ocurrido un error al obtener el Espacio' });
   }
 };
 
 export const createEspacio = async (req, res) => {
   try {
     console.log(req.body);
-    const { nombre, descripcion, capacidad, id_estado } = req.body;
+    const { nombre, descripcion, capacidad, id_estado, id_tipo_espacio } = req.body;
 
     // Crear el nuevo espacio
     const nuevoEspacio = await Espacio.create({
@@ -46,6 +53,7 @@ export const createEspacio = async (req, res) => {
       descripcion: descripcion,
       capacidad: capacidad,
       estadoId: id_estado,
+      tipoEspacioId: id_tipo_espacio
     });
 
     // Enviar una respuesta al cliente con el ministerio creado
@@ -66,6 +74,7 @@ export const updateEspacio = async (req, res) => {
     const { descripcion } = req.body;
     const { capacidad } = req.body;
     const { id_estado } = req.body;
+    const { id_tipo_espacio } = req.body;
 
     const espacio = await Espacio.findByPk(id);
     if (!espacio) {
@@ -79,6 +88,7 @@ export const updateEspacio = async (req, res) => {
     if (descripcion) updates.descripcion = descripcion;
     if (capacidad) updates.capacidad = capacidad;
     if (id_estado) updates.estadoId = id_estado;
+    if (id_tipo_espacio) updates.tipoEspacioId = id_tipo_espacio;
 
     // await Esácop.update(updates)
     await Espacio.update(updates, {
@@ -110,5 +120,18 @@ export const deleteEspacio = async (req, res) => {
     res
       .status(500)
       .json({ message: "Ha ocurrido un error al eliminar el Espacio" });
+  }
+};
+
+
+export const getTiposEspacio = async (req, res) => {
+  try {
+    const tiposEspacio = await TipoEspacio.findAll();
+    res.status(200).json(tiposEspacio);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Ha ocurrido un error al obtener los tipos de espacios" });
   }
 };

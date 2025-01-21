@@ -63,7 +63,8 @@ export const getReservaById = async (req, res) => {
 
 export const createReserva = async (req, res) => {
     try {
-        console.log(req.body);
+        // console.log("req.body reserva: ");
+        // console.log(req.body);
         const { espacioId, ministerioId, actividadId, fechaInicio, fechaFin } = req.body;
 
        // Verificar si ya existe una reserva para el mismo espacio en el rango de fechas
@@ -84,7 +85,6 @@ export const createReserva = async (req, res) => {
             },
         });
 
-
         if (reservasConflicto) {
             return res.status(400).json({ message: 'Ya existe una reserva para este espacio en el rango de fechas indicado.' });
         }
@@ -95,6 +95,7 @@ export const createReserva = async (req, res) => {
             espacioId, ministerioId,actividadId, fechaInicio, fechaFin
         });
 
+       
         // Enviar una respuesta al cliente con el ministerio creado
         res.status(201).json(nuevaReserva);
     } catch (error) {

@@ -8,9 +8,11 @@ import Rol from "./models/Rol.js";
 import Recurso from "./models/Recurso.js";
 import Espacio from "./models/Espacio.js";
 import Reserva from "./models/Reserva.js";
-import SolicitudReserva from "./models/SolicitudReserva.js";
+import Solicitud from "./models/Solicitud.js";
 import Actividad from "./models/Actividad.js";
 import EstadoEspacio from "./models/EstadoEspacio.js";
+import EstadoSolicitud from "./models/EstadoSolicitud.js";
+import TipoEspacio from "./models/TipoEspacio.js";
 
 async function main() {
   //await connectDB();
@@ -37,10 +39,16 @@ async function main() {
 
     await Reserva.sync({ alter: false });
 
-    await SolicitudReserva.sync({ alter: false });
+    await Solicitud.sync({ alter: false });
+
+    await EstadoSolicitud.sync({ alter: false });
+
+    await TipoEspacio.sync({ alter: false });
+
   } catch (error) {
     console.log("error en la conexion", error);
   }
+  
   //await createAdminUser();
 
   app.listen(3000, () => {

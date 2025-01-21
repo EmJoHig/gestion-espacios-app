@@ -1,6 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import db2 from "../database/db2.js";
 import EstadoEspacio from "./EstadoEspacio.js";
+import TipoEspacio from "./TipoEspacio.js";
 
 class Espacio extends Model {}
 
@@ -29,6 +30,15 @@ Espacio.init(
       allowNull: true,
       field: "id_estado",
     },
+    tipoEspacioId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: TipoEspacio,
+        key: "id",
+      },
+      allowNull: true,
+      field: "id_tipo_espacio",
+    },
   },
   {
     sequelize: db2,
@@ -44,6 +54,11 @@ Espacio.init(
 Espacio.belongsTo(EstadoEspacio, {
   foreignKey: "estadoId",
   as: "estado",
+});
+
+Espacio.belongsTo(TipoEspacio, {
+  foreignKey: "tipoEspacioId",
+  as: "tipoEspacio",
 });
 
 export default Espacio;
