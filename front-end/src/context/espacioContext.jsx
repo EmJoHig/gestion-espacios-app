@@ -2,9 +2,11 @@ import { createContext, useContext, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   getEspaciosRequest,
+  getEspacioRequest,
   createEspacioRequest,
   updateEspacioRequest,
   deleteEspacioRequest,
+  getTiposEspacioRequest,
 } from "../api/espacio.js";
 
 const EspacioContext = createContext();
@@ -22,7 +24,7 @@ export function EspacioProvider({ children }) {
 
   const getEspacios = async () => {
     try {
-      
+
       const token = await getAccessTokenSilently({
         audience: 'https://gestion-espacios/api',
       });
@@ -34,6 +36,25 @@ export function EspacioProvider({ children }) {
     }
   };
 
+
+  const getEspacio = async (id) => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await getEspacioRequest(token, id);
+
+      if (res.status === 200) {
+        return res.data;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const createEspacio = async (espacio) => {
     try {
@@ -65,14 +86,31 @@ export function EspacioProvider({ children }) {
   };
 
 
+  const getTiposEspacio = async () => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+      const res = await getTiposEspacioRequest(token);
+
+      return res.data;
+    } catch (error) {
+      console.error('Error fetching espacios:', error);
+    }
+  };
+
+
   return (
     <EspacioContext.Provider
       value={{
         espacios,
         getEspacios,
+        getEspacio,
         createEspacio,
         updateEspacio,
         deleteEspacio,
+        getTiposEspacio,
       }}
     >
       {children}

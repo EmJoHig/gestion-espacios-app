@@ -34,8 +34,8 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
   useEffect(() => {
     if (selectedDate) {
       // Precargamos los valores del formulario con los datos de la reserva seleccionada
-      console.log("Dialog - selectedDate: ",selectedDate)
-      console.log("dayjs selctdDate.fechaInicio", dayjs(selectedDate.fechaInicio))
+      // console.log("Dialog - selectedDate: ",selectedDate)
+      // console.log("dayjs selctdDate.fechaInicio", dayjs(selectedDate.fechaInicio))
       setSelectedMinisterio(selectedDate.ministerioId || ""); // Ajusta según tu estructura
       setSelectedActividad(selectedDate.actividadId || "");
       setSelectedEspacio(selectedDate.espacioId || "");
@@ -76,8 +76,8 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
     setEditable(false);
   };
   
-  console.log("isEditing", isEditing)
-  console.log("editable", editable)
+  // console.log("isEditing", isEditing)
+  // console.log("editable", editable)
 
   const handleFechaHoraInicioChange = (newValue) => {
     if (newValue && newValue.isValid()) {  // Verifica si el nuevo valor es válido

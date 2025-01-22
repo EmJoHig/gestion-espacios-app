@@ -14,7 +14,7 @@ import rolRoutes from "./routes/rol.routes.js";
 import recursoRoutes from "./routes/recurso.routes.js";
 import actividadRoutes from "./routes/actividad.routes.js";
 import reservaRoutes from "./routes/reserva.routes.js";
-import solicitudReservaRoutes from "./routes/solicitudReserva.routes.js";
+import solicitudRoutes from "./routes/solicitud.routes.js";
 import espacioRoutes from "./routes/espacio.routes.js";
 import estadoRoutes from "./routes/estado.routes.js";
 
@@ -83,7 +83,7 @@ app.use("/recurso", recursoRoutes);
 app.use("/actividad", actividadRoutes);
 app.use("/espacio", espacioRoutes);
 app.use("/reserva", reservaRoutes);
-app.use("/solicitudreserva", solicitudReservaRoutes);
+app.use("/solicitud", solicitudRoutes);
 
 // static files
 app.use(express.static(join(__dirname, "public")));

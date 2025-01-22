@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { format } from 'date-fns';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -23,6 +24,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -173,30 +175,30 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, solicitudesSeleccionadas } = props;
+  const { numSelected, handleSolicitudesSelected } = props;
 
 
-// APROBAR SOLICITUD RESERVA
-const handleAprobarSolicitud = async () => {
-  
-  console.log("IDS solicitudes Seleccionadas");
-  console.log(solicitudesSeleccionadas);
+  // APROBAR SOLICITUD RESERVA
+  // const handleAprobarSolicitud = async () => {
 
-  //llamar a la api para aprobar las solicitudes seleccionadas
-  // const res = await aprobarSolicitudRequest(solicitudesSeleccionadas);
-  // console.log(res);
-  // if (res.status === 200) {
-  //   console.log("Solicitudes Aprobadas");
-  //   console.log(res.data);
-  //   // setSolicitudes(res.data);
-  //   // setOpen(false);
-  // } else {
-  //   console.log("Error al aprobar solicitudes");
-  //   console.log(res);
-  //   // setErrors(res.data.message);
-  // }
-  
-};
+  //   console.log("IDS solicitudes Seleccionadas");
+  //   console.log(solicitudesSeleccionadas);
+
+  //   //llamar a la api para aprobar las solicitudes seleccionadas
+  //   // const res = await aprobarSolicitudRequest(solicitudesSeleccionadas);
+  //   // console.log(res);
+  //   // if (res.status === 200) {
+  //   //   console.log("Solicitudes Aprobadas");
+  //   //   console.log(res.data);
+  //   //   // setSolicitudes(res.data);
+  //   //   // setOpen(false);
+  //   // } else {
+  //   //   console.log("Error al aprobar solicitudes");
+  //   //   console.log(res);
+  //   //   // setErrors(res.data.message);
+  //   // }
+
+  // };
 
 
   return (
@@ -226,16 +228,28 @@ const handleAprobarSolicitud = async () => {
           id="tableTitle"
           component="div"
         >
-          Reservas
+          Solicitudes
         </Typography>
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Aprobar Solicitud">
-          {/* <IconButton>
-            <DeleteIcon />
-          </IconButton> */}
-          <Button style={{ }} color='success' variant="contained" onClick={handleAprobarSolicitud}>APROBAR</Button>
+        <Tooltip title="Cambiar Estado">
+          <Box sx={{ display: 'flex', gap: 2 }}> {/* Contenedor flex con espacio entre botones */}
+            <Button
+              color="success"
+              variant="contained"
+              onClick={() => handleSolicitudesSelected('AP')}
+            >
+              APROBAR
+            </Button>
+            <Button
+              color="error"
+              variant="contained"
+              onClick={() => handleSolicitudesSelected('RE')}
+            >
+              RECHAZAR
+            </Button>
+          </Box>
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
@@ -252,19 +266,25 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({ data, columnasTabla }) {
+export default function EnhancedTable({ data, columnasTabla, onSolicitudesSelected }) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
 
-  useEffect(() => {
-    console.log("data listado solucitudes");
-    console.log(data);
-  }, [data]);
+  // useEffect(() => {
+
+  // }, [data]);
+
+  const handleSolicitudesSelected = (estado) => {
+    // Enviar los ids seleccionados al padre
+    onSolicitudesSelected(selected, estado); // Enviamos el array de ids seleccionados
+    setSelected([]);
+  };
+
 
 
   const handleRequestSort = (event, property) => {
@@ -283,22 +303,35 @@ export default function EnhancedTable({ data, columnasTabla }) {
   };
 
   const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-    setSelected(newSelected);
+    // seleccion simple
+    setSelected((prevSelected) => {
+      if (prevSelected.includes(id)) {
+        // Si el ID ya está seleccionado, se quita de la selección
+        return prevSelected.filter((selectedId) => selectedId !== id);
+      } else {
+        // Si el ID no está seleccionado, se selecciona
+        return [id];
+      }
+    });
+
+    // seleccion multiple
+    // const selectedIndex = selected.indexOf(id);
+    // let newSelected = [];
+
+    // if (selectedIndex === -1) {
+    //   newSelected = newSelected.concat(selected, id);
+    // } else if (selectedIndex === 0) {
+    //   newSelected = newSelected.concat(selected.slice(1));
+    // } else if (selectedIndex === selected.length - 1) {
+    //   newSelected = newSelected.concat(selected.slice(0, -1));
+    // } else if (selectedIndex > 0) {
+    //   newSelected = newSelected.concat(
+    //     selected.slice(0, selectedIndex),
+    //     selected.slice(selectedIndex + 1),
+    //   );
+    // }
+    // setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -332,7 +365,11 @@ export default function EnhancedTable({ data, columnasTabla }) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} solicitudesSeleccionadas={selected} />
+        {/* <EnhancedTableToolbar numSelected={selected.length} handleSolicitudesSelected={handleSolicitudesSelected} /> */}
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          handleSolicitudesSelected={handleSolicitudesSelected}
+        />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -365,30 +402,40 @@ export default function EnhancedTable({ data, columnasTabla }) {
                     sx={{ cursor: 'pointer' }}
                   >
                     <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                        onClick={(event) => handleClick(event, row.id)}
-                      />
+                      {
+                        row.estadoSolicitud.codigo === 'EP' && (
+                          <Checkbox
+                            color="primary"
+                            checked={isItemSelected}
+                            inputProps={{
+                              'aria-labelledby': labelId,
+                            }}
+                            onClick={(event) => handleClick(event, row.id)}
+                          />
+                        )
+                      }
                     </TableCell>
-                    <TableCell
+                    <TableCell align="center">{row.espacio.nombre}</TableCell>
+                    <TableCell align="center">{row.ministerio.descripcion}</TableCell>
+                    <TableCell align="center">{row.actividad.descripcion}</TableCell>
+                    <TableCell align="center">{row.estadoSolicitud.nombre}</TableCell>
+                    <TableCell align="center">{row.fechaInicio ? format(new Date(row.fechaInicio), 'dd/MM/yyyy HH:mm') : '-'}</TableCell>
+                    <TableCell align="center">{row.fechaFin ? format(new Date(row.fechaFin), 'dd/MM/yyyy HH:mm') : '-'}</TableCell>
+
+                    {/* <TableCell
                       component="th"
                       id={labelId}
                       scope="row"
                       padding="normal"
                       align="center"
                     >
-                      {row.codigo}
-                    </TableCell>
-                    <TableCell align="center">{row.descripcion}</TableCell>
-                    <TableCell align="center">
+                      {row.id}
+                    </TableCell> */}
+                    {/* <TableCell align="center">
                       <IconButton aria-label="edit">
                         <EditIcon />
                       </IconButton>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 );
               })}
@@ -423,6 +470,6 @@ export default function EnhancedTable({ data, columnasTabla }) {
 }
 
 EnhancedTable.propTypes = {
-    data: PropTypes.array.isRequired,
-    columnasTabla: PropTypes.array.isRequired,
-  };
+  data: PropTypes.array.isRequired,
+  columnasTabla: PropTypes.array.isRequired,
+};

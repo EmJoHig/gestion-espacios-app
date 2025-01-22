@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, Select, MenuItem, InputLabel, FormControl, Box, FormHelperText } from '@mui/material';
 import { useEstado } from '../../context/estadoContext';
 
-const FormularioEditar = ({ espacio, onSave, onCancel }) => {
+const FormularioEditar = ({ espacio, onSave, onCancel, tipoEspacioList }) => {
   const [nombre, setNombre] = useState(espacio.nombre);
   const [descripcion, setDescripcion] = useState(espacio.descripcion);
   const [capacidad, setCapacidad] = useState(espacio.capacidad);
   const [id_estado, setEstado] = useState(espacio.estado.id); // Suponiendo que 'estado' es un objeto con 'id' y 'nombre'
+  const [id_tipo_espacio, setTipoEspacio] = useState(espacio.tipoEspacio.id); // Suponiendo que 'estado' es un objeto con 'id' y 'nombre'
 
   const { estados, getEstados } = useEstado();
 
@@ -22,6 +23,7 @@ const FormularioEditar = ({ espacio, onSave, onCancel }) => {
     setDescripcion(espacio.descripcion);
     setCapacidad(espacio.capacidad);
     setEstado(espacio.estado.id); // Si el espacio ya tiene un estado, lo carga
+    setTipoEspacio(espacio.tipoEspacio.id);
   }, [espacio]);
 
   // Función para validar los campos
@@ -31,6 +33,7 @@ const FormularioEditar = ({ espacio, onSave, onCancel }) => {
     if (!nombre.trim()) newErrors.nombre = 'El nombre es obligatorio.';
     if (!capacidad || capacidad <= 0) newErrors.capacidad = 'La capacidad debe ser un número mayor a 0.';
     if (!id_estado) newErrors.id_estado = 'Debe seleccionar un estado.';
+    if (!id_tipo_espacio) newErrors.id_tipo_espacio = 'Debe seleccionar un tipo de espacio.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -45,6 +48,7 @@ const FormularioEditar = ({ espacio, onSave, onCancel }) => {
       descripcion,
       capacidad: parseInt(capacidad, 10), // Aseguramos que capacidad sea un número
       id_estado,
+      id_tipo_espacio,
     };
     onSave(espacioEditado);
   };
@@ -97,6 +101,26 @@ const FormularioEditar = ({ espacio, onSave, onCancel }) => {
         </Select>
         <FormHelperText>{errors.id_estado}</FormHelperText>
       </FormControl>
+
+
+
+      <FormControl fullWidth margin="normal" error={!!errors.id_tipo_espacio}>
+        <InputLabel>Tipo Espacio</InputLabel>
+        <Select
+          value={id_tipo_espacio}
+          onChange={(e) => setTipoEspacio(e.target.value)}
+          label="Tipo Espacio"
+        >
+          {tipoEspacioList?.length > 0 &&
+            tipoEspacioList.map((tipoEspacio) => (
+              <MenuItem key={tipoEspacio.id} value={tipoEspacio.id}>
+                {tipoEspacio.nombre}
+              </MenuItem>
+            ))}
+        </Select>
+        <FormHelperText>{errors.id_tipo_espacio}</FormHelperText>
+      </FormControl>
+      
 
       <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
         <Button onClick={onCancel} variant="outlined" color="error">

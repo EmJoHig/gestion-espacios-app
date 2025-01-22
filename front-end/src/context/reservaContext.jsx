@@ -53,8 +53,8 @@ export function ReservaProvider({ children }) {
   const createReserva = async (reserva) => {
     try {
       const res = await createReservaRequest(reserva);
-      console.log("context: ",res);
-      return res
+      // console.log("context: ",res);
+      return res;
     } catch (error) {
       console.log(error);
       return error

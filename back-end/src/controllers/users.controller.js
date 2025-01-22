@@ -120,16 +120,10 @@ export const validarUsuarioAUTH0 = async (req, res) => {
 
     const { UsuarioAUTH0 } = req.body;
 
-    console.log("UsuarioAUTH0");
-    console.log(UsuarioAUTH0);
-
     const _usuario = await Usuario.findOne({ where: { idUsuarioAUTH0: UsuarioAUTH0.sub } });
-
 
     // si no existe, lo creo
     if (!_usuario) {
-
-      console.log("entra a crear usuario ");
 
       const nuevoUsuario = await Usuario.create({ nombreUsuario: UsuarioAUTH0.name, email: UsuarioAUTH0.email, idUsuarioAUTH0: UsuarioAUTH0.sub });
 
