@@ -22,6 +22,30 @@ Usuario.init({
     trim: true,
     field: 'nombre_usuario'
   },
+  nombre: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    trim: true,
+    field: 'nombre'
+  },
+  apellido: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    trim: true,
+    field: 'apellido'
+  },
+  telefono: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    trim: true,
+    field: 'telefono'
+  },
+  dni: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    trim: true,
+    field: 'dni'
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -29,10 +53,6 @@ Usuario.init({
     trim: true,
     field: 'email'
   },
-  // password: {
-  //   type: DataTypes.STRING,
-  //   allowNull: false,
-  // },
   fechaAlta: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
