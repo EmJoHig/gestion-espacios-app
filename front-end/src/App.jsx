@@ -31,9 +31,9 @@ import { AsociarRolesPage } from "./pages/Rol/AsociarRolesPage";
 import { AsociarRespAMinisterioPage } from "./pages/Ministerio/AsociarRespAMinisterioPage";
 import { ActividadPage } from "./pages/Actividad/ActividadPage";
 import { AsociarActMinisterioPage } from "./pages/Actividad/AsociarActMinisterioPage";
-
 import { UsuarioPage } from "./pages/Usuario/UsuarioPage";
 import { EspacioPage } from "./pages/Espacio/EspacioPage";
+import { PerfilUsuarioPage } from "./pages/Usuario/PerfilUsuarioPage";
 
 
 function App() {
@@ -73,6 +73,8 @@ function App() {
                               <Route path="/actividad" element={<ActividadPage />} />
                               <Route path="/asociar-actividades" element={<AsociarActMinisterioPage />} />
                               <Route path="/usuarios" element={<UsuarioPage />} />
+                              <Route path="/perfil-usuario" element={<PerfilUsuarioPage />} />
+
                               {/* <Route path="/add-task" element={<TaskFormPage />} />
                       <Route path="/tasks/:id" element={<TaskFormPage />} />
                       <Route path="/profile" element={<h1>Profile</h1>} /> */}

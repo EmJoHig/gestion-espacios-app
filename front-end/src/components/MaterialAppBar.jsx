@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -63,7 +64,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function PrimarySearchAppBar() {
   // const { isAuthenticated, logout, usuario } = useAuth();
-
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const isMenuOpen = Boolean(anchorEl);
@@ -333,8 +334,8 @@ export default function PrimarySearchAppBar() {
             open={isMenuOpen}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={handleMenuClose}>Perfil</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Mis Reservas</MenuItem>
+            <MenuItem onClick={() => navigate("/perfil-usuario")}>Perfil</MenuItem>
+            {/* <MenuItem onClick={handleMenuClose}>Mis Reservas</MenuItem> */}
             <MenuItem onClick={logout}>Log Out</MenuItem>
 
           </Menu>

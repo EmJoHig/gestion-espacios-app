@@ -202,11 +202,10 @@ export function UsuarioPage() {
                     Modulo Usuarios
                 </Typography>
 
-                <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
+                <Button variant="contained" onClick={() => navigate("/home")} >
                     HOME
                 </Button>
 
-                <Button variant="contained">Nuevo</Button>
                 <Button variant="contained" onClick={() => navigate("/asociar-roles")} style={{ marginLeft: '20px' }}>ASOCIAR ROLES</Button>
 
 

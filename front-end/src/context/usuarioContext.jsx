@@ -1,12 +1,13 @@
 import { createContext, useContext, useState } from "react";
 import {
-  createUsuarioRequest,
-  deleteUsuarioRequest,
+  // createUsuarioRequest,
+  // deleteUsuarioRequest,
   getUsuariosRequest,
   getUsuarioRequest,
   updateUsuarioRequest,
   getUsuarioAuth0Request,
   getUsuariosAUTH0Request,
+  getUserByIdAUTH0Request,
 } from "../api/usuario";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -72,9 +73,22 @@ export function UsuarioProvider({ children }) {
     }
   };
 
-  const updateUsuario = async (id, usuario) => {
+  const updateUsuario = async (usuario) => {
     try {
-      await updateUsuarioRequest(id, usuario);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
+      });
+
+      const resp = await updateUsuarioRequest(token, usuario);
+
+      if (resp.status === 200) {
+        return resp.data;
+      } else {
+        return null;
+      }
+
     } catch (error) {
       console.error(error);
     }
@@ -83,7 +97,6 @@ export function UsuarioProvider({ children }) {
 
   //chequea que el usuario logueado este en auth0, sino lo esta lo crea en mi bd
   const getUsuarioAuth0 = async (usuario) => {
-
     try {
 
       const token = await getAccessTokenSilently({
@@ -102,7 +115,6 @@ export function UsuarioProvider({ children }) {
     } catch (error) {
       console.error(error);
     }
-
   };
 
 
@@ -138,17 +150,39 @@ export function UsuarioProvider({ children }) {
 
 
 
+  // obtiene un usaurio por idAUTH0
+  const getUserByIdAUTH0 = async (id) => {
+    try {
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api', // USAR ESTE
+        // audience: 'https://dev-zgzo7qc6w6kujif0.us.auth0.com/api/v2/',
+      });
+
+      const res = await getUserByIdAUTH0Request(token, id);
+      
+      if (res.status === 200) {
+        return res.data;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
   return (
     <UsuarioContext.Provider
       value={{
         usuarios,
         getUsuarios,
-        deleteUsuario,
-        createUsuario,
+        // deleteUsuario,
+        // createUsuario,
         getUsuario,
         updateUsuario,
         getUsuarioAuth0,
         getUsuariosAUTH0,
+        getUserByIdAUTH0,
       }}
     >
       {children}
