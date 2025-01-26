@@ -30,6 +30,9 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAuth0 } from "@auth0/auth0-react";
+import Container from '@mui/material/Container';
+import TablaUsuarios from './TablaUsuarios';
+
 // import DialogEditarUsuario from './DialogEditarUsuario';
 // import TablaUsuarios from './TablaUsuarios';
 import { useUsuario } from "../../context/usuarioContext";
@@ -68,7 +71,7 @@ export function UsuarioPage() {
     useEffect(() => {
 
         getUsuariosAUTH0();
-        
+
     }, []);
 
 
@@ -86,6 +89,27 @@ export function UsuarioPage() {
     // };
 
 
+    const columnas = [
+        {
+            id: 'name',
+            numeric: false,
+            disablePadding: true,
+            label: 'Nombre Usuario',
+        },
+        {
+            id: 'email',
+            numeric: true,
+            disablePadding: false,
+            label: 'Email',
+        },
+        {
+            id: 'created_at',
+            numeric: true,
+            disablePadding: false,
+            label: 'Fecha Alta',
+        }
+    ];
+
     //DIALOG EDITAR
 
     const handleClickOpenEdit = () => {
@@ -100,8 +124,8 @@ export function UsuarioPage() {
             const { name, description } = usuarioJson;
             usuarioEdicion.name = name;
             usuarioEdicion.description = description;
-            
-            console.log("usuarioEdicion", usuarioEdicion);
+
+            // console.log("usuarioEdicion", usuarioEdicion);
 
             const resp = await updateUsuario(usuarioEdicion);
 
@@ -112,7 +136,7 @@ export function UsuarioPage() {
             }
 
             window.location.reload();
-            
+
             // await getUsuarioes();
             // handleCloseEdit();
         } catch (error) {
@@ -197,94 +221,42 @@ export function UsuarioPage() {
 
     return (
         <>
-            <Box sx={{ marginTop: '50px', marginBottom: '150px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    Modulo Usuarios
-                </Typography>
-
-                <Button variant="contained" onClick={() => navigate("/home")} >
-                    HOME
-                </Button>
-
-                <Button variant="contained" onClick={() => navigate("/asociar-roles")} style={{ marginLeft: '20px' }}>ASOCIAR ROLES</Button>
-
-
-                {/* {openEdit && (
-                    <DialogEditarUsuario
-                        usuario={usuarioEdicion}
-                        open={openEdit}
-                        onClose={handleCloseEdit}
-                        onSubmit={handleSubmitEdit}
-                    />
-                )} */}
-
-                {/* {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={usuarioIdToDelete} />} */}
-
-                <Box sx={{ marginTop: '50px' }}>
-
+            <Container fixed>
+                <Box sx={{ marginTop: '50px', marginBottom: '150px' }}>
                     <Typography gutterBottom variant="h5" component="div">
-                        Usuarioes UTH0
+                        Modulo Usuarios
                     </Typography>
 
-                    <br />
-                    <Divider />
-                    <br />
+                    <Button variant="contained" onClick={() => navigate("/home")} >
+                        HOME
+                    </Button>
 
-                    {usuarios != null && usuarios.length > 0 ? (
-                        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                    <Button variant="contained" onClick={() => navigate("/asociar-roles")} style={{ marginLeft: '20px' }}>ASOCIAR ROLES</Button>
 
-                            {usuarios.length === 0 && (
-                                <h1>no hay usuarios</h1>
-                            )}
-
-                            {usuarios.map((usuario) => (
-                                <Grid item xs={3} key={usuario.id}>
-                                    <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={handleClick(null)}>
-
-                                        <CardContent>
-                                            <Stack direction="row" spacing={0} sx={{
-                                                justifyContent: "flex-end",
-                                                alignItems: "center",
-                                            }}>
-                                                <IconButton aria-label="edit" onClick={() => handleSetUsuarioState(usuario)}>
-                                                    <EditIcon />
-                                                </IconButton>
-                                            </Stack>
-                                        </CardContent>
-                                        
-                                        <CardContent>
-                                            <Typography gutterBottom variant="h6" component="div">
-                                                <b>{usuario.nombreUsuario}</b>
-                                            </Typography>
-                                            <br />
-                                            <Typography gutterBottom variant="h6" component="div">
-                                                {usuario.email}
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    ) : (
-                        <h1>no hay usuarioesUsuario</h1>
-                    )}
+                    <Box sx={{ marginTop: '50px' }}>
+                        <TablaUsuarios
+                            data={usuarios}
+                            columnasTabla={columnas}
+                            nombreTabla={"Listado de users"}
+                        />
+                    </Box>
 
                 </Box>
-            </Box>
-            <Snackbar
-                open={snackBarState.open}
-                autoHideDuration={4000}
-                onClose={closeSnackBar}
-            >
-                <Alert
+                <Snackbar
+                    open={snackBarState.open}
+                    autoHideDuration={4000}
                     onClose={closeSnackBar}
-                    severity={snackBarState.severity}
-                    variant="filled"
-                    sx={{ width: '100%' }}
                 >
-                    {snackBarState.message}
-                </Alert>
-            </Snackbar>
+                    <Alert
+                        onClose={closeSnackBar}
+                        severity={snackBarState.severity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {snackBarState.message}
+                    </Alert>
+                </Snackbar>
+            </Container>
         </>
     );
 }

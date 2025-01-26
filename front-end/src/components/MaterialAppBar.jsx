@@ -12,6 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -267,19 +268,16 @@ export default function PrimarySearchAppBar() {
             open={isMobileMenuOpen}
             onClose={handleMobileMenuClose}
           >
-            <MenuItem onClick={handleProfileMenuOpen}>
+            <MenuItem onClick={() => { navigate("/perfil-usuario"); handleMenuClose(); }}>
               <IconButton
                 size="large"
-                aria-label="account of current usuario"
-                aria-controls="primary-search-account-menu"
-                aria-haspopup="true"
                 color="inherit"
               >
                 <AccountCircle />
               </IconButton>
-              <p>Profile</p>
+              <p>Perfil</p>
             </MenuItem>
-            <MenuItem onClick={handleProfileMenuOpen}>
+            {/* <MenuItem onClick={handleProfileMenuOpen}>
               <IconButton
                 size="large"
                 aria-label="account of current usuario"
@@ -290,8 +288,8 @@ export default function PrimarySearchAppBar() {
                 <AccountCircle />
               </IconButton>
               <p>Mis Reservas</p>
-            </MenuItem>
-            <MenuItem>
+            </MenuItem> */}
+            {/* <MenuItem>
               <IconButton
                 size="large"
                 aria-label="show 17 new notifications"
@@ -302,18 +300,15 @@ export default function PrimarySearchAppBar() {
                 </Badge>
               </IconButton>
               <p>Notifications</p>
-            </MenuItem>
-            <MenuItem>
+            </MenuItem> */}
+            <MenuItem onClick={() => { logout(); handleMenuClose(); }}>
               <IconButton
                 size="large"
-                aria-label="show 17 new notifications"
                 color="inherit"
               >
-                {/* <Badge badgeContent={17} color="error">
-              <NotificationsIcon />
-            </Badge> */}
+                <LogoutIcon />
               </IconButton>
-              <p>Log Out</p>
+              <p>Cerrar Sesión</p>
             </MenuItem>
           </Menu>
 
@@ -334,9 +329,29 @@ export default function PrimarySearchAppBar() {
             open={isMenuOpen}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={() => navigate("/perfil-usuario")}>Perfil</MenuItem>
+            {/* <MenuItem onClick={() => navigate("/perfil-usuario")}>Perfil</MenuItem> */}
+            <MenuItem onClick={() => { navigate("/perfil-usuario"); handleMenuClose(); }}>
+              <IconButton
+                size="large"
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <p>Perfil</p>
+            </MenuItem>
+
             {/* <MenuItem onClick={handleMenuClose}>Mis Reservas</MenuItem> */}
-            <MenuItem onClick={logout}>Log Out</MenuItem>
+
+            {/* <MenuItem onClick={logout}>Log Out</MenuItem> */}
+            <MenuItem onClick={() => { logout(); handleMenuClose(); }}>
+              <IconButton
+                size="large"
+                color="inherit"
+              >
+                <LogoutIcon />
+              </IconButton>
+              <p>Cerrar Sesión</p>
+            </MenuItem>
 
           </Menu>
         </>

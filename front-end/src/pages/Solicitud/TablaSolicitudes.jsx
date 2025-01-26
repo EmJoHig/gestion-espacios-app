@@ -374,7 +374,7 @@ export default function EnhancedTable({ data, columnasTabla, onSolicitudesSelect
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
+            size={'small'}
           >
             <EnhancedTableHead
               numSelected={selected.length}

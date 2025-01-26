@@ -30,6 +30,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAuth0 } from "@auth0/auth0-react";
+import Container from '@mui/material/Container';
 // import DialogEditarUsuario from './DialogEditarUsuario';
 // import TablaUsuarios from './TablaUsuarios';
 import { useUsuario } from "../../context/usuarioContext";
@@ -152,6 +153,7 @@ export function PerfilUsuarioPage() {
 
     return (
         <>
+         <Container fixed>
             <Box sx={{ marginTop: '50px', marginBottom: '150px' }}>
                 <Typography variant="h5" sx={{ marginBottom: '20px' }}> Perfil de Usuario </Typography>
 
@@ -231,6 +233,7 @@ export function PerfilUsuarioPage() {
                     </Alert>
                 </Snackbar>
             </Box>
+            </Container>
         </>
     );
 }

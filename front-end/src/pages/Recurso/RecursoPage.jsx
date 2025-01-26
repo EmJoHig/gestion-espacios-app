@@ -26,7 +26,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-
+import Container from '@mui/material/Container';
 import TablaRecursos from './TablaRecursos';
 import { useRecurso } from "../../context/recursoContext";
 
@@ -162,6 +162,15 @@ export function RecursoPage() {
 
     //DIALOG NUEVO
     function RenderizarDialogNuevoRecurso(props) {
+        const [cantidad, setCantidad] = React.useState("");
+        const handleCantidadChange = (event) => {
+            const value = event.target.value;
+            // Validar que solo se ingresen números y que no excedan 4 dígitos
+            if (/^\d{0,4}$/.test(value)) {
+                setCantidad(value);
+            }
+        };
+
         return (
             <>
                 <Dialog
@@ -218,6 +227,12 @@ export function RecursoPage() {
                             }}
                             fullWidth
                             variant="standard"
+                            value={cantidad}
+                            onChange={handleCantidadChange}
+                            inputProps={{
+                                pattern: "\\d{1,4}", // Expresión regular para 1 a 4 dígitos
+                                maxLength: 4, // Limita la longitud máxima a 4 caracteres
+                            }}
                         />
                     </DialogContent>
                     <DialogActions>
@@ -248,7 +263,12 @@ export function RecursoPage() {
             setDescripcionEdit(event.target.value);
         };
         const handleCantidadChange = (event) => {
-            setCantidadEdit(event.target.value);
+            // setCantidadEdit(event.target.value);
+            const value = event.target.value;
+            // Validar que solo se ingresen números y que no excedan 4 dígitos
+            if (/^\d{0,4}$/.test(value)) {
+                setCantidadEdit(value);
+            }
         };
         return (
             <>
@@ -306,6 +326,10 @@ export function RecursoPage() {
                             fullWidth
                             value={cantidadEdit}
                             onChange={handleCantidadChange}
+                            inputProps={{
+                                pattern: "\\d{1,4}", // Expresión regular para 1 a 4 dígitos
+                                maxLength: 4, // Limita la longitud máxima a 4 caracteres
+                            }}
                         />
                     </DialogContent>
                     <DialogActions>
@@ -392,54 +416,56 @@ export function RecursoPage() {
 
     return (
         <>
-            <Box sx={{ marginTop: '50px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    Modulo Recursos
-                </Typography>
-
-                <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
-                    HOME
-                </Button>
-
-                <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-
-                {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={recursoIdToDelete} />}
-
-
-                {openEdit && (
-                    <RenderizarDialogEditarRecurso recurso={recursoEdicion} />
-                )}
-                
-                <RenderizarDialogNuevoRecurso />
-
+            <Container fixed>
                 <Box sx={{ marginTop: '50px' }}>
-                    <TablaRecursos
-                        data={recursos}
-                        columnasTabla={columnas}
-                        nombreTabla={"Listado de Recursos"}
-                        onEditClick={handleObtenerRow}
-                        onClickDeleteRecurso={handleDeleteRecurso}
-                    />
+                    <Typography gutterBottom variant="h5" component="div">
+                        Modulo Recursos
+                    </Typography>
+
+                    <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
+                        HOME
+                    </Button>
+
+                    <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
+
+                    {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={recursoIdToDelete} />}
+
+
+                    {openEdit && (
+                        <RenderizarDialogEditarRecurso recurso={recursoEdicion} />
+                    )}
+
+                    <RenderizarDialogNuevoRecurso />
+
+                    <Box sx={{ marginTop: '50px' }}>
+                        <TablaRecursos
+                            data={recursos}
+                            columnasTabla={columnas}
+                            nombreTabla={"Listado de Recursos"}
+                            onEditClick={handleObtenerRow}
+                            onClickDeleteRecurso={handleDeleteRecurso}
+                        />
+                    </Box>
+
+
+
                 </Box>
 
-
-
-            </Box>
-
-            <Snackbar
-                open={snackBarState.open}
-                autoHideDuration={4000}
-                onClose={closeSnackBar}
-            >
-                <Alert
+                <Snackbar
+                    open={snackBarState.open}
+                    autoHideDuration={4000}
                     onClose={closeSnackBar}
-                    severity={snackBarState.severity}
-                    variant="filled"
-                    sx={{ width: '100%' }}
                 >
-                    {snackBarState.message}
-                </Alert>
-            </Snackbar>
+                    <Alert
+                        onClose={closeSnackBar}
+                        severity={snackBarState.severity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {snackBarState.message}
+                    </Alert>
+                </Snackbar>
+            </Container>
         </>
     );
 }

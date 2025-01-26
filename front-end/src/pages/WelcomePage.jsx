@@ -7,8 +7,13 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import MaterialAppBar from "../components/MaterialAppBar";
 import MaterialTable from "../components/MaterialTable";
+import Container from '@mui/material/Container';
 //auth0
 import { useAuth0 } from "@auth0/auth0-react";
+
+import imgwelcome from '../assets/imgwelcome.jpeg';
+import logo from '../assets/logoreservap.png';
+
 
 function WelcomePage() {
 
@@ -36,24 +41,29 @@ function WelcomePage() {
 
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          backgroundColor: "#f5f5f5",
-        }}
-      >
-        <Box textAlign="center">
-          <CircularProgress size={80} thickness={4} />
-          <Box mt={2}>
-            <h2 style={{ fontFamily: "Arial, sans-serif", color: "#1976d2" }}>
-              Cargando, por favor espera...
-            </h2>
+      <>
+        <Container fixed>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100vh",
+              backgroundColor: "#f5f5f5",
+            }}
+          >
+            <Box textAlign="center">
+              <CircularProgress size={80} thickness={4} />
+              <Box mt={2}>
+                <h2 style={{ fontFamily: "Arial, sans-serif", color: "#1976d2" }}>
+                  Cargando, por favor espera...
+                </h2>
+              </Box>
+            </Box>
           </Box>
-        </Box>
-      </Box>
+        </Container>
+      </>
+
     );
   }
 
@@ -70,39 +80,45 @@ function WelcomePage() {
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8"></div>
         </main>
       </div> */}
-
-
       <Box
         sx={{
-          minHeight: "100vh",
+          height: "100vh", // Asegura que el contenedor ocupe toda la altura de la ventana
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          background: "linear-gradient(135deg, #90caf9, #42a5f5)",
+          background: `url(${imgwelcome}) no-repeat center center/cover`, // Usar la imagen de fondo y cubrir todo el contenedor
+          backgroundPosition: "center", // Centra la imagen
+          backgroundSize: "cover", // Asegura que la imagen cubra todo el contenedor
           padding: 3,
+          color: "#fff",
         }}
       >
         <Box
           sx={{
             textAlign: "center",
-            backgroundColor: "#ffffff",
-            padding: 5,
+            padding: 4,
             borderRadius: "16px",
             boxShadow: "0 8px 20px rgba(0, 0, 0, 0.2)",
             maxWidth: "500px",
             width: "100%",
+            background: "rgb(255, 255, 255)", // Fondo translúcido para mejorar la visibilidad del texto
+            color: "#1976d2",
           }}
         >
           <img
-            src="https://via.placeholder.com/150"
+            src={logo}
             alt="Logo"
-            style={{ marginBottom: "1.5rem", borderRadius: "50%" }}
+            style={{
+              marginBottom: "1.5rem",
+              borderRadius: "50%",
+              border: "5px solid #1976d2",
+              padding: "5px",
+            }}
           />
           <h1
             style={{
               fontSize: "2.8rem",
-              color: "#1976d2",
               marginBottom: "1rem",
               fontWeight: "bold",
               fontFamily: "Arial, sans-serif",
@@ -113,9 +129,9 @@ function WelcomePage() {
           <p
             style={{
               fontSize: "1rem",
-              color: "#555",
               marginBottom: "1.5rem",
               lineHeight: "1.5",
+              color: "#555",
             }}
           >
             Accede a todas las funcionalidades de nuestra plataforma con tu cuenta.

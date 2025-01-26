@@ -28,7 +28,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-
+import Container from '@mui/material/Container';
 import TablaSolicitudes from './TablaSolicitudes.jsx';
 
 // importo el conetxt de usuario para llamar a la api
@@ -194,10 +194,10 @@ export function SolicitudPage() {
 
                     console.log("responseGetSolicitud: ", responseGetSolicitud);
 
-                    if(!responseGetSolicitud){
+                    if (!responseGetSolicitud) {
                         throw new Error("Error al obtener la solicitud");
-                    }                    
-                               
+                    }
+
                     const nuevaReserva = {
                         id: null,
                         ministerioId: responseGetSolicitud.ministerioId,
@@ -214,9 +214,9 @@ export function SolicitudPage() {
 
                     if (!res.success) {
                         openSnackBar('No se pudo crear la RESERVA. Intente nuevamente.', 'error');
-                      } else {
+                    } else {
                         openSnackBar('Se creó la RESERVA con exito.', 'success');
-                      }
+                    }
                 }
                 else
                     openSnackBar('Se rechazo la solicitud con exito.', 'success');
@@ -235,7 +235,7 @@ export function SolicitudPage() {
         } catch (error) {
             if (codigoEstado === "AP") {
                 openSnackBar('Error al aprobar la solicitud.', 'error');
-            }else{
+            } else {
                 openSnackBar('Error al rechazar la solicitud.', 'error');
             }
         }
@@ -245,46 +245,47 @@ export function SolicitudPage() {
 
     return (
         <>
-            <Box sx={{ marginTop: '50px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    Modulo Solicitudes de Reserva
-                </Typography>
+            <Container fixed>
+                <Box sx={{ marginTop: '50px' }}>
+                    <Typography gutterBottom variant="h5" component="div">
+                        Modulo Solicitudes de Reserva
+                    </Typography>
 
-                <Button style={{ marginTop: '10px', marginBottom: '10px' }} variant="contained" onClick={() => navigate("/home")}>
-                    HOME
-                </Button>
+                    <Button style={{ marginTop: '10px', marginBottom: '10px' }} variant="contained" onClick={() => navigate("/home")}>
+                        HOME
+                    </Button>
 
-                {/* <Typography gutterBottom variant="h4" component="div">
+                    {/* <Typography gutterBottom variant="h4" component="div">
                     componente CALENDARIO QUE MUESTRE LOS DIAS QUE HAY RESERVAS
                 </Typography> */}
-                {/* <MonthlyCalendar /> */}
+                    {/* <MonthlyCalendar /> */}
 
-                <Box sx={{ width: '100%', marginTop: '50px' }}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6} md={4} lg={4}>
-                            <Typography gutterBottom variant="h5" component="div">
-                                Espacio
-                            </Typography>
-                            <FormControl sx={{ width: '100%', marginTop: 3 }} variant="standard">
-                                <Select
-                                    value={ministerioSelect}
-                                    onChange={ChangeSelectMinisterio}
-                                    displayEmpty
-                                    inputProps={{ 'aria-label': 'Without label' }}
-                                >
-                                    <MenuItem value="">
-                                        <em>TODOS</em>
-                                    </MenuItem>
-                                    {
-                                        espacios.map((espacio) => (
-                                            <MenuItem key={espacio.id} value={espacio.id}>{espacio.nombre}</MenuItem>
-                                        ))
-                                    }
-                                </Select>
-                            </FormControl>
-                        </Grid>
+                    <Box sx={{ width: '100%', marginTop: '50px' }}>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} sm={6} md={4} lg={4}>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    Espacio
+                                </Typography>
+                                <FormControl sx={{ width: '100%', marginTop: 3 }} variant="standard">
+                                    <Select
+                                        value={ministerioSelect}
+                                        onChange={ChangeSelectMinisterio}
+                                        displayEmpty
+                                        inputProps={{ 'aria-label': 'Without label' }}
+                                    >
+                                        <MenuItem value="">
+                                            <em>TODOS</em>
+                                        </MenuItem>
+                                        {
+                                            espacios.map((espacio) => (
+                                                <MenuItem key={espacio.id} value={espacio.id}>{espacio.nombre}</MenuItem>
+                                            ))
+                                        }
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-                        {/* <Grid item xs={12} sm={6} md={4} lg={3}>
+                            {/* <Grid item xs={12} sm={6} md={4} lg={3}>
                             <Typography gutterBottom variant="h5" component="div">
                                 Ministerio
                             </Typography>
@@ -305,89 +306,90 @@ export function SolicitudPage() {
                             </FormControl>
                         </Grid> */}
 
-                        <Grid item xs={12} sm={6} md={4} lg={3}>
-                            <Typography gutterBottom variant="h5" component="div">
-                                Fecha Inicio
-                            </Typography>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                {/* <DemoContainer components={['DatePicker']}> */}
-                                <DatePicker
-                                    slotProps={{
-                                        field: { clearable: true, onClear: () => setCleared(true) },
-                                    }}
-                                    value={valueFecha}
-                                    onChange={(newValue) => setValueFecha(newValue)}
-                                />
-                                {/* </DemoContainer> */}
-                            </LocalizationProvider>
+                            <Grid item xs={12} sm={6} md={4} lg={3}>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    Fecha Inicio
+                                </Typography>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    {/* <DemoContainer components={['DatePicker']}> */}
+                                    <DatePicker
+                                        slotProps={{
+                                            field: { clearable: true, onClear: () => setCleared(true) },
+                                        }}
+                                        value={valueFecha}
+                                        onChange={(newValue) => setValueFecha(newValue)}
+                                    />
+                                    {/* </DemoContainer> */}
+                                </LocalizationProvider>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                    <Button
-                        style={{ marginTop: '40px', marginBottom: '80px' }}
-                        variant="contained"
-                        onClick={handleBuscar}
-                    >
-                        BUSCAR SOLICITUDES
-                    </Button>
-                </Box>
-
-
-                {
-                    loading ? (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                // height: '100vh'
-                            }}
+                        <Button
+                            style={{ marginTop: '40px', marginBottom: '80px' }}
+                            variant="contained"
+                            onClick={handleBuscar}
                         >
-                            <Card sx={{ padding: 2, boxShadow: 3, maxWidth: 400, textAlign: 'center' }}>
-                                <CardContent>
-                                    <CircularProgress />
-                                    <Typography variant="h4" gutterBottom>
-                                        Buscando ...
-                                    </Typography>
+                            BUSCAR SOLICITUDES
+                        </Button>
+                    </Box>
 
-                                    {/* <Typography variant="body2" color="text.secondary" sx={{ marginTop: 2 }}>
+
+                    {
+                        loading ? (
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    // height: '100vh'
+                                }}
+                            >
+                                <Card sx={{ padding: 2, boxShadow: 3, maxWidth: 400, textAlign: 'center' }}>
+                                    <CardContent>
+                                        <CircularProgress />
+                                        <Typography variant="h4" gutterBottom>
+                                            Buscando ...
+                                        </Typography>
+
+                                        {/* <Typography variant="body2" color="text.secondary" sx={{ marginTop: 2 }}>
                                         Por favor, espere mientras cargamos la información.
                                     </Typography> */}
-                                </CardContent>
-                            </Card>
-                        </Box>
-                    ) : solicitudes && solicitudes.length > 0 ? (
-                        <TablaSolicitudes data={solicitudes} columnasTabla={columnas} onSolicitudesSelected={onSolicitudesSelected} />
-                    ) : (
-                        <Box sx={{ textAlign: 'center' }}>
-                            <Card sx={{ maxWidth: "100%" }}>
-                                <CardActionArea>
-                                    <CardContent>
-                                        <Typography gutterBottom variant="h5" component="div">
-                                            No hay solicitudes de reserva
-                                        </Typography>
                                     </CardContent>
-                                </CardActionArea>
-                            </Card>
-                        </Box>
-                    )
-                }
-                {/* <TablaGenerica data={data} columnasTabla={columnas} nombreTabla={"Solicitudes de Reserva"} /> */}
-            </Box>
+                                </Card>
+                            </Box>
+                        ) : solicitudes && solicitudes.length > 0 ? (
+                            <TablaSolicitudes data={solicitudes} columnasTabla={columnas} onSolicitudesSelected={onSolicitudesSelected} />
+                        ) : (
+                            <Box sx={{ textAlign: 'center' }}>
+                                <Card sx={{ maxWidth: "100%" }}>
+                                    <CardActionArea>
+                                        <CardContent>
+                                            <Typography gutterBottom variant="h5" component="div">
+                                                No hay solicitudes de reserva
+                                            </Typography>
+                                        </CardContent>
+                                    </CardActionArea>
+                                </Card>
+                            </Box>
+                        )
+                    }
+                    {/* <TablaGenerica data={data} columnasTabla={columnas} nombreTabla={"Solicitudes de Reserva"} /> */}
+                </Box>
 
-            <Snackbar
-                open={snackBarState.open}
-                autoHideDuration={4000}
-                onClose={closeSnackBar}
-            >
-                <Alert
+                <Snackbar
+                    open={snackBarState.open}
+                    autoHideDuration={4000}
                     onClose={closeSnackBar}
-                    severity={snackBarState.severity}
-                    variant="filled"
-                    sx={{ width: '100%' }}
                 >
-                    {snackBarState.message}
-                </Alert>
-            </Snackbar>
+                    <Alert
+                        onClose={closeSnackBar}
+                        severity={snackBarState.severity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {snackBarState.message}
+                    </Alert>
+                </Snackbar>
+            </Container>
         </>
     );
 }

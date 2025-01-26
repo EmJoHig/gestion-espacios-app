@@ -53,11 +53,9 @@ function App() {
                       <main className="">
                         <MaterialAppBar />
 
-                        <Container fixed>
+                        {/* <Container fixed> */}
                           <Routes>
                             <Route path="/" element={<WelcomePage />} />
-                            {/* <Route path="/login" element={<LoginPage />} /> */}
-                            {/* <Route path="/register" element={<RegisterPage />} /> */}
 
                             <Route element={<ProtectedRoute />}>
 
@@ -75,13 +73,9 @@ function App() {
                               <Route path="/usuarios" element={<UsuarioPage />} />
                               <Route path="/perfil-usuario" element={<PerfilUsuarioPage />} />
 
-                              {/* <Route path="/add-task" element={<TaskFormPage />} />
-                      <Route path="/tasks/:id" element={<TaskFormPage />} />
-                      <Route path="/profile" element={<h1>Profile</h1>} /> */}
-
                             </Route>
                           </Routes>
-                        </Container>
+                        {/* </Container> */}
 
                       </main>
                     </BrowserRouter>

@@ -30,7 +30,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAuth0 } from "@auth0/auth0-react";
-
+import Container from '@mui/material/Container';
 import TablaAsociarRolUsuario from './TablaAsociarRolUsuario';
 import RenderizarDialogEditarRolUsuario from './RenderizarDialogEditarRolUsuario';
 import { useRol } from "../../context/rolContext";
@@ -154,61 +154,63 @@ export function AsociarRolesPage() {
             await getUsuarios();
             handleCloseEdit();
         } catch (error) {
-            openSnackBar('Error al asociar el rol: '+ error, 'success');
+            openSnackBar('Error al asociar el rol: ' + error, 'success');
         }
     };
 
 
     return (
         <>
-            <Box sx={{ marginTop: '50px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    Asociar roles a usuarios
-                </Typography>
-                <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
-                    HOME
-                </Button>
-                <Button variant="contained" onClick={() => navigate("/rol")} style={{ marginRight: '20px' }}>
-                    ROLES
-                </Button>
-
-
-                {openEdit && (
-                    <RenderizarDialogEditarRolUsuario
-                        usuario={null}
-                        open={openEdit}
-                        onClose={handleCloseEdit}
-                        onSubmit={handleSubmitEdit}
-                        roles={roles}
-                        idRolSelect={idRolSelect}
-                        setRolSelect={setRolSelect}
-                    />
-                )}
-
+            <Container fixed>
                 <Box sx={{ marginTop: '50px' }}>
-                    <TablaAsociarRolUsuario
-                        data={usuarios}
-                        columnasTabla={columnas}
-                        nombreTabla={"Listado de Usuarios"}
-                        onEditClick={handleObtenerRow}
-                    />
-                </Box>
-            </Box>
+                    <Typography gutterBottom variant="h5" component="div">
+                        Asociar roles a usuarios
+                    </Typography>
+                    <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
+                        HOME
+                    </Button>
+                    <Button variant="contained" onClick={() => navigate("/rol")} style={{ marginRight: '20px' }}>
+                        ROLES
+                    </Button>
 
-            <Snackbar
-                open={snackBarState.open}
-                autoHideDuration={4000}
-                onClose={closeSnackBar}
-            >
-                <Alert
+
+                    {openEdit && (
+                        <RenderizarDialogEditarRolUsuario
+                            usuario={null}
+                            open={openEdit}
+                            onClose={handleCloseEdit}
+                            onSubmit={handleSubmitEdit}
+                            roles={roles}
+                            idRolSelect={idRolSelect}
+                            setRolSelect={setRolSelect}
+                        />
+                    )}
+
+                    <Box sx={{ marginTop: '50px' }}>
+                        <TablaAsociarRolUsuario
+                            data={usuarios}
+                            columnasTabla={columnas}
+                            nombreTabla={"Listado de Usuarios"}
+                            onEditClick={handleObtenerRow}
+                        />
+                    </Box>
+                </Box>
+
+                <Snackbar
+                    open={snackBarState.open}
+                    autoHideDuration={4000}
                     onClose={closeSnackBar}
-                    severity={snackBarState.severity}
-                    variant="filled"
-                    sx={{ width: '100%' }}
                 >
-                    {snackBarState.message}
-                </Alert>
-            </Snackbar>
+                    <Alert
+                        onClose={closeSnackBar}
+                        severity={snackBarState.severity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {snackBarState.message}
+                    </Alert>
+                </Snackbar>
+            </Container>
         </>
     );
 }

@@ -85,19 +85,23 @@ function DialogNuevaActividad({ open, onClose, onSubmit, ministerios }) {
                                 onChange={(e) => setDescripcion(e.target.value)}
                             />
                             <br />
-                            <Select
-                                value={ministerioId}
-                                onChange={(e) => setMinisterioId(e.target.value)}
-                                id="ministerioId"
-                                name="ministerioId"
-                                variant="standard"
-                                displayEmpty
-                                inputProps={{ 'aria-label': 'Without label' }}
-                            >
-                                {ministerios.map((min) => (
-                                    <MenuItem key={min.id} value={min.id}>{min.descripcion}</MenuItem>
-                                ))}
-                            </Select>
+                            <FormControl fullWidth variant="standard" margin="dense">
+                                <InputLabel id="ministerio-label">Ministerio</InputLabel>
+                                <Select
+                                    labelId="ministerio-label"
+                                    id="ministerioId"
+                                    name="ministerioId"
+                                    value={ministerioId}
+                                    onChange={(e) => setMinisterioId(e.target.value)}
+                                    label="Ministerio"
+                                >
+                                    {ministerios.map((min) => (
+                                        <MenuItem key={min.id} value={min.id}>
+                                            {min.descripcion}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </FormControl>
                     </Grid>
                 </Grid>
