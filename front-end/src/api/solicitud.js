@@ -59,7 +59,7 @@ export const getSolicitudRequest = async (token, id) => {
 export const createSolicitudRequest = async (token, body) => {
 
     try {
-        const response = await axios.post("http://localhost:3000/solicitud/nueva_solicitud", body, {
+        const response = await axios.post(`${API_URL}/solicitud/nueva_solicitud`, body, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -76,7 +76,7 @@ export const updateSolicitudRequest = async (token, solicitud) => {
     console.log('llega el body', solicitud);
 
     try {
-        const response = await axios.put(`http://localhost:3000/solicitud/editar_solicitud/${solicitud.id}`, solicitud, {
+        const response = await axios.put(`${API_URL}/solicitud/editar_solicitud/${solicitud.id}`, solicitud, {
             headers: {
                 Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
             },
