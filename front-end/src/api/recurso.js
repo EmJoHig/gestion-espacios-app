@@ -1,8 +1,10 @@
 import axios from "./axios";
+import { API_URL } from "../config";
+
 
 export const getRecursosRequest = async (token) => {
     try {
-        const response = await axios.get("http://localhost:3000/recurso/get_recursos", {
+        const response = await axios.get(`${API_URL}/recurso/get_recursos`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -21,7 +23,7 @@ export const getRecursosRequest = async (token) => {
 export const createRecursoRequest = async (token, body) => {
 
     try {
-        const response = await axios.post("http://localhost:3000/recurso/nuevo_recurso", body, {
+        const response = await axios.post(`${API_URL}/recurso/nuevo_recurso`, body, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -40,7 +42,7 @@ export const createRecursoRequest = async (token, body) => {
 export const updateRecursoRequest = async (token, recurso) => {
 
     try {
-        const response = await axios.put(`http://localhost:3000/recurso/editar_recurso/${recurso.id}`, recurso, {
+        const response = await axios.put(`${API_URL}/recurso/editar_recurso/${recurso.id}`, recurso, {
             headers: {
                 Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
             },
@@ -58,7 +60,7 @@ export const updateRecursoRequest = async (token, recurso) => {
 export const deleteRecursoRequest = async (token, id) => {
 
     try {
-        const response = await axios.delete(`http://localhost:3000/recurso/eliminar_recurso/${id}`, {
+        const response = await axios.delete(`${API_URL}/recurso/eliminar_recurso/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
             },

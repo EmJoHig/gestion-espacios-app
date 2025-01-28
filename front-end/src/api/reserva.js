@@ -1,9 +1,12 @@
 import axios from "./axios";
+import { API_URL } from "../config";
+
+
 
 
 export const getReservasRequest = async (token) => {
     try {
-      const responseReservas = await axios.get('http://localhost:3000/reserva/get_reservas', {
+      const responseReservas = await axios.get(`${API_URL}/reserva/get_reservas`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -36,7 +39,7 @@ export const getReservasRequest = async (token) => {
 
     export const getReservaRequest = async (token, id) => {
       try {
-        const reserva = await axios.get(`http://localhost:3000/reserva/${id}`, {
+        const reserva = await axios.get(`${API_URL}/reserva/${id}`, {
           headers: {
               Authorization: `Bearer ${token}`,
           },
@@ -49,7 +52,7 @@ export const getReservasRequest = async (token) => {
 
 export const createReservaRequest = async (reserva) => {
   try {
-      const response = await axios.post("http://localhost:3000/reserva/nueva_reserva", reserva);
+      const response = await axios.post(`${API_URL}/reserva/nueva_reserva`, reserva);
       return {
         success: true,
         message: response.data
@@ -74,7 +77,7 @@ export const createReservaRequest = async (reserva) => {
 
 export const updateReservaRequest = async (reserva) => {
   try {
-    const response = await axios.put(`http://localhost:3000/reserva/editar_reserva/${reserva.id}`, reserva);
+    const response = await axios.put(`${API_URL}/reserva/editar_reserva/${reserva.id}`, reserva);
     console.log("reponse: ", response)
     return {
       success: true,
@@ -98,4 +101,4 @@ export const updateReservaRequest = async (reserva) => {
   }
 };
 
-export const deleteReservaRequest = async (id) => axios.delete(`http://localhost:3000/reserva/eliminar_reserva/${id}`);
+export const deleteReservaRequest = async (id) => axios.delete(`${API_URL}/reserva/eliminar_reserva/${id}`);

@@ -1,8 +1,10 @@
 import axios from "./axios";
+import { API_URL } from "../config";
+
 
 export const getActividadesRequest = async (token) => {
     try {
-        const response = await axios.get("http://localhost:3000/actividad/get_actividades", {
+        const response = await axios.get(`${API_URL}/actividad/get_actividades`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -20,7 +22,7 @@ export const getActividadesRequest = async (token) => {
 export const createActividadRequest = async (token, body) => {
 
     try {
-        const response = await axios.post("http://localhost:3000/actividad/nueva_actividad", body, {
+        const response = await axios.post(`${API_URL}/actividad/nueva_actividad`, body, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -38,7 +40,7 @@ export const updateActividadRequest = async (token, actividad) => {
     console.log('llega el body', actividad);
 
     try {
-        const response = await axios.put(`http://localhost:3000/actividad/editar_actividad/${actividad.id}`, actividad, {
+        const response = await axios.put(`${API_URL}/actividad/editar_actividad/${actividad.id}`, actividad, {
             headers: {
                 Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
             },
@@ -53,7 +55,7 @@ export const updateActividadRequest = async (token, actividad) => {
 export const deleteActividadRequest = async (token, id) => {
 
     try {
-        const response = await axios.delete(`http://localhost:3000/actividad/eliminar_actividad/${id}`, {
+        const response = await axios.delete(`${API_URL}/actividad/eliminar_actividad/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
             },
@@ -69,7 +71,7 @@ export const deleteActividadRequest = async (token, id) => {
 export const asociarActividadAMinistRequest = async (token, actsMinisterioBody) => {
 
     try {
-        const response = await axios.post("http://localhost:3000/actividad/asociar_actividad_a_ministerio", actsMinisterioBody, {
+        const response = await axios.post(`${API_URL}/actividad/asociar_actividad_a_ministerio`, actsMinisterioBody, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -85,7 +87,7 @@ export const asociarActividadAMinistRequest = async (token, actsMinisterioBody) 
 
 export const GetActividadesSinMinisterioRequest = async (token) => {
     try {
-        const response = await axios.get("http://localhost:3000/actividad/get_actividades_sin_ministerio", {
+        const response = await axios.get(`${API_URL}/actividad/get_actividades_sin_ministerio`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -103,7 +105,7 @@ export const GetActividadesSinMinisterioRequest = async (token) => {
 export const quitarActividadAMinisterioRequest = async (token, actMinisterioBody) => {
 
     try {
-        const response = await axios.post("http://localhost:3000/actividad/quitar_actividad_a_ministerio", actMinisterioBody, {
+        const response = await axios.post(`${API_URL}/actividad/quitar_actividad_a_ministerio`, actMinisterioBody, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
