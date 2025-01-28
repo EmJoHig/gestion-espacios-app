@@ -26,6 +26,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Container from '@mui/material/Container';
 import DialogEditarActividad from './DialogEditarActividad';
 import DialogNuevaActividad from './DialogNuevaActividad';
 import TablaActividades from './TablaActividades';
@@ -251,86 +252,88 @@ export function ActividadPage() {
 
     return (
         <>
-            <Box sx={{ marginTop: '50px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    Modulo actividades
-                </Typography>
-
-                <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
-                    HOME
-                </Button>
-
-                <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-                <Button variant="contained" onClick={() => navigate("/asociar-actividades")} style={{ marginLeft: '20px' }}>Administrar Actividades de Ministerios</Button>
-
-
-                {openEdit && (
-                    <DialogEditarActividad
-                        actividad={actividadEdicion}
-                        open={openEdit}
-                        onClose={handleCloseEdit}
-                        onSubmit={handleSubmitEdit}
-                        ministerios={ministerios}
-                        idMinisterioSelect={idMinisterioSelect}
-                        setMinisterioSelect={setMinisterioSelect} />
-                )}
-
-
-                {open && (
-                    <DialogNuevaActividad
-                        // actividad={null}
-                        open={open}
-                        onClose={handleClose}
-                        onSubmit={handleSubmit}
-                        ministerios={ministerios}
-                    // idMinisterioSelect={idMinisterioSelect}
-                    // setMinisterioSelect={setMinisterioSelect} 
-                    />
-                )}
-
-                {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={actIdToDelete} />}
-
+            <Container fixed>
                 <Box sx={{ marginTop: '50px' }}>
+                    <Typography gutterBottom variant="h5" component="div">
+                        Modulo actividades
+                    </Typography>
 
-                    {actividades != null && actividades.length > 0 ? (
-                        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                    <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
+                        HOME
+                    </Button>
 
-                            {actividades.length === 0 && (
-                                <h1>no hay actividades</h1>
-                            )}
+                    <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
+                    <Button variant="contained" onClick={() => navigate("/asociar-actividades")} style={{ marginLeft: '20px' }}>Administrar Actividades de Ministerios</Button>
 
-                            <TablaActividades
-                                data={actividades}
-                                columnasTabla={columnas}
-                                nombreTabla={"Listado de actividades"}
-                                onEditClick={handleObtenerRow}
-                                onClickDeleteActividad={handleDeleteActividad}
-                            />
-                        </Grid>
-                    ) : (
-                        <h1>no hay actividades</h1>
+
+                    {openEdit && (
+                        <DialogEditarActividad
+                            actividad={actividadEdicion}
+                            open={openEdit}
+                            onClose={handleCloseEdit}
+                            onSubmit={handleSubmitEdit}
+                            ministerios={ministerios}
+                            idMinisterioSelect={idMinisterioSelect}
+                            setMinisterioSelect={setMinisterioSelect} />
                     )}
+
+
+                    {open && (
+                        <DialogNuevaActividad
+                            // actividad={null}
+                            open={open}
+                            onClose={handleClose}
+                            onSubmit={handleSubmit}
+                            ministerios={ministerios}
+                        // idMinisterioSelect={idMinisterioSelect}
+                        // setMinisterioSelect={setMinisterioSelect} 
+                        />
+                    )}
+
+                    {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={actIdToDelete} />}
+
+                    <Box sx={{ marginTop: '50px' }}>
+
+                        {actividades != null && actividades.length > 0 ? (
+                            <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+
+                                {actividades.length === 0 && (
+                                    <h1>no hay actividades</h1>
+                                )}
+
+                                <TablaActividades
+                                    data={actividades}
+                                    columnasTabla={columnas}
+                                    nombreTabla={"Listado de actividades"}
+                                    onEditClick={handleObtenerRow}
+                                    onClickDeleteActividad={handleDeleteActividad}
+                                />
+                            </Grid>
+                        ) : (
+                            <h1>no hay actividades</h1>
+                        )}
+
+                    </Box>
+
+
 
                 </Box>
 
-
-
-            </Box>
-
-            <Snackbar
-                open={snackBarState.open}
-                autoHideDuration={4000}
-                onClose={closeSnackBar}
-            >
-                <Alert
+                <Snackbar
+                    open={snackBarState.open}
+                    autoHideDuration={4000}
                     onClose={closeSnackBar}
-                    severity={snackBarState.severity}
-                    variant="filled"
-                    sx={{ width: '100%' }}
                 >
-                    {snackBarState.message}
-                </Alert>
-            </Snackbar>
+                    <Alert
+                        onClose={closeSnackBar}
+                        severity={snackBarState.severity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {snackBarState.message}
+                    </Alert>
+                </Snackbar>
+            </Container>
         </>
     );
 }

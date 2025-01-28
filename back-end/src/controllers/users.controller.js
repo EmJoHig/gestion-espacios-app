@@ -42,29 +42,38 @@ export const getUserById = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { email, password } = req.body;
+    const { id, nombre, apellido, nombreUsuario, dni, telefono } = req.body;
 
-    // Buscar un usuario por su ID en la base de datos
     const user = await Usuario.findByPk(id);
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Actualizar el correo electrónico y la contraseña del usuario
     const updates = {};
-    if (email) updates.email = email;
-    if (password) updates.password = await bcrypt.hash(password, 10);
-    await user.update(updates);
-    //await Usuario.update(user, { where: { id: id} });
+    if (nombre) updates.nombre = nombre;
+    if (apellido) updates.apellido = apellido;
+    if (nombreUsuario) updates.nombreUsuario = nombreUsuario;
+    if (dni) updates.dni = dni;
+    if (telefono) updates.telefono = telefono;
 
-    // Enviar una respuesta al cliente
-    res.status(200).json(user);
+    const [updatedRows] = await Usuario.update(updates, {
+      where: { id: id }
+    });
+
+    if (updatedRows < 1) {
+      return res.status(400).json({ message: 'No se pudo editar el usuario' });
+    }
+    
+    const updatedUser = await Usuario.findByPk(id);
+
+    if (updatedUser === null) {
+      return res.status(400).json({ message: 'No se pudo editar el usuario' });
+    } else {
+      return res.status(200).json(updatedUser);
+    }    
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ message: "Ha ocurrido un error al actualizar el usuario" });
+    res.status(500).json({ message: "Ha ocurrido un error al actualizar el usuario" });
   }
 };
 
@@ -72,15 +81,15 @@ export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Buscar un usuario por su ID en la base de datos
-    const user = await Usuario.destroy({
-      where: { id: id },
-    });
-    if (!user) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
-    // Enviar una respuesta al cliente
-    res.status(200).json(user);
+    // // Buscar un usuario por su ID en la base de datos
+    // const user = await Usuario.destroy({
+    //   where: { id: id },
+    // });
+    // if (!user) {
+    //   return res.status(404).json({ message: "Usuario no encontrado" });
+    // }
+    // // Enviar una respuesta al cliente
+    // res.status(200).json(user);
   } catch (error) {
     console.error(error);
     res
@@ -125,7 +134,15 @@ export const validarUsuarioAUTH0 = async (req, res) => {
     // si no existe, lo creo
     if (!_usuario) {
 
-      const nuevoUsuario = await Usuario.create({ nombreUsuario: UsuarioAUTH0.name, email: UsuarioAUTH0.email, idUsuarioAUTH0: UsuarioAUTH0.sub });
+      const nuevoUsuario = await Usuario.create({
+        nombreUsuario: UsuarioAUTH0.name,
+        email: UsuarioAUTH0.email,
+        idUsuarioAUTH0: UsuarioAUTH0.sub,
+        nombre: UsuarioAUTH0.given_name,
+        apellido: UsuarioAUTH0.family_name,
+        telefono: UsuarioAUTH0.phone_number,
+        dni: '',
+      });
 
       if (nuevoUsuario != null) {
         res.status(200).json({ message: "" });
@@ -173,7 +190,7 @@ export const getUsersAUTH0 = async (req, res) => {
         // console.log("response");
         // console.log(response);
 
-        res.status(200).json({data: response.data, status: response.status});
+        res.status(200).json({ data: response.data, status: response.status });
       } else {
         res.status(500).json({ message: 'Ha ocurrido un error al actualizar el Rol en AUTH0' });
       }
@@ -183,5 +200,24 @@ export const getUsersAUTH0 = async (req, res) => {
     res
       .status(500)
       .json({ message: "Ha ocurrido un error al obtener los usuarios" });
+  }
+};
+
+
+export const getUserByIdAUTH0 = async (req, res) => {
+  try {
+
+    const { idUsuarioAUTH0 } = req.body;
+
+    const _user = await Usuario.findOne({ where: { idUsuarioAUTH0: idUsuarioAUTH0 } });
+    if (!_user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    res.status(200).json(_user);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Ha ocurrido un error al obtener el usuario" });
   }
 };

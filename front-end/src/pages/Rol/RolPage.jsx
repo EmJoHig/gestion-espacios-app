@@ -30,6 +30,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAuth0 } from "@auth0/auth0-react";
+import Container from '@mui/material/Container';
 import DialogNuevoRol from './DialogNuevoRol';
 import DialogEditarRol from './DialogEditarRol';
 import TablaRoles from './TablaRoles';
@@ -271,40 +272,41 @@ export function RolPage() {
 
     return (
         <>
-            <Box sx={{ marginTop: '50px', marginBottom: '150px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    Modulo Roles
-                </Typography>
+            <Container fixed>
+                <Box sx={{ marginTop: '50px', marginBottom: '150px' }}>
+                    <Typography gutterBottom variant="h5" component="div">
+                        Modulo Roles
+                    </Typography>
 
-                <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
-                    HOME
-                </Button>
+                    <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
+                        HOME
+                    </Button>
 
-                <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-                <Button variant="contained" onClick={() => navigate("/asociar-roles")} style={{ marginLeft: '20px' }}>ASOCIAR ROLES</Button>
+                    <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
+                    <Button variant="contained" onClick={() => navigate("/asociar-roles")} style={{ marginLeft: '20px' }}>ASOCIAR ROLES</Button>
 
-                {open && (
-                    <DialogNuevoRol
-                        open={open}
-                        onClose={handleClose}
-                        onSubmit={handleSubmit}
-                    />
-                )}
+                    {open && (
+                        <DialogNuevoRol
+                            open={open}
+                            onClose={handleClose}
+                            onSubmit={handleSubmit}
+                        />
+                    )}
 
-                {openEdit && (
-                    <DialogEditarRol
-                        rol={rolEdicion}
-                        open={openEdit}
-                        onClose={handleCloseEdit}
-                        onSubmit={handleSubmitEdit}
-                    />
-                )}
+                    {openEdit && (
+                        <DialogEditarRol
+                            rol={rolEdicion}
+                            open={openEdit}
+                            onClose={handleCloseEdit}
+                            onSubmit={handleSubmitEdit}
+                        />
+                    )}
 
-                {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={rolIdToDelete} />}
+                    {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={rolIdToDelete} />}
 
-                <Box sx={{ marginTop: '50px' }}>
+                    <Box sx={{ marginTop: '50px' }}>
 
-                    {/* {rolesUsuarioAUTH0 != null && rolesUsuarioAUTH0.length > 0 ? (
+                        {/* {rolesUsuarioAUTH0 != null && rolesUsuarioAUTH0.length > 0 ? (
                     <TablaRoles
                     data={rolesUsuarioAUTH0}
                     columnasTabla={columnas}
@@ -316,11 +318,11 @@ export function RolPage() {
                     <h1>no hay roles</h1>
                 )} */}
 
-                    <Typography gutterBottom variant="h5" component="div">
-                        Roles UTH0
-                    </Typography>
+                        <Typography gutterBottom variant="h5" component="div">
+                            Roles UTH0
+                        </Typography>
 
-                    {/* {esAdmin && (
+                        {/* {esAdmin && (
                         rolesUsuarioAUTH0 != null && rolesUsuarioAUTH0.length > 0 ? (
                             <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
                                 {rolesUsuarioAUTH0.length === 0 && (
@@ -363,73 +365,74 @@ export function RolPage() {
 
 
 
-                    <br />
-                    <Divider />
-                    <br />
+                        <br />
+                        <Divider />
+                        <br />
 
-                    {/* <Typography gutterBottom variant="h5" component="div">
+                        {/* <Typography gutterBottom variant="h5" component="div">
                         Roles MI BD
                     </Typography> */}
 
-                    {esAdmin && (
-                        roles != null && roles.length > 0 ? (
-                            <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                        {esAdmin && (
+                            roles != null && roles.length > 0 ? (
+                                <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
 
-                                {roles.length === 0 && (
-                                    <h1>no hay roles</h1>
-                                )}
+                                    {roles.length === 0 && (
+                                        <h1>no hay roles</h1>
+                                    )}
 
-                                {roles.map((rol) => (
-                                    <Grid item xs={3} key={rol.id}>
-                                        <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={handleClick(null)}>
-                                            <CardContent>
-                                                <Stack direction="row" spacing={0} sx={{
-                                                    justifyContent: "flex-end",
-                                                    alignItems: "center",
-                                                }}>
-                                                    <IconButton aria-label="edit" onClick={() => handleSetRolState(rol)}>
-                                                        <EditIcon />
-                                                    </IconButton>
-                                                </Stack>
-                                            </CardContent>
-                                            <CardContent>
-                                                <Typography gutterBottom variant="h6" component="div">
-                                                    <b>{rol.name}</b>
-                                                </Typography>
-                                                <br />
-                                                <Typography gutterBottom variant="h6" component="div">
-                                                    {rol.description}
-                                                </Typography>
-                                                <br />
-                                                <Button variant="contained" onClick={() => handleConfirmarEliminarRol(rol.id)}>
-                                                    ELIMINAR
-                                                </Button>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                ))}
-                            </Grid>
-                        ) : (
-                            <h1>no hay rolesUsuario</h1>
-                        )
-                    )}
+                                    {roles.map((rol) => (
+                                        <Grid item xs={3} key={rol.id}>
+                                            <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={handleClick(null)}>
+                                                <CardContent>
+                                                    <Stack direction="row" spacing={0} sx={{
+                                                        justifyContent: "flex-end",
+                                                        alignItems: "center",
+                                                    }}>
+                                                        <IconButton aria-label="edit" onClick={() => handleSetRolState(rol)}>
+                                                            <EditIcon />
+                                                        </IconButton>
+                                                    </Stack>
+                                                </CardContent>
+                                                <CardContent>
+                                                    <Typography gutterBottom variant="h6" component="div">
+                                                        <b>{rol.name}</b>
+                                                    </Typography>
+                                                    <br />
+                                                    <Typography gutterBottom variant="h6" component="div">
+                                                        {rol.description}
+                                                    </Typography>
+                                                    <br />
+                                                    <Button variant="contained" onClick={() => handleConfirmarEliminarRol(rol.id)}>
+                                                        ELIMINAR
+                                                    </Button>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            ) : (
+                                <h1>no hay rolesUsuario</h1>
+                            )
+                        )}
 
+                    </Box>
                 </Box>
-            </Box>
-            <Snackbar
-                open={snackBarState.open}
-                autoHideDuration={4000}
-                onClose={closeSnackBar}
-            >
-                <Alert
+                <Snackbar
+                    open={snackBarState.open}
+                    autoHideDuration={4000}
                     onClose={closeSnackBar}
-                    severity={snackBarState.severity}
-                    variant="filled"
-                    sx={{ width: '100%' }}
                 >
-                    {snackBarState.message}
-                </Alert>
-            </Snackbar>
+                    <Alert
+                        onClose={closeSnackBar}
+                        severity={snackBarState.severity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {snackBarState.message}
+                    </Alert>
+                </Snackbar>
+            </Container>
         </>
     );
 }

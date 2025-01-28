@@ -22,7 +22,24 @@ export const getUsuariosRequest = async (token) => {
 
 export const createUsuarioRequest = async (usuario) => axios.post("/usuarios", usuario);
 
-export const updateUsuarioRequest = async (usuario) => axios.put(`/usuarios/${usuario._id}`, usuario);
+
+// export const updateUsuarioRequest = async (usuario) => axios.put(`/usuarios/${usuario._id}`, usuario);
+export const updateUsuarioRequest = async (token, usuario) => {
+
+    try {
+        const response = await axios.put(`http://localhost:3000/usuarios/editar_usuario`, usuario, {
+            headers: {
+                Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Error updateUsuarioRequest: ', error);
+        throw error;
+    }
+};
+
+
 
 export const deleteUsuarioRequest = async (id) => axios.delete(`/usuarios/${id}`);
 
@@ -56,6 +73,25 @@ export const getUsuariosAUTH0Request = async (token) => {
         const response = await axios.get(`${API_URL}/usuarios/get_usuarios_auth0`, {
             headers: {
                 Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Error getRolesRequest: ', error);
+        throw error;
+    }
+
+};
+
+
+export const getUserByIdAUTH0Request = async (token, id) => {
+
+    try { 
+        const response = await axios.post(`http://localhost:3000/usuarios/get_usuario_by_id_auth0`, {
+            idUsuarioAUTH0: id
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
             },
         });
         return response;

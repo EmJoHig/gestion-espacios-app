@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect } from "react";
 import PropTypes from 'prop-types';
+import { format } from 'date-fns';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -8,8 +10,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
@@ -21,8 +21,8 @@ import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { visuallyHidden } from '@mui/utils';
-import TextField from '@mui/material/TextField';
-import { useActividad } from "../../context/actividadContext";
+
+import { useUsuario } from "../../context/usuarioContext";
 
 
 function descendingComparator(a, b, orderBy) {
@@ -63,17 +63,17 @@ function EnhancedTableHead(props) {
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
-                        checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{
-                            'aria-label': 'select all desserts',
-                        }}
-                    />
-                </TableCell>
+                {/* <TableCell padding="checkbox">
+          <Checkbox
+            color="primary"
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick}
+            inputProps={{
+              'aria-label': 'select all desserts',
+            }}
+          />
+        </TableCell> */}
                 {columnasTablaParam.map((headCell) => (
                     <TableCell
                         key={headCell.id}
@@ -112,7 +112,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-    const { numSelected, nombreTablaParam, searchText, onSearchChange, handleActividadesSelected  } = props;
+    const { numSelected, nombreTablaParam } = props;
 
     return (
         <Toolbar
@@ -132,80 +132,50 @@ function EnhancedTableToolbar(props) {
                     variant="subtitle1"
                     component="div"
                 >
-                    {numSelected} selectecionadas
+                    {numSelected} selected
                 </Typography>
             ) : (
-                <>
-
-                    <Stack direction="column" spacing={4} sx={{
-                        justifyContent: "flex-start",
-                        alignItems: "center",
-                    }}>
-                        {/* <Typography
-                        sx={{ flex: '1 1 100%' }}
-                        variant="h6"
-                        id="tableTitle"
-                        component="div"
-                    >
-                        {nombreTablaParam}
-                    </Typography> */}
-                        <TextField
-                            variant="outlined"
-                            size="small"
-                            placeholder="Buscar..."
-                            value={searchText}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                            sx={{ width: '100%' }}
-                        // style={{ marginLeft: '200px' }}
-                        />
-                    </Stack>
-
-
-
-                </>
+                <Typography
+                    sx={{ flex: '1 1 100%' }}
+                    variant="h6"
+                    id="tableTitle"
+                    component="div"
+                >
+                    {/* Listado Usuarios */}
+                    {nombreTablaParam}
+                </Typography>
             )}
 
             {numSelected > 0 ? (
-                <Tooltip title="">
-                    <Button variant="contained" type="button" onClick={() => handleActividadesSelected()}>ASOCIAR ACTIVIDAD</Button>
-                    {/* <IconButton >
-                        <DeleteIcon />
-                    </IconButton> */}
+                <Tooltip title="Delete">
+                    {/* <IconButton>
+            <DeleteIcon />
+          </IconButton> */}
                 </Tooltip>
             ) : (
                 <></>
             )}
-
         </Toolbar>
     );
 }
 
 EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
-    searchText: PropTypes.string.isRequired,
-    onSearchChange: PropTypes.func.isRequired,
 };
 
-export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEditClick, onClickDeleteActividad, onActividadesSelected }) {
+export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEditClick, onClickDeleteUsuario }) {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
-    const [searchText, setSearchText] = useState('');
-    const { actividades, getActividades, deleteActividad } = useActividad();
 
-
-    const handleActividadesSelected = () => {
-        // Enviar los ids seleccionados al padre
-        onActividadesSelected(selected); // Enviamos el array de ids seleccionados
-    };
-
+    const { usuarios, getUsuarios, deleteUsuario } = useUsuario();
 
 
     useEffect(() => {
-        // getActividads();
+        // getUsuarios();
     }, [data]);
 
 
@@ -223,17 +193,6 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
         }
         setSelected([]);
     };
-
-    const handleSearchChange = (text) => {
-        setSearchText(text);
-        setPage(0);
-    };
-
-    const filteredData = data.filter((row) =>
-        Object.values(row).some(
-            (value) => value && value.toString().toLowerCase().includes(searchText.toLowerCase())
-        )
-    );
 
     const handleClick = (event, id) => {
         const selectedIndex = selected.indexOf(id);
@@ -264,26 +223,48 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
     };
 
     const isSelected = (id) => selected.indexOf(id) !== -1;
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredData.length) : 0;
+
+    // Avoid a layout jump when reaching the last page with empty rows.
+    const emptyRows =
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+
     const visibleRows = React.useMemo(
         () =>
-            stableSort(filteredData, getComparator(order, orderBy)).slice(
+            stableSort(data, getComparator(order, orderBy)).slice(
                 page * rowsPerPage,
                 page * rowsPerPage + rowsPerPage,
             ),
-        [order, orderBy, page, rowsPerPage, filteredData]
+        [order, orderBy, page, rowsPerPage, data],
     );
+
+
+    //ELIMINAR MINISTERIO
+
+    // const handleEliminarUsuario = async (id) => {
+
+    //     try {
+    //         console.log("Eliminar Usuario ID: ");
+    //         console.log(id);
+
+    //         const respDelete = await deleteUsuario(id);
+
+    //         if(respDelete == ""){
+    //             openSnackBar('El usuario se ha creado con éxito.', 'success');
+    //         } else {
+    //             openSnackBar('Error al crear el usuario.', 'error');
+    //         }
+
+    //         await getUsuarios();
+    //     } catch (error) {
+    //         openSnackBar('Error al crear el usuario.', 'error');
+    //     }
+    // }
 
 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar
-                    numSelected={selected.length}
-                    nombreTablaParam={nombreTabla}
-                    searchText={searchText}
-                    onSearchChange={handleSearchChange}
-                    handleActividadesSelected={handleActividadesSelected} />
+                <EnhancedTableToolbar numSelected={selected.length} nombreTablaParam={nombreTabla} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -296,7 +277,7 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={filteredData.length}
+                            rowCount={data.length}
                             columnasTablaParam={columnasTabla}
                         />
                         <TableBody>
@@ -315,27 +296,9 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                         selected={isItemSelected}
                                         sx={{ cursor: 'pointer' }}
                                     >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                color="primary"
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': labelId,
-                                                }}
-                                                onClick={(event) => handleClick(event, row.id)}
-                                            />
-                                        </TableCell>
-                                        <TableCell id={row.nombre} align="center" > {row.nombre} </TableCell>
-                                        <TableCell align="center">{row.descripcion}</TableCell>
-                                        {/* <TableCell align="center" >{row.ministerio ? row.ministerio.descripcion : ""}</TableCell> */}
-                                        {/* <TableCell align="center">
-                                            <IconButton aria-label="edit" onClick={() => onEditClick(row)}>
-                                                <EditIcon />
-                                            </IconButton>
-                                            <IconButton aria-label="delete" onClick={() => onClickDeleteActividad(row.id)}>
-                                                <DeleteIcon />
-                                            </IconButton>
-                                        </TableCell> */}
+                                        <TableCell id={row.nombre} align="center" > {row.name} </TableCell>
+                                        <TableCell align="center">{row.email}</TableCell>
+                                        <TableCell component="th" align="center" >{row.created_at ? format(new Date(row.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
                                     </TableRow>
                                 );
                             })}

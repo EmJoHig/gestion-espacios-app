@@ -14,6 +14,7 @@ import {
   deleteUser,
   validarUsuarioAUTH0,
   getUsersAUTH0,
+  getUserByIdAUTH0,
 } from "../controllers/users.controller.js";
 const router = express.Router();
 
@@ -24,18 +25,19 @@ const jwtCheck = auth({
 });
 
 router.post('/nuevo_usuario', createUser);
+
 router.get("/get_usuarios", jwtCheck, getUsers);
+
 router.get("/get_usuario/:id", jwtCheck, getUserById);
-router.patch("/editar-usuario/:id", jwtCheck, updateUser);
+
+router.put("/editar_usuario", jwtCheck, updateUser);
+
 router.delete("/eliminar-usuario/:id", jwtCheck, deleteUser);
 
 router.post('/validar_usuario_auth0', jwtCheck, validarUsuarioAUTH0);
 
 router.get("/get_usuarios_auth0", jwtCheck, getUsersAUTH0);
 
-
-// router.get('/perfil-usuario', requiresAuth(), (req, res) => {
-//   res.send(JSON.stringify(req.oidc.user));
-// });
+router.post("/get_usuario_by_id_auth0", jwtCheck, getUserByIdAUTH0);
 
 export default router;

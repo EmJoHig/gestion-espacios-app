@@ -26,7 +26,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-
+import Container from '@mui/material/Container';
 import TablaMinisterios from './TablaMinisterios';
 import { useMinisterio } from "../../context/ministerioContext";
 
@@ -372,56 +372,58 @@ export function MinisterioPage() {
 
     return (
         <>
-            <Box sx={{ marginTop: '50px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    Modulo Ministerios
-                </Typography>
-
-                <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
-                    HOME
-                </Button>
-
-                <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
-                <Button variant="contained" onClick={() => navigate("/asociar-responsables")} style={{ marginLeft: '20px' }}>Asociar Responsables</Button>
-                <Button variant="contained" onClick={() => navigate("/asociar-actividades")} style={{ marginLeft: '20px' }}>Administrar Actividades de Ministerios</Button>
-
-                {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={ministerioIdToDelete} />}
-
-                <RenderizarDialogNuevoMinist />
-
-                {openEdit && (
-                    <RenderizarDialogEditarMinist ministerio={ministerioEdicion} />
-                )}
-
+            <Container fixed>
                 <Box sx={{ marginTop: '50px' }}>
-                    <TablaMinisterios
-                        data={ministerios}
-                        columnasTabla={columnas}
-                        nombreTabla={"Listado de Ministerios"}
-                        onEditClick={handleObtenerRow}
-                        onClickDeleteMinisterio={handleDeleteMinisterio}
-                    />
+                    <Typography gutterBottom variant="h5" component="div">
+                        Modulo Ministerios
+                    </Typography>
+
+                    <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
+                        HOME
+                    </Button>
+
+                    <Button variant="contained" onClick={handleClickOpen}>Nuevo</Button>
+                    <Button variant="contained" onClick={() => navigate("/asociar-responsables")} style={{ marginLeft: '20px' }}>Asociar Responsables</Button>
+                    <Button variant="contained" onClick={() => navigate("/asociar-actividades")} style={{ marginLeft: '20px' }}>Administrar Actividades de Ministerios</Button>
+
+                    {openConfirm && <RenderizarDialogConfirmar open={openConfirm} id={ministerioIdToDelete} />}
+
+                    <RenderizarDialogNuevoMinist />
+
+                    {openEdit && (
+                        <RenderizarDialogEditarMinist ministerio={ministerioEdicion} />
+                    )}
+
+                    <Box sx={{ marginTop: '50px' }}>
+                        <TablaMinisterios
+                            data={ministerios}
+                            columnasTabla={columnas}
+                            nombreTabla={"Listado de Ministerios"}
+                            onEditClick={handleObtenerRow}
+                            onClickDeleteMinisterio={handleDeleteMinisterio}
+                        />
+                    </Box>
+
+
+
                 </Box>
 
 
-
-            </Box>
-
-
-            <Snackbar
-                open={snackBarState.open}
-                autoHideDuration={4000}
-                onClose={closeSnackBar}
-            >
-                <Alert
+                <Snackbar
+                    open={snackBarState.open}
+                    autoHideDuration={4000}
                     onClose={closeSnackBar}
-                    severity={snackBarState.severity}
-                    variant="filled"
-                    sx={{ width: '100%' }}
                 >
-                    {snackBarState.message}
-                </Alert>
-            </Snackbar>
+                    <Alert
+                        onClose={closeSnackBar}
+                        severity={snackBarState.severity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {snackBarState.message}
+                    </Alert>
+                </Snackbar>
+            </Container>
         </>
     );
 }

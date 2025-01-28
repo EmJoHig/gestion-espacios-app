@@ -12,7 +12,20 @@ import {
   Select,
   Checkbox,
   ListItemText,
+  Icon,
 } from "@mui/material";
+import Container from '@mui/material/Container';
+import {
+  EventNote, // for RESERVAS
+  Room, // for ESPACIOS
+  Inventory, // for RECURSOS
+  AssignmentTurnedIn, // for SOLICITUDES DE RESERVA
+  Group, // for MINISTERIOS
+  Event, // for ACTIVIDADES
+  Security, // for ROLES
+  People, // for USUARIOS
+} from "@mui/icons-material";
+import { styled, alpha } from '@mui/material/styles';
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Snackbar from '@mui/material/Snackbar';
@@ -74,6 +87,51 @@ export function HomePage() {
 
   const navigate = useNavigate();
 
+
+  const StyledCard = styled(Card)(({ theme }) => ({
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: theme.spacing(0.5),
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    transition: "all 0.2s ease-in-out",
+    "&:hover": {
+      transform: "translateY(-2px)",
+      boxShadow: theme.shadows[3],
+    },
+  }))
+
+  const IconWrapper = styled(Box)(({ theme }) => ({
+    marginBottom: theme.spacing(0.25),
+    "& .MuiSvgIcon-root": {
+      fontSize: "1.2rem",
+    },
+  }))
+
+  const getIcon = (codigo) => {
+    switch (codigo) {
+      case "3":
+        return <Room />
+      case "4":
+        return <Inventory />
+      case "5":
+        return <AssignmentTurnedIn />
+      case "6":
+        return <Group />
+      case "7":
+        return <Event />
+      case "8":
+        return <Security />
+      case "9":
+        return <People />
+      default:
+        return <EventNote />
+    }
+  }
+
   useEffect(() => {
     getEspacios();
     getActividades();
@@ -103,11 +161,10 @@ export function HomePage() {
 
   // modulos
   const modulos = [
-    { codigo: "2", descripcion: "RESERVAS", ruta: "/reservas", rolesPermitidos: ["ADMIN", "RESPONSABLE"] },
     { codigo: "3", descripcion: "ESPACIOS", ruta: "/espacio", rolesPermitidos: ["ADMIN"] },
     { codigo: "4", descripcion: "RECURSOS", ruta: "/recurso", rolesPermitidos: ["ADMIN"] },
     { codigo: "5", descripcion: "SOLICITUDES DE RESERVA", ruta: "/solicitudes-reservas", rolesPermitidos: ["ADMIN", "RESPONSABLE"] },
-    { codigo: "6", descripcion: "MINISTERIOS", ruta: "/ministerio", rolesPermitidos: ["ADMIN"] },
+    { codigo: "2", descripcion: "MINISTERIOS", ruta: "/ministerio", rolesPermitidos: ["ADMIN"] },
     { codigo: "7", descripcion: "ACTIVIDADES", ruta: "/actividad", rolesPermitidos: ["ADMIN"] },
     { codigo: "8", descripcion: "ROLES", ruta: "/rol", rolesPermitidos: ["ADMIN"] },
     { codigo: "9", descripcion: "USUARIOS", ruta: "/usuarios", rolesPermitidos: ["ADMIN"] },
@@ -222,7 +279,7 @@ export function HomePage() {
 
       // SI EL ESPACIO ES DE TIPO AULA, CREO DIRECTO LA RESERVA
       if (respGetEspacio && respGetEspacio.tipoEspacio.nombre === "AULA") {
-        
+
         const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
         if (!res.success) {
           setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
@@ -232,9 +289,9 @@ export function HomePage() {
           await getReservas(); // Refrescar las reservas después de guardar
           setOpenDialog(false); // Cerrar el diálogo
         }
-      }else{
+      } else {
         // SINO, CREO UNA SOLICITUD DE RESERVA
-        const nuevaSolicitud= {
+        const nuevaSolicitud = {
           id: null,
           espacioId: nuevaReserva.espacioId,
           ministerioId: nuevaReserva.ministerioId,
@@ -243,7 +300,7 @@ export function HomePage() {
           fechaFin: nuevaReserva.fechaFin,
         };
 
-        const res = await createSolicitud(nuevaSolicitud); 
+        const res = await createSolicitud(nuevaSolicitud);
 
         if (res == "") {
           openSnackBar('Se creó la SOLICITUD de RESERVA con exito.', 'success');
@@ -288,168 +345,100 @@ export function HomePage() {
 
   return (
     <>
-      <ReservaDialog
-        open={openDialog}
-        onClose={handleDialogClose}
-        onSave={handleSaveOrUpdateReserva}
-        ministerios={ministerios || []}
-        actividades={actividades || []}
-        espacios={espacios || []}
-        selectedDate={selectedDate}
-        isEditing={isEditing}
-        errorMessage={errorMessage}
-      />
-      <Box sx={{ flexGrow: 1, marginTop: '50px' }}>
-
-        {/* <Typography gutterBottom variant="h5" component="div">
-          Modulos
-        </Typography> */}
-
-        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-
-
-          {/* {usuario.modulos.length === 0 && (
-            <h1>no hay modulos</h1>
-          )}
-
-          {usuario.modulos.map((modulo) => (
-            <Grid item xs={3} key={modulo.codigo}>
-              <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={handleClick(modulo.ruta)}>
-                <CardActionArea>
-                  <CardContent>
-                    <Typography gutterBottom variant="h6" component="div">
-                      {modulo.descripcion}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))} */}
-
-          {modulosFiltrados.map((modulo) => (
-            // <Grid item xs={3} key={modulo.codigo}>
-            //   <Card
-            //     sx={{ maxWidth: "100%", textAlign: "center", backgroundColor: "#90caf9" }}
-            //     onClick={handleClick(modulo.ruta)}
-            //   >
-            //     <CardActionArea>
-            //       <CardContent>
-            //         <Typography gutterBottom variant="h6" component="div">
-            //           {modulo.descripcion}
-            //         </Typography>
-            //       </CardContent>
-            //     </CardActionArea>
-            //   </Card>
-            // </Grid>
-
-
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              key={modulo.codigo}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <Card
-                sx={{
-                  width: "100%",
-                  maxWidth: "300px",
-                  textAlign: "center",
-                  backgroundColor: "#1976d2",
-                  color: "#fff",
-                  borderRadius: "12px",
-                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-                  transition: "transform 0.3s, box-shadow 0.3s",
-                  "&:hover": {
-                    transform: "scale(1.03)",
-                    boxShadow: "0px 6px 15px rgba(0, 0, 0, 0.3)",
-                  },
-                }}
-                onClick={handleClick(modulo.ruta)}
-              >
-                <CardActionArea>
-                  <CardContent
-                    sx={{
-                      p: 3,
-                    }}
-                  >
-                    <Typography
-                      gutterBottom
-                      variant="h6"
-                      component="div"
-                      sx={{
-                        fontWeight: "bold",
-                        fontSize: { xs: "16px", sm: "18px", md: "20px" },
-                      }}
-                    >
-                      {modulo.descripcion}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
-
-
-        </Grid>
-      </Box>
-
-      <Box sx={{ width: '100%', marginTop: '50px', marginBottom: '100px' }}>
-        <Typography gutterBottom variant="h5">
-          Calendario de Reservas
-        </Typography>
-
-        {/* Select para filtrar espacios */}
-        <FormControl sx={{ m: 1, width: 300 }}>
-          <InputLabel>Espacios</InputLabel>
-          <Select
-            multiple
-            value={espaciosSeleccionados}
-            onChange={handleChange}
-            renderValue={(selected) => selected.join(', ')}
-          >
-            {espaciosDisponibles.map((espacio) => (
-              <MenuItem key={espacio} value={espacio}>
-                <Checkbox checked={espaciosSeleccionados.includes(espacio)} />
-                <ListItemText primary={espacio} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
-          headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-          }}
-          events={eventosFiltrados}
-          dateClick={handleDateClick}
-          eventClick={handleEventClick}
+      <Container fixed>
+        <ReservaDialog
+          open={openDialog}
+          onClose={handleDialogClose}
+          onSave={handleSaveOrUpdateReserva}
+          ministerios={ministerios || []}
+          actividades={actividades || []}
+          espacios={espacios || []}
+          selectedDate={selectedDate}
+          isEditing={isEditing}
+          errorMessage={errorMessage}
         />
-      </Box>
+        <Box sx={{ flexGrow: 1, margin: "20px 0" }}>
+          <Grid container spacing={2}>
+            {modulosFiltrados.map((modulo) => (
+              <Grid item xs={4} sm={3} md={2} lg={1.5} key={modulo.codigo}>
+                <StyledCard onClick={handleClick(modulo.ruta)}>
+                  <CardActionArea>
+                    <CardContent sx={{ padding: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                      <Icon sx={{ fontSize: { xs: "3rem", sm: "3rem", md: "3rem" } }}> {/* Ajuste directo al tamaño del icono */}
+                        {getIcon(modulo.codigo)}
+                      </Icon>
+                      <Typography
+                        variant="caption"
+                        component="div"
+                        align="center"
+                        sx={{
+                          fontWeight: "medium",
+                          fontSize: { xs: "0.8rem", sm: "0.8rem", md: "0.9rem" },
+                          lineHeight: 1.1,
+                        }}
+                      >
+                        {modulo.descripcion}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </StyledCard>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
 
-      <Snackbar
-        open={snackBarState.open}
-        autoHideDuration={4000}
-        onClose={closeSnackBar}
-      >
-        <Alert
+        <Box sx={{ width: '100%', marginTop: '50px', marginBottom: '100px' }}>
+          <Typography gutterBottom variant="h5">
+            Calendario de Reservas
+          </Typography>
+
+          {/* Select para filtrar espacios */}
+          <FormControl sx={{ m: 1, width: 300 }}>
+            <InputLabel>Espacios</InputLabel>
+            <Select
+              multiple
+              value={espaciosSeleccionados}
+              onChange={handleChange}
+              renderValue={(selected) => selected.join(', ')}
+            >
+              {espaciosDisponibles.map((espacio) => (
+                <MenuItem key={espacio} value={espacio}>
+                  <Checkbox checked={espaciosSeleccionados.includes(espacio)} />
+                  <ListItemText primary={espacio} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FullCalendar
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            }}
+            events={eventosFiltrados}
+            dateClick={handleDateClick}
+            eventClick={handleEventClick}
+          />
+        </Box>
+
+        <Snackbar
+          open={snackBarState.open}
+          autoHideDuration={4000}
           onClose={closeSnackBar}
-          severity={snackBarState.severity}
-          variant="filled"
-          sx={{ width: '100%' }}
         >
-          {snackBarState.message}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={closeSnackBar}
+            severity={snackBarState.severity}
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {snackBarState.message}
+          </Alert>
+        </Snackbar>
+      </Container>
     </>
   );
 }

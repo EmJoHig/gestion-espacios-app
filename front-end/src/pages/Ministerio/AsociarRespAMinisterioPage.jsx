@@ -29,7 +29,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-
+import Container from '@mui/material/Container';
 import { useAuth0 } from "@auth0/auth0-react";
 
 import TablaAsociarMinisteroUsuario from '../Ministerio/TablaAsociarMinisteroUsuario';
@@ -171,55 +171,57 @@ export function AsociarRespAMinisterioPage() {
 
     return (
         <>
-            <Box sx={{ marginTop: '50px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    ASOCIAR RESPONSABLE A MINISTERIO
-                </Typography>
-                <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
-                    HOME
-                </Button>
-                <Button variant="contained" onClick={() => navigate("/ministerio")} style={{ marginRight: '20px' }}>
-                    MINISTERIOS
-                </Button>
-
-                {/* <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>get users</Button> */}
-
-                {openEdit && (
-                    <DialogEditarMinisterioUsuario
-                        usuario={null}
-                        open={openEdit}
-                        onClose={handleCloseEdit}
-                        onSubmit={handleSubmitEdit}
-                        ministerios={ministerios}
-                        idMinisterioSelect={idMinisterioSelect}
-                        setMinisterioSelect={setMinisterioSelect}
-                    />
-                )}
-
+            <Container fixed>
                 <Box sx={{ marginTop: '50px' }}>
-                    <TablaAsociarMinisteroUsuario
-                        data={usuarios}
-                        columnasTabla={columnas}
-                        nombreTabla={"Usuarios"}
-                        onEditClick={handleObtenerRow}
-                    />
-                </Box>
-            </Box>
+                    <Typography gutterBottom variant="h5" component="div">
+                        ASOCIAR RESPONSABLE A MINISTERIO
+                    </Typography>
+                    <Button variant="contained" onClick={() => navigate("/home")} style={{ marginRight: '20px' }}>
+                        HOME
+                    </Button>
+                    <Button variant="contained" onClick={() => navigate("/ministerio")} style={{ marginRight: '20px' }}>
+                        MINISTERIOS
+                    </Button>
 
-            <Snackbar
-                open={snackBarState.open}
-                autoHideDuration={4000}
-                onClose={closeSnackBar}
-            >
-                <Alert
+                    {/* <Button variant="contained" onClick={handleTEST} style={{ marginLeft: '20px' }}>get users</Button> */}
+
+                    {openEdit && (
+                        <DialogEditarMinisterioUsuario
+                            usuario={null}
+                            open={openEdit}
+                            onClose={handleCloseEdit}
+                            onSubmit={handleSubmitEdit}
+                            ministerios={ministerios}
+                            idMinisterioSelect={idMinisterioSelect}
+                            setMinisterioSelect={setMinisterioSelect}
+                        />
+                    )}
+
+                    <Box sx={{ marginTop: '50px' }}>
+                        <TablaAsociarMinisteroUsuario
+                            data={usuarios}
+                            columnasTabla={columnas}
+                            nombreTabla={"Usuarios"}
+                            onEditClick={handleObtenerRow}
+                        />
+                    </Box>
+                </Box>
+
+                <Snackbar
+                    open={snackBarState.open}
+                    autoHideDuration={4000}
                     onClose={closeSnackBar}
-                    severity={snackBarState.severity}
-                    variant="filled"
-                    sx={{ width: '100%' }}
                 >
-                    {snackBarState.message}
-                </Alert>
-            </Snackbar>
+                    <Alert
+                        onClose={closeSnackBar}
+                        severity={snackBarState.severity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {snackBarState.message}
+                    </Alert>
+                </Snackbar>
+            </Container>
         </>
     );
 }
