@@ -63,14 +63,14 @@ export const updateUser = async (req, res) => {
     if (updatedRows < 1) {
       return res.status(400).json({ message: 'No se pudo editar el usuario' });
     }
-    
+
     const updatedUser = await Usuario.findByPk(id);
 
     if (updatedUser === null) {
       return res.status(400).json({ message: 'No se pudo editar el usuario' });
     } else {
       return res.status(200).json(updatedUser);
-    }    
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Ha ocurrido un error al actualizar el usuario" });
@@ -134,6 +134,12 @@ export const validarUsuarioAUTH0 = async (req, res) => {
     // si no existe, lo creo
     if (!_usuario) {
 
+      const rolCONSULTA = await Rol.findOne({ where: { name: 'CONSULTA' } });
+
+      if (!rolCONSULTA) {
+        return res.status(500).json({ message: 'rol no encontrado' });
+      }
+
       const nuevoUsuario = await Usuario.create({
         nombreUsuario: UsuarioAUTH0.name,
         email: UsuarioAUTH0.email,
@@ -142,6 +148,7 @@ export const validarUsuarioAUTH0 = async (req, res) => {
         apellido: UsuarioAUTH0.family_name,
         telefono: UsuarioAUTH0.phone_number,
         dni: '',
+        rolId: rolCONSULTA.id,
       });
 
       if (nuevoUsuario != null) {
@@ -209,7 +216,8 @@ export const getUserByIdAUTH0 = async (req, res) => {
 
     const { idUsuarioAUTH0 } = req.body;
 
-    const _user = await Usuario.findOne({ where: { idUsuarioAUTH0: idUsuarioAUTH0 } });
+    const _user = await Usuario.findOne({ where: { idUsuarioAUTH0: idUsuarioAUTH0 }, include: [{ model: Rol, as: 'rol', }] });
+
     if (!_user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
