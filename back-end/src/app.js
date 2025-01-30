@@ -23,7 +23,7 @@ import bodyParser from "body-parser";
 import multer from "multer";
 import cors from "cors";
 //AUTH0
-import { auth } from "express-oauth2-jwt-bearer";
+import { auth } from "express-oauth2-jwt-bearer"; 
 
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
