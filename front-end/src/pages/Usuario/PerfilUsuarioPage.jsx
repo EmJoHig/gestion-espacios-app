@@ -83,10 +83,7 @@ export function PerfilUsuarioPage() {
 
     useEffect(() => {
         if (user) {
-
-            console.log("user: ", user);
-
-
+            // console.log("user: ", user);
             const id = user.sub;
             const fetchGetUserPorAUTH0id = async () => {
                 try {
@@ -122,15 +119,15 @@ export function PerfilUsuarioPage() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if(name == 'dni' || name == 'telefono'){
+        if (name == 'dni' || name == 'telefono') {
             const numericValue = value.replace(/\D/g, ''); // Reemplaza cualquier cosa que no sea un número
-            const maxLength = name === "dni" ? 9 : 13; 
+            const maxLength = name === "dni" ? 9 : 13;
             if (numericValue.length <= maxLength) {
                 setUsuarioEditando({ ...usuarioEditando, [name]: numericValue });
             }
-        }else{
+        } else {
             setUsuarioEditando({ ...usuarioEditando, [name]: value });
-        }        
+        }
     };
 
     const handleSaveUsuario = async () => {
@@ -153,86 +150,86 @@ export function PerfilUsuarioPage() {
 
     return (
         <>
-         <Container fixed>
-            <Box sx={{ marginTop: '50px', marginBottom: '150px' }}>
-                <Typography variant="h5" sx={{ marginBottom: '20px' }}> Perfil de Usuario </Typography>
+            <Container fixed>
+                <Box sx={{ marginTop: '50px', marginBottom: '150px' }}>
+                    <Typography variant="h5" sx={{ marginBottom: '20px' }}> Perfil de Usuario </Typography>
 
-                <Button variant="contained" onClick={() => navigate("/home")}> HOME</Button>
+                    <Button variant="contained" onClick={() => navigate("/home")}> HOME</Button>
 
-                <Box sx={{ marginTop: '50px', justifyContent: 'center' }}>
-                    <Grid justifyContent="center" alignItems="center" sx={{ minHeight: '100vh' }}>
-                        <Grid item xs={12} sm={8} md={6} lg={4}>
-                            <Card
-                                sx={{
-                                    width: '100%',
-                                    textAlign: 'center',
-                                    background: 'linear-gradient(135deg, #42a5f5 30%, #1e88e5 90%)',
-                                    boxShadow: 5,
-                                    borderRadius: 4,
-                                    p: 3,
-                                    color: 'white'
-                                }}
-                            >
-                                <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Button
-                                        variant="contained"
-                                        color="secondary"
-                                        onClick={handleEditUsuario}
-                                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
-                                    >
-                                        Editar Perfil
-                                    </Button>
-                                </CardContent>
-                                <CardContent sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3, textAlign: 'left' }}>
-                                    <Typography variant="h6"><b>Nombre:</b> {usuario.nombre}</Typography>
-                                    <Typography variant="h6"><b>Apellido:</b> {usuario.apellido}</Typography>
-                                    <Typography variant="h6"><b>Nombre Usuario:</b> {usuario.nombreUsuario}</Typography>
-                                    <Typography variant="h6"><b>DNI:</b> {usuario.dni}</Typography>
-                                    <Typography variant="h6"><b>Teléfono:</b> {usuario.telefono}</Typography>
-                                </CardContent>
-                            </Card>
+                    <Box sx={{ marginTop: '50px', justifyContent: 'center' }}>
+                        <Grid justifyContent="center" alignItems="center" sx={{ minHeight: '100vh' }}>
+                            <Grid item xs={12} sm={8} md={6} lg={4}>
+                                <Card
+                                    sx={{
+                                        width: '100%',
+                                        textAlign: 'center',
+                                        background: 'linear-gradient(135deg, #42a5f5 30%, #1e88e5 90%)',
+                                        boxShadow: 5,
+                                        borderRadius: 4,
+                                        p: 3,
+                                        color: 'white'
+                                    }}
+                                >
+                                    <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            onClick={handleEditUsuario}
+                                            sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
+                                        >
+                                            Editar Perfil
+                                        </Button>
+                                    </CardContent>
+                                    <CardContent sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3, textAlign: 'left' }}>
+                                        <Typography variant="h6"><b>Nombre:</b> {usuario.nombre}</Typography>
+                                        <Typography variant="h6"><b>Apellido:</b> {usuario.apellido}</Typography>
+                                        <Typography variant="h6"><b>Nombre Usuario:</b> {usuario.nombreUsuario}</Typography>
+                                        <Typography variant="h6"><b>DNI:</b> {usuario.dni}</Typography>
+                                        <Typography variant="h6"><b>Teléfono:</b> {usuario.telefono}</Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Box>
+                    </Box>
 
-                <Dialog open={openEdit} onClose={handleCloseEdit}>
-                    <DialogTitle>Editar Usuario</DialogTitle>
-                    <DialogContent>
-                        <TextField margin="dense" name="nombre" label="Nombre" fullWidth value={usuarioEditando?.nombre || ''} onChange={handleChange} />
-                        <TextField margin="dense" name="apellido" label="Apellido" fullWidth value={usuarioEditando?.apellido || ''} onChange={handleChange} />
-                        <TextField margin="dense" name="nombreUsuario" label="Nombre Usuario" fullWidth value={usuarioEditando?.nombreUsuario || ''} onChange={handleChange} />
-                        <TextField
-                            margin="dense"
-                            name="dni"
-                            label="DNI"
-                            fullWidth
-                            value={usuarioEditando?.dni || ''}
-                            onChange={handleChange}
-                            type="text" // Asegura que solo se ingresen números
-                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 9 }} // Asegura que sea solo numérico
-                        />
-                        <TextField
-                            margin="dense"
-                            name="telefono"
-                            label="Teléfono"
-                            fullWidth
-                            value={usuarioEditando?.telefono || ''}
-                            onChange={handleChange}
-                            type="text" // Asegura que solo se ingresen números
-                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 13 }} // Asegura que sea solo numérico
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleCloseEdit}>Cancelar</Button>
-                        <Button onClick={handleSaveUsuario} variant="contained" color="primary">Guardar</Button>
-                    </DialogActions>
-                </Dialog>
-                <Snackbar open={snackBarState.open} autoHideDuration={4000} onClose={closeSnackBar}>
-                    <Alert onClose={closeSnackBar} severity={snackBarState.severity} variant="filled" sx={{ width: '100%' }}>
-                        {snackBarState.message}
-                    </Alert>
-                </Snackbar>
-            </Box>
+                    <Dialog open={openEdit} onClose={handleCloseEdit}>
+                        <DialogTitle>Editar Usuario</DialogTitle>
+                        <DialogContent>
+                            <TextField margin="dense" name="nombre" label="Nombre" fullWidth value={usuarioEditando?.nombre || ''} onChange={handleChange} />
+                            <TextField margin="dense" name="apellido" label="Apellido" fullWidth value={usuarioEditando?.apellido || ''} onChange={handleChange} />
+                            <TextField margin="dense" name="nombreUsuario" label="Nombre Usuario" fullWidth value={usuarioEditando?.nombreUsuario || ''} onChange={handleChange} />
+                            <TextField
+                                margin="dense"
+                                name="dni"
+                                label="DNI"
+                                fullWidth
+                                value={usuarioEditando?.dni || ''}
+                                onChange={handleChange}
+                                type="text" // Asegura que solo se ingresen números
+                                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 9 }} // Asegura que sea solo numérico
+                            />
+                            <TextField
+                                margin="dense"
+                                name="telefono"
+                                label="Teléfono"
+                                fullWidth
+                                value={usuarioEditando?.telefono || ''}
+                                onChange={handleChange}
+                                type="text" // Asegura que solo se ingresen números
+                                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 13 }} // Asegura que sea solo numérico
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseEdit}>Cancelar</Button>
+                            <Button onClick={handleSaveUsuario} variant="contained" color="primary">Guardar</Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Snackbar open={snackBarState.open} autoHideDuration={4000} onClose={closeSnackBar}>
+                        <Alert onClose={closeSnackBar} severity={snackBarState.severity} variant="filled" sx={{ width: '100%' }}>
+                            {snackBarState.message}
+                        </Alert>
+                    </Snackbar>
+                </Box>
             </Container>
         </>
     );
