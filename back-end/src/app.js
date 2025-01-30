@@ -29,7 +29,7 @@ const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const corsOptions = {
-  origin: 'http://localhost:5173' || 'https://ge.patriciorodriguez.com.ar/',
+  origin: ['http://localhost:5173', 'https://ge.patriciorodriguez.com.ar'],
   credentials: true, // Habilitar el intercambio de cookies y otros datos de autenticación
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders:

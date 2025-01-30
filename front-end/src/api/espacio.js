@@ -1,9 +1,11 @@
 import axios from "./axios";
+import { API_URL } from "../config";
+
 
 
 export const getEspaciosRequest = async (token) => {
   try {
-    const responseEspacios = await axios.get('http://localhost:3000/espacio/get_espacios', {
+    const responseEspacios = await axios.get(`${API_URL}/espacio/get_espacios`, {
       /*         headers: {
                   Authorization: `Bearer ${token}`,
               }, */
@@ -17,7 +19,7 @@ export const getEspaciosRequest = async (token) => {
 
 export const getEspacioRequest = async (token, id) => {
   try {
-    const response = await axios.get(`http://localhost:3000/espacio/get_espacio/${id}`, {
+    const response = await axios.get(`${API_URL}/espacio/get_espacio/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -30,13 +32,11 @@ export const getEspacioRequest = async (token, id) => {
 };
 
 
-export const createEspacioRequest = async (espacio) => axios.post("http://localhost:3000/espacio/nuevo_espacio", espacio);
+export const createEspacioRequest = async (espacio) => axios.post(`${API_URL}/espacio/nuevo_espacio`, espacio);
 
-export const updateEspacioRequest = async (espacio) => axios.put(`http://localhost:3000/espacio/editar_espacio/${espacio.id}`, espacio);
+export const updateEspacioRequest = async (espacio) => axios.put(`${API_URL}/espacio/editar_espacio/${espacio.id}`, espacio);
 
-export const deleteEspacioRequest = async (id) => axios.delete(`http://localhost:3000/espacio/eliminar_espacio/${id}`);
-
-
+export const deleteEspacioRequest = async (id) => axios.delete(`${API_URL}/espacio/eliminar_espacio/${id}`);
 
 export const getTiposEspacioRequest = async (token) => {
   try {

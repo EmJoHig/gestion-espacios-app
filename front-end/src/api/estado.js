@@ -1,9 +1,11 @@
 import axios from "axios";
+import { API_URL } from "../config";
+
 
 export const getEstadosRequest = async (token) => {
   try {
     const responseEstados = await axios.get(
-      "http://localhost:3000/estado/get_estados",
+      `${API_URL}/estado/get_estados`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

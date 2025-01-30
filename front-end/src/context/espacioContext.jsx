@@ -37,7 +37,7 @@ export function EspacioProvider({ children }) {
   };
 
 
-  const getEspacio = async (id) => {
+   const getEspacio = async (id) => {
     try {
 
       const token = await getAccessTokenSilently({
@@ -54,7 +54,7 @@ export function EspacioProvider({ children }) {
     } catch (error) {
       console.error(error);
     }
-  };
+  }; 
 
   const createEspacio = async (espacio) => {
     try {
@@ -86,7 +86,7 @@ export function EspacioProvider({ children }) {
   };
 
 
-  const getTiposEspacio = async () => {
+   const getTiposEspacio = async () => {
     try {
 
       const token = await getAccessTokenSilently({
@@ -98,7 +98,7 @@ export function EspacioProvider({ children }) {
     } catch (error) {
       console.error('Error fetching espacios:', error);
     }
-  };
+  }; 
 
 
   return (
