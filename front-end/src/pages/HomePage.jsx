@@ -31,7 +31,6 @@ import Box from "@mui/material/Box";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -41,7 +40,7 @@ import { useEspacio } from "../context/espacioContext";
 import { useMinisterio } from "../context/ministerioContext.jsx";
 import { useActividad } from "../context/actividadContext.jsx";
 import { useSolicitud } from "../context/solicitudContext";
-
+import { useUsuario } from "../context/usuarioContext";
 import ReservaDialog from '../components/ReservaDialog';
 import dayjs from "dayjs";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -56,11 +55,16 @@ export function HomePage() {
   const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
   const { actividades, getActividades } = useActividad();
   const { createSolicitud } = useSolicitud();
+  const { getUserByIdAUTH0 } = useUsuario();
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [ rolUsuarioBD, setRolUsuarioBD ] = useState("");
+  const [modulosFiltrados, setModulosFiltrados] = useState([]);
+
+
 
   //snackbar
   const [snackBarState, setSnackBarState] = React.useState({
@@ -132,11 +136,49 @@ export function HomePage() {
     }
   }
 
+  // modulos
+  const modulos = [
+    { codigo: "3", descripcion: "ESPACIOS", ruta: "/espacio", rolesPermitidos: ["ADMIN"] },
+    { codigo: "4", descripcion: "RECURSOS", ruta: "/recurso", rolesPermitidos: ["ADMIN"] },
+    { codigo: "5", descripcion: "SOLICITUDES DE RESERVA", ruta: "/solicitudes-reservas", rolesPermitidos: ["ADMIN", "RESPONSABLE"] },
+    { codigo: "2", descripcion: "MINISTERIOS", ruta: "/ministerio", rolesPermitidos: ["ADMIN"] },
+    { codigo: "7", descripcion: "ACTIVIDADES", ruta: "/actividad", rolesPermitidos: ["ADMIN"] },
+    { codigo: "8", descripcion: "ROLES", ruta: "/rol", rolesPermitidos: ["ADMIN"] },
+    { codigo: "9", descripcion: "USUARIOS", ruta: "/usuarios", rolesPermitidos: ["ADMIN"] },
+  ];
+
+
   useEffect(() => {
     getEspacios();
     getActividades();
     getMinisterios();
     getReservas();
+
+    if (user) {
+      const id = user.sub;
+      const fetchGetUserPorAUTH0id = async () => {
+        try {
+          const usuario = await getUserByIdAUTH0(id);
+          console.log("usuario: ", usuario);
+
+          const rolUserBD = usuario?.rol?.name || "";
+          setRolUsuarioBD(rolUserBD);
+
+          setModulosFiltrados(modulos.filter((modulo) => {
+            if (modulo.rolesPermitidos) {
+              return usuario?.rol?.name
+                ? modulo.rolesPermitidos.some((rol) => usuario.rol.name.includes(rol))
+                : false;
+            }
+            return true;
+          }));
+
+        } catch (error) {
+          console.error("Error fetching tipos de espacio:", error);
+        }
+      };
+      fetchGetUserPorAUTH0id();
+    }
 
   }, []);
 
@@ -159,25 +201,16 @@ export function HomePage() {
   }, [reserva]);
 
 
-  // modulos
-  const modulos = [
-    { codigo: "3", descripcion: "ESPACIOS", ruta: "/espacio", rolesPermitidos: ["ADMIN"] },
-    { codigo: "4", descripcion: "RECURSOS", ruta: "/recurso", rolesPermitidos: ["ADMIN"] },
-    { codigo: "5", descripcion: "SOLICITUDES DE RESERVA", ruta: "/solicitudes-reservas", rolesPermitidos: ["ADMIN", "RESPONSABLE"] },
-    { codigo: "2", descripcion: "MINISTERIOS", ruta: "/ministerio", rolesPermitidos: ["ADMIN"] },
-    { codigo: "7", descripcion: "ACTIVIDADES", ruta: "/actividad", rolesPermitidos: ["ADMIN"] },
-    { codigo: "8", descripcion: "ROLES", ruta: "/rol", rolesPermitidos: ["ADMIN"] },
-    { codigo: "9", descripcion: "USUARIOS", ruta: "/usuarios", rolesPermitidos: ["ADMIN"] },
-  ];
 
-  const modulosFiltrados = modulos.filter((modulo) => {
-    if (modulo.rolesPermitidos) {
-      return modulo.rolesPermitidos.some((rol) =>
-        user["https://gestion-espacios/roles"]?.includes(rol)
-      );
-    }
-    return true;
-  });
+
+  // const modulosFiltrados = modulos.filter((modulo) => {
+  //   if (modulo.rolesPermitidos) {
+  //     return modulo.rolesPermitidos.some((rol) =>
+  //       user["https://gestion-espacios/roles"]?.includes(rol)
+  //     );
+  //   }
+  //   return true;
+  // });
 
 
 
@@ -228,10 +261,11 @@ export function HomePage() {
       fechaFin: fechaFin.toISOString(), // Convertir a formato ISO
     };
 
-    // console.log("Nueva reserva: ", reserva); // Para verificar el objeto creado
+    console.log("rolUsuarioBD: ", rolUsuarioBD); // Para verificar el objeto creado
 
     setSelectedDate(reserva); // Actualizar el estado con la nueva reserva
-    setOpenDialog(true); // Abrir el diálogo
+    if(rolUsuarioBD !== "CONSULTA")
+      setOpenDialog(true); // Abrir el diálogo
   };
 
   const handleDialogClose = () => {
@@ -334,6 +368,8 @@ export function HomePage() {
   };
 
   const handleEventClick = (info) => {
+    console.log("handleEventClick rolUsuarioBD: ", rolUsuarioBD); 
+
     const selectedReserva = reservas.find((res) => res.id === parseInt(info.event.id));
     getReserva(parseInt(info.event.id));
     if (selectedReserva) {
@@ -356,6 +392,7 @@ export function HomePage() {
           selectedDate={selectedDate}
           isEditing={isEditing}
           errorMessage={errorMessage}
+          rolUsuarioBD={rolUsuarioBD}
         />
         <Box sx={{ flexGrow: 1, margin: "20px 0" }}>
           <Grid container spacing={2}>

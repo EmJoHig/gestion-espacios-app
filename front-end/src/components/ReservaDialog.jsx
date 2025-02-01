@@ -20,8 +20,8 @@ import dayjs from 'dayjs';
 import { Close } from '@mui/icons-material';
 
 
-export default function ReservaDialog({ open, onClose, onSave, ministerios, actividades, espacios, selectedDate, errorMessage, isEditing }) {
-      // Estados para los selectores
+export default function ReservaDialog({ open, onClose, onSave, ministerios, actividades, espacios, selectedDate, errorMessage, isEditing, rolUsuarioBD }) {
+  // Estados para los selectores
   const [selectedMinisterio, setSelectedMinisterio] = useState('');
   const [selectedActividad, setSelectedActividad] = useState('');
   const [actividadesFiltradas, setActividadesFiltradas] = useState([]);
@@ -41,7 +41,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
       setSelectedEspacio(selectedDate.espacioId || "");
       setFechaHoraInicio(selectedDate.fechaInicio ? dayjs(selectedDate.fechaInicio) : null);
       setFechaHoraFin(selectedDate.fechaFin ? dayjs(selectedDate.fechaFin) : null);
-  
+
       if (selectedDate.ministerioId) {
         const actividadesRelacionadas = actividades.filter(
           (actividad) => actividad.ministerioId === selectedDate.ministerioId
@@ -75,14 +75,14 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
     onClose();
     setEditable(false);
   };
-  
+
   // console.log("isEditing", isEditing)
   // console.log("editable", editable)
 
   const handleFechaHoraInicioChange = (newValue) => {
     if (newValue && newValue.isValid()) {  // Verifica si el nuevo valor es válido
       setFechaHoraInicio(newValue);
-  
+
       // Si se selecciona una fecha y hora de inicio, establecemos la fecha y hora de fin como una hora más
       const nuevaFechaHoraFin = newValue.add(1, 'hour'); // Sumar 1 hora
       setFechaHoraFin(nuevaFechaHoraFin);
@@ -90,7 +90,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
       console.log("Fecha de inicio inválida");
     }
   };
-  
+
 
   const handleEspacioChange = (event) => {
     setSelectedEspacio(event.target.value);
@@ -101,7 +101,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
     setSelectedActividad(event.target.value);
   };
 
-     // Manejar el cambio en el selector de ministerios
+  // Manejar el cambio en el selector de ministerios
   const handleMinisterioChange = (event) => {
     const selectedId = event.target.value;
     console.log("aca: ", selectedId)
@@ -110,51 +110,51 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
     const actividadesRelacionadas = actividades.filter((actividad) => actividad.ministerioId === selectedId);
     setActividadesFiltradas(actividadesRelacionadas);
     setSelectedActividad(''); // Reiniciar actividad seleccionada
-    console.log("act: ",actividadesRelacionadas)
+    console.log("act: ", actividadesRelacionadas)
   };
 
   return (
     <Dialog open={open} onClose={handleClose} PaperProps={{ component: 'form', onSubmit: handleSubmit }}>
       <DialogTitle>{isEditing ? (editable ? "Editar Reserva" : "Visualizar Reserva") : "Crear Nueva Reserva"}</DialogTitle>
       {errorMessage && (
-                        <Typography color="error" variant="body2" style={{ marginBottom: '10px' }}>
-                            {errorMessage}
-                        </Typography>
-                    )}
+        <Typography color="error" variant="body2" style={{ marginBottom: '10px' }}>
+          {errorMessage}
+        </Typography>
+      )}
       <DialogContent>
-                            {/* Selector de Ministerios */}
-                            <FormControl fullWidth margin="normal" disabled={isEditing && !editable}>
-                        <InputLabel id="ministerio-label">Ministerio</InputLabel>
-                        <Select
-                            labelId="ministerio-label"
-                            value={selectedMinisterio}
-                            onChange={handleMinisterioChange}
-                        >
-                            {ministerios.map((ministerio) => (
-                                <MenuItem key={ministerio.id} value={ministerio.id}>
-                                    {ministerio.codigo} - {ministerio.descripcion}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+        {/* Selector de Ministerios */}
+        <FormControl fullWidth margin="normal" disabled={isEditing && !editable}>
+          <InputLabel id="ministerio-label">Ministerio</InputLabel>
+          <Select
+            labelId="ministerio-label"
+            value={selectedMinisterio}
+            onChange={handleMinisterioChange}
+          >
+            {ministerios.map((ministerio) => (
+              <MenuItem key={ministerio.id} value={ministerio.id}>
+                {ministerio.codigo} - {ministerio.descripcion}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-                    {/* Selector de Actividades */}
-                    <FormControl fullWidth margin="normal" disabled={(isEditing && !editable) || !selectedMinisterio}>
-                        <InputLabel id="actividad-label">Actividad</InputLabel>
-                        <Select
-                            labelId="actividad-label"
-                            value={selectedActividad}
-                            onChange={handleActividadChange}
-                        >
-                            {actividadesFiltradas.map((actividad) => (
-                                <MenuItem key={actividad.id} value={actividad.id}>
-                                    {actividad.nombre}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+        {/* Selector de Actividades */}
+        <FormControl fullWidth margin="normal" disabled={(isEditing && !editable) || !selectedMinisterio}>
+          <InputLabel id="actividad-label">Actividad</InputLabel>
+          <Select
+            labelId="actividad-label"
+            value={selectedActividad}
+            onChange={handleActividadChange}
+          >
+            {actividadesFiltradas.map((actividad) => (
+              <MenuItem key={actividad.id} value={actividad.id}>
+                {actividad.nombre}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-                    {/* Selector de Espacios */}
+        {/* Selector de Espacios */}
 
         <FormControl fullWidth margin="normal" disabled={isEditing && !editable}>
           <InputLabel id="espacio-label">Espacio</InputLabel>
@@ -198,12 +198,25 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
           </Grid>
         </Grid>
       </DialogContent>
-      {!isEditing || editable ? <span/> : (
+      {/* {!isEditing || editable ? <span/> : (
           <Button onClick={handleModify} type="button">Modificar</Button>
-        )}
+        )} */}
+      {rolUsuarioBD !== "CONSULTA" ? (
+        (!isEditing || editable) ? <span /> : (
+          <Button onClick={handleModify} type="button">Modificar</Button>
+        )
+      ) : null}
       <DialogActions>
-        <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={handleSubmit} disabled={isEditing && !editable}>Guardar</Button>
+
+        {rolUsuarioBD === "CONSULTA" ? <span /> : (
+          <>
+            <Button onClick={handleClose}>Cancelar</Button>
+            <Button onClick={handleSubmit} disabled={isEditing && !editable}>Guardar</Button>
+          </>
+        )}
+
+
+
       </DialogActions>
     </Dialog>
   );

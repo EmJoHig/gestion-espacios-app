@@ -6,7 +6,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 
 // context
-import { AuthProvider } from "./context/authContext";
 import { ProtectedRoute } from "./routes";
 import { MinisterioProvider } from "./context/ministerioContext";
 import { UsuarioProvider } from "./context/usuarioContext";
@@ -19,8 +18,6 @@ import { SolicitudProvider } from "./context/solicitudContext";
 
 // vistas
 import WelcomePage from "./pages/WelcomePage";
-import RegisterPage from "./pages/RegisterPage";
-import { LoginPage } from "./pages/LoginPage";
 import { HomePage } from "./pages/HomePage";
 import { MinisterioPage } from "./pages/Ministerio/MinisterioPage";
 import { SolicitudPage } from "./pages/Solicitud/SolicitudPage";
@@ -38,7 +35,6 @@ import { PerfilUsuarioPage } from "./pages/Usuario/PerfilUsuarioPage";
 
 function App() {
   return (
-    // <AuthProvider>
     <SolicitudProvider>
       <RecursoProvider>
         <MinisterioProvider>
@@ -54,27 +50,49 @@ function App() {
                         <MaterialAppBar />
 
                         {/* <Container fixed> */}
-                          <Routes>
-                            <Route path="/" element={<WelcomePage />} />
+                        <Routes>
+                          <Route path="/" element={<WelcomePage />} />
 
-                            <Route element={<ProtectedRoute />}>
+                          {/* <Route element={<ProtectedRoute />}> */}
 
-                              <Route path="/home" element={<HomePage />} />
-                              <Route path="/ministerio" element={<MinisterioPage />} />
-                              <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
-                              <Route path="/reservas" element={<ReservasPage />} />
-                              <Route path="/espacio" element={<EspacioPage />} />
-                              <Route path="/rol" element={<RolPage />} />
-                              <Route path="/asociar-roles" element={<AsociarRolesPage />} />
-                              <Route path="/recurso" element={<RecursoPage />} />
-                              <Route path="/asociar-responsables" element={<AsociarRespAMinisterioPage />} />
-                              <Route path="/actividad" element={<ActividadPage />} />
-                              <Route path="/asociar-actividades" element={<AsociarActMinisterioPage />} />
-                              <Route path="/usuarios" element={<UsuarioPage />} />
-                              <Route path="/perfil-usuario" element={<PerfilUsuarioPage />} />
+                          {/* <Route path="/home" element={<HomePage />} allowedRoles={["ADMIN", "CONSULTA", "RESPONSABLE"]} />
+                              <Route path="/ministerio" element={<MinisterioPage />} allowedRoles={["ADMIN", "RESPONSABLE"]}/>
+                              <Route path="/solicitudes-reservas" element={<SolicitudPage />} allowedRoles={["ADMIN", "RESPONSABLE"]} />
+                              <Route path="/reservas" element={<ReservasPage />} allowedRoles={["ADMIN", "CONSULTA", "RESPONSABLE"]} />
+                              <Route path="/espacio" element={<EspacioPage />} allowedRoles={["ADMIN"]} />
+                              <Route path="/rol" element={<RolPage />} allowedRoles={["ADMIN"]} />
+                              <Route path="/asociar-roles" element={<AsociarRolesPage />} allowedRoles={["ADMIN"]} />
+                              <Route path="/recurso" element={<RecursoPage allowedRoles={["ADMIN"]}/>} />
+                              <Route path="/asociar-responsables" element={<AsociarRespAMinisterioPage />} allowedRoles={["ADMIN"]} />
+                              <Route path="/actividad" element={<ActividadPage allowedRoles={["ADMIN"]}/>} />
+                              <Route path="/asociar-actividades" element={<AsociarActMinisterioPage />} allowedRoles={["ADMIN"]} />
+                              <Route path="/usuarios" element={<UsuarioPage />} allowedRoles={["ADMIN"]} />
+                              <Route path="/perfil-usuario" element={<PerfilUsuarioPage />} allowedRoles={["ADMIN", "CONSULTA", "RESPONSABLE"]} /> */}
 
-                            </Route>
-                          </Routes>
+                          <Route element={<ProtectedRoute allowedRoles={["ADMIN", "RESPONSABLE"]} />}>
+                            <Route path="/solicitudes-reservas" element={<SolicitudPage />} />
+                            {/* <Route path="/reservas" element={<ReservasPage />} /> */}
+                          </Route>
+
+                          <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+                            <Route path="/ministerio" element={<MinisterioPage />} />
+                            <Route path="/rol" element={<RolPage />} />
+                            <Route path="/asociar-roles" element={<AsociarRolesPage />} />
+                            <Route path="/recurso" element={<RecursoPage />} />
+                            <Route path="/asociar-responsables" element={<AsociarRespAMinisterioPage />} />
+                            <Route path="/actividad" element={<ActividadPage />} />
+                            <Route path="/asociar-actividades" element={<AsociarActMinisterioPage />} />
+                            <Route path="/usuarios" element={<UsuarioPage />} />
+                            <Route path="/espacio" element={<EspacioPage />} />
+                          </Route>
+
+                          <Route element={<ProtectedRoute allowedRoles={["ADMIN", "CONSULTA", "RESPONSABLE"]} />}>
+                            <Route path="/home" element={<HomePage />} />
+                            <Route path="/perfil-usuario" element={<PerfilUsuarioPage />} />
+                          </Route>
+
+                          {/* </Route> */}
+                        </Routes>
                         {/* </Container> */}
 
                       </main>
@@ -87,7 +105,6 @@ function App() {
         </MinisterioProvider>
       </RecursoProvider>
     </SolicitudProvider>
-    // </AuthProvider>
   );
 }
 
