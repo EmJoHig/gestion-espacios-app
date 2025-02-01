@@ -301,7 +301,7 @@ export default function PrimarySearchAppBar() {
               </IconButton>
               <p>Notifications</p>
             </MenuItem> */}
-            <MenuItem onClick={() => { logout(); handleMenuClose(); }}>
+            <MenuItem onClick={() => { logout({ returnTo: window.location.origin, }); handleMenuClose(); }}>
               <IconButton
                 size="large"
                 color="inherit"
@@ -343,7 +343,7 @@ export default function PrimarySearchAppBar() {
             {/* <MenuItem onClick={handleMenuClose}>Mis Reservas</MenuItem> */}
 
             {/* <MenuItem onClick={logout}>Log Out</MenuItem> */}
-            <MenuItem onClick={() => { logout(); handleMenuClose(); }}>
+            <MenuItem onClick={() => { logout({ returnTo: window.location.origin, }); handleMenuClose(); }}>
               <IconButton
                 size="large"
                 color="inherit"
