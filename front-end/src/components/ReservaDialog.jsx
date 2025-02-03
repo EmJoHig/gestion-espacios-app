@@ -123,12 +123,13 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
       )}
       <DialogContent>
         {/* Selector de Ministerios */}
-        <FormControl fullWidth margin="normal" disabled={isEditing && !editable}>
+        <FormControl fullWidth margin="normal" disabled={isEditing && !editable} variant="outlined">
           <InputLabel id="ministerio-label">Ministerio</InputLabel>
           <Select
             labelId="ministerio-label"
             value={selectedMinisterio}
             onChange={handleMinisterioChange}
+            label="Ministerio"
           >
             {ministerios.map((ministerio) => (
               <MenuItem key={ministerio.id} value={ministerio.id}>
@@ -139,12 +140,13 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
         </FormControl>
 
         {/* Selector de Actividades */}
-        <FormControl fullWidth margin="normal" disabled={(isEditing && !editable) || !selectedMinisterio}>
+        <FormControl fullWidth margin="normal" disabled={(isEditing && !editable) || !selectedMinisterio} variant="outlined">
           <InputLabel id="actividad-label">Actividad</InputLabel>
           <Select
             labelId="actividad-label"
             value={selectedActividad}
             onChange={handleActividadChange}
+            label="Actividad"
           >
             {actividadesFiltradas.map((actividad) => (
               <MenuItem key={actividad.id} value={actividad.id}>
@@ -156,12 +158,13 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
 
         {/* Selector de Espacios */}
 
-        <FormControl fullWidth margin="normal" disabled={isEditing && !editable}>
+        <FormControl fullWidth margin="normal" disabled={isEditing && !editable} variant="outlined">
           <InputLabel id="espacio-label">Espacio</InputLabel>
           <Select
             labelId="espacio-label"
             value={selectedEspacio}
             onChange={handleEspacioChange}
+            label="Espacio"
           >
             {espacios.map((espacio) => (
               <MenuItem key={espacio.id} value={espacio.id}>
