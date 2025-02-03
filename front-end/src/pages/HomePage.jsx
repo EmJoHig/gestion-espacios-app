@@ -37,6 +37,9 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import esLocale from "@fullcalendar/core/locales/es";
+import './styles.css';
+
 import { useReserva } from "../context/reservaContext";
 import { useEspacio } from "../context/espacioContext";
 import { useMinisterio } from "../context/ministerioContext.jsx";
@@ -109,6 +112,7 @@ export function HomePage() {
       boxShadow: theme.shadows[3],
     },
   }))
+
 
   const fabStyle = {
     position: 'fixed',
@@ -434,13 +438,13 @@ export function HomePage() {
         </Box>
 
         <Box sx={{ width: '100%', marginTop: '50px', marginBottom: '100px' }}>
-          <Typography gutterBottom variant="h5">
+          <Typography gutterBottom variant="h5" sx={{ textAlign: 'center', mb: 3 }}>
             Calendario de Reservas
           </Typography>
 
           {/* Select para filtrar espacios */}
-          <FormControl sx={{ m: 1, width: 300 }}>
-            <InputLabel>Espacios</InputLabel>
+          <FormControl sx={{ m: 1, width: 300, transform: 'scale(0.75)',transformOrigin: 'top left' }}>
+            <InputLabel sx={{ fontSize: '0.875rem' }}>Espacios</InputLabel>
             <Select
               multiple
               value={espaciosSeleccionados}
@@ -460,6 +464,7 @@ export function HomePage() {
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
+            locale={esLocale}
             headerToolbar={{
               left: 'prev,next today',
               center: 'title',

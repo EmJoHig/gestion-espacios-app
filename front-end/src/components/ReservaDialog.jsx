@@ -178,7 +178,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
           <Grid item xs={12}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateTimePicker
-                label="Seleccionar Fecha y Hora de Inicio"
+                label="Fecha y Hora de Inicio"
                 value={fechaHoraInicio}
                 onChange={handleFechaHoraInicioChange}
                 fullWidth
@@ -190,7 +190,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
           <Grid item xs={12}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateTimePicker
-                label="Seleccionar Fecha y Hora de Fin"
+                label="Fecha y Hora de Fin"
                 value={fechaHoraFin}
                 onChange={setFechaHoraFin}
                 fullWidth

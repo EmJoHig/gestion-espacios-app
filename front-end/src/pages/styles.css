@@ -1,0 +1,16 @@
+/* Reducir tamaño del texto en el headerToolbar */
+.fc-header-toolbar {
+    font-size: 80%;
+  }
+  
+/* Establecer color de fondo y borde para los botones */
+.fc .fc-button {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+}
+
+/* Estilo de hover */
+.fc .fc-button:hover {
+  background-color: #007BFF !important;
+  border-color: #007BFF !important;
+}
