@@ -30,6 +30,8 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 import CircularProgress from '@mui/material/CircularProgress';
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -107,6 +109,13 @@ export function HomePage() {
       boxShadow: theme.shadows[3],
     },
   }))
+
+  const fabStyle = {
+    position: 'fixed',
+    bottom: 16,
+    right: 16,
+  };
+
 
   const IconWrapper = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(0.25),
@@ -437,6 +446,7 @@ export function HomePage() {
               value={espaciosSeleccionados}
               onChange={handleChange}
               renderValue={(selected) => selected.join(', ')}
+              label="Espacios"
             >
               {espaciosDisponibles.map((espacio) => (
                 <MenuItem key={espacio} value={espacio}>
@@ -461,6 +471,7 @@ export function HomePage() {
           />
         </Box>
 
+
         <Snackbar
           open={snackBarState.open}
           autoHideDuration={4000}
@@ -476,6 +487,10 @@ export function HomePage() {
           </Alert>
         </Snackbar>
       </Container>
+        <Fab sx={fabStyle} aria-label='Add' color={'primary'} variant="extended" onClick={() => setOpenDialog(true)}>
+                    <AddIcon />
+                    NUEVA RESERVA
+        </Fab>
     </>
   );
 }
