@@ -24,6 +24,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+import { useAuth0 } from "@auth0/auth0-react";
+import { useUsuario } from "../../context/usuarioContext.jsx";
 
 
 function createData(id, name, calories, fat, carbs, protein) {
@@ -175,7 +177,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, handleSolicitudesSelected } = props;
+  const { numSelected, handleSolicitudesSelected, esAdministrador } = props;
 
 
   // APROBAR SOLICITUD RESERVA
@@ -232,7 +234,7 @@ function EnhancedTableToolbar(props) {
         </Typography>
       )}
 
-      {numSelected > 0 ? (
+      {numSelected > 0 && esAdministrador ? (
         <Tooltip title="Cambiar Estado">
           <Box sx={{ display: 'flex', gap: 2 }}> {/* Contenedor flex con espacio entre botones */}
             <Button
@@ -252,11 +254,13 @@ function EnhancedTableToolbar(props) {
           </Box>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <>
+        </>
+        // <Tooltip title="Filter list">
+        //   <IconButton>
+        //     <FilterListIcon />
+        //   </IconButton>
+        // </Tooltip>
       )}
     </Toolbar>
   );
@@ -267,12 +271,40 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function EnhancedTable({ data, columnasTabla, onSolicitudesSelected }) {
+
+  //auth0
+  const { user } = useAuth0();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const { getUserByIdAUTH0 } = useUsuario();
+  
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+
+  //CHEQUEO EL ROLE DEL USUARIO 
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (user) {
+        try {
+          const id = user.sub;
+          const usuario = await getUserByIdAUTH0(id);
+          const userRole = usuario?.rol?.name || "";
+          if (userRole === "RESPONSABLE") {
+            setIsAdmin(false);
+          } else {
+            setIsAdmin(true);
+          }
+        } catch (error) {
+          console.error("Error fetching user role:", error);
+        }
+      }
+    };
+    checkAccess();
+  }, [user]);
 
 
   // useEffect(() => {
@@ -369,6 +401,7 @@ export default function EnhancedTable({ data, columnasTabla, onSolicitudesSelect
         <EnhancedTableToolbar
           numSelected={selected.length}
           handleSolicitudesSelected={handleSolicitudesSelected}
+          esAdministrador={isAdmin}
         />
         <TableContainer>
           <Table

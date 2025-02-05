@@ -30,11 +30,13 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import TablaSolicitudes from './TablaSolicitudes.jsx';
+import { useAuth0 } from "@auth0/auth0-react";
 
 // importo el conetxt de usuario para llamar a la api
 import { useSolicitud } from "../../context/solicitudContext.jsx";
 import { useEspacio } from "../../context/espacioContext.jsx";
 import { useReserva } from "../../context/reservaContext.jsx";
+import { useUsuario } from "../../context/usuarioContext.jsx";
 
 //picker
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -44,17 +46,31 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 export function SolicitudPage() {
 
-    const { solicitudes, loading, getSolicitudesFilter, getSolicitud, cambiarEstadoSolicitud } = useSolicitud();
+    const { user } = useAuth0();
+
+    const { solicitudes, loading, getSolicitudesFilter, getSolicitud, cambiarEstadoSolicitud, getSolicitudesPorResponsable } = useSolicitud();
 
     const { createReserva } = useReserva();
 
     const { espacios, getEspacios } = useEspacio();
 
+    const { getUserByIdAUTH0 } = useUsuario();
+
     const [cleared, setCleared] = useState(false);
 
-    const [ministerioSelect, setMinisterioSelect] = React.useState('');
+    const [espacioSelect, setEspacioSelect] = React.useState('');
 
     const [valueFecha, setValueFecha] = useState(null);
+
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    const [usuarioBD, setUsuarioBD] = useState(null);
+
+    const bodyGetSolicitudesPorResp = {
+        idMinistDeResponsable: null,
+        espacioId: null,
+        fechaInicio: null,
+    };
 
     const navigate = useNavigate();
 
@@ -81,16 +97,55 @@ export function SolicitudPage() {
 
 
     const filtros = {
-        espacioId: ministerioSelect || "", // Agregar solo si tiene valor
+        espacioId: espacioSelect || "", // Agregar solo si tiene valor
         fechaInicio: valueFecha ? valueFecha.toISOString() : "", // Agregar solo si tiene valor
     };
 
 
     // cuando inicia la pantalla se ejecuta 
+    // useEffect(() => {
+    //     getSolicitudesFilter(filtros);
+    //     getEspacios();
+    // }, []);
+
+
     useEffect(() => {
-        getSolicitudesFilter(filtros);
-        getEspacios();
-    }, []);
+        const checkAccess = async () => {
+            if (user) {
+                try {
+                    const id = user.sub;
+                    const usuario = await getUserByIdAUTH0(id);
+                    const userRole = usuario?.rol?.name || "";
+                    setUsuarioBD(usuario);
+                    if (userRole === "RESPONSABLE") {
+                        if (usuario.ministerioId !== null) {
+                            setIsAdmin(false);
+
+                            console.log("usuario RESPONSABLE: ", usuario);
+
+                            // ir a buscar las solicitudes del ministerio del responsable
+                            bodyGetSolicitudesPorResp.idMinistDeResponsable = usuario.ministerioId;
+
+                            console.log("bodyGetSolicitudesPorResp: ", bodyGetSolicitudesPorResp);
+
+                            getSolicitudesPorResponsable(bodyGetSolicitudesPorResp);
+                        } else {
+                            setIsAdmin(false);
+                        }
+
+                    } else {
+                        console.log("usuario ADMIN: ", usuario);
+                        setIsAdmin(true);
+                        getSolicitudesFilter(filtros);
+                    }
+                } catch (error) {
+                    console.error("Error fetching user role:", error);
+                }
+            }
+            getEspacios();
+        };
+        checkAccess();
+    }, [user]);
 
 
     //cleared date picker
@@ -106,7 +161,7 @@ export function SolicitudPage() {
 
 
     const ChangeSelectMinisterio = (event) => {
-        setMinisterioSelect(event.target.value);
+        setEspacioSelect(event.target.value);
     };
 
 
@@ -164,10 +219,26 @@ export function SolicitudPage() {
 
     const handleBuscar = async () => {
 
-        filtros.espacioId = ministerioSelect;
-        filtros.fechaInicio = valueFecha ? valueFecha.format('YYYY-MM-DD') : "";
+        try {
+            filtros.espacioId = espacioSelect;
+            filtros.fechaInicio = valueFecha ? valueFecha.format('YYYY-MM-DD') : "";
 
-        await getSolicitudesFilter(filtros);
+            if (isAdmin) {
+                await getSolicitudesFilter(filtros);
+            } else {
+                if (usuarioBD !== null) {
+                    
+                    bodyGetSolicitudesPorResp.idMinistDeResponsable = usuarioBD.ministerioId;
+                    bodyGetSolicitudesPorResp.espacioId = espacioSelect;
+                    bodyGetSolicitudesPorResp.fechaInicio = valueFecha ? valueFecha.format('YYYY-MM-DD') : "";
+
+                    await getSolicitudesPorResponsable(bodyGetSolicitudesPorResp);
+                }
+            }
+        } catch (error) {
+            openSnackBar('Error al obtener solicitudes.', 'error');
+        }
+
     };
 
 
@@ -227,7 +298,7 @@ export function SolicitudPage() {
                     openSnackBar('Error al rechazar la solicitud.', 'error');
             }
 
-            filtros.espacioId = ministerioSelect;
+            filtros.espacioId = espacioSelect;
             filtros.fechaInicio = valueFecha ? valueFecha.format('YYYY-MM-DD') : "";
 
             await getSolicitudesFilter(filtros);
@@ -268,7 +339,7 @@ export function SolicitudPage() {
                                 </Typography>
                                 <FormControl sx={{ width: '100%', marginTop: 3 }} variant="standard">
                                     <Select
-                                        value={ministerioSelect}
+                                        value={espacioSelect}
                                         onChange={ChangeSelectMinisterio}
                                         displayEmpty
                                         inputProps={{ 'aria-label': 'Without label' }}

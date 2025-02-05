@@ -120,3 +120,21 @@ export const cambiarEstadoSolicitudRequest = async (token, body) => {
     }
 }
 
+
+export const getSolicitudesPorResponsableRequest = async (token, bodyIdResponsable) => {
+
+    try {
+        const response = await axios.get(`${API_URL}/solicitud/get_solicitudes_por_responsable`, {
+            params: bodyIdResponsable,
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response;
+
+    } catch (error) {
+        console.error('Error fetching getSolicitudesPorResponsableRequest:', error);
+        throw error;
+    }
+};

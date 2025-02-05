@@ -8,6 +8,7 @@ import {
   updateSolicitudRequest,
   deleteSolicitudRequest,
   cambiarEstadoSolicitudRequest,
+  getSolicitudesPorResponsableRequest,
 } from "../api/solicitud";
 
 const SolicitudContext = createContext();
@@ -198,6 +199,34 @@ export function SolicitudProvider({ children }) {
   };
 
 
+  const getSolicitudesPorResponsable = async (bodyIMinistDeResp) => {
+
+    try {
+
+      setLoading(true);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await getSolicitudesPorResponsableRequest(token, bodyIMinistDeResp);
+
+      if (res.status === 200) {
+        setSolicitudes(res.data);
+        // return res.data;
+      } else {
+        setSolicitudes([]);
+        // return [];
+      }
+
+    } catch (error) {
+      console.error('Error fetching solicitudes:', error);
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SolicitudContext.Provider
       value={{
@@ -210,6 +239,7 @@ export function SolicitudProvider({ children }) {
         updateSolicitud,
         deleteSolicitud,
         cambiarEstadoSolicitud,
+        getSolicitudesPorResponsable,
       }}
     >
       {children}
