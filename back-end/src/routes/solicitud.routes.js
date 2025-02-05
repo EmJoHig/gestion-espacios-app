@@ -11,6 +11,7 @@ import {
   updateSolicitud,
   deleteSolicitud,
   cambiarEstadoSolicitud,
+  getSolicitudesPorResponsable
 } from "../controllers/solicitud.controller.js";
 
 const router = express.Router();
@@ -28,6 +29,7 @@ router.post('/nueva_solicitud', jwtCheck, createSolicitud);
 router.put('/editar_solicitud/:id', jwtCheck, updateSolicitud);
 router.delete('/eliminar_solicitud/:id', jwtCheck, deleteSolicitud);
 router.post('/cambiar_estado_solicitud', jwtCheck, cambiarEstadoSolicitud);
+router.get('/get_solicitudes_por_responsable', jwtCheck, getSolicitudesPorResponsable);
 
 
 export default router;

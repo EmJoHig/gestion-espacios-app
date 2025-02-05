@@ -75,15 +75,15 @@ app.use((req, res, next) => {
 
 // routes
 // app.use(usuarioRoutes);
-app.use("/usuarios", usuarioRoutes);
-app.use("/ministerio", ministerioRoutes);
-app.use("/rol", rolRoutes);
-app.use("/estado", estadoRoutes);
-app.use("/recurso", recursoRoutes);
-app.use("/actividad", actividadRoutes);
-app.use("/espacio", espacioRoutes);
-app.use("/reserva", reservaRoutes);
-app.use("/solicitud", solicitudRoutes);
+app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/ministerio", ministerioRoutes);
+app.use("/api/rol", rolRoutes);
+app.use("/api/estado", estadoRoutes);
+app.use("/api/recurso", recursoRoutes);
+app.use("/api/actividad", actividadRoutes);
+app.use("/api/espacio", espacioRoutes);
+app.use("/api/reserva", reservaRoutes);
+app.use("/api/solicitud", solicitudRoutes);
 
 // static files
 app.use(express.static(join(__dirname, "public")));

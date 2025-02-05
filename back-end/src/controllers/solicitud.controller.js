@@ -232,3 +232,53 @@ export const cambiarEstadoSolicitud = async (req, res) => {
         res.status(500).json({ message: 'Ha ocurrido un error al cambiar estado de solicitud ' });
     }
 };
+
+
+
+
+// BUSQUEDA SOLICITUDES POR RESPONSABLE
+export const getSolicitudesPorResponsable = async (req, res) => {
+    try {
+
+        const { idMinistDeResponsable, espacioId, fechaInicio } = req.query;
+
+
+        const whereClause = {};
+
+        if (idMinistDeResponsable) whereClause.ministerioId = idMinistDeResponsable;
+
+        if (espacioId) whereClause.espacioId = espacioId;
+        if (fechaInicio) {
+            whereClause[Op.and] = [
+                Sequelize.where(
+                    Sequelize.fn('DATE', Sequelize.col('fechaInicio')),
+                    '=',
+                    fechaInicio
+                ),
+            ];
+        }
+
+
+        const solicitudes = await Solicitud.findAll({
+            where: whereClause, // Filtros dinámicos
+            // where: { ministerioId: idMinistDeResponsable },
+            include: [
+                { model: Ministerio, as: 'ministerio' },
+                { model: Espacio, as: 'espacio' },
+                { model: Actividad, as: 'actividad' },
+                { model: EstadoSolicitud, as: 'estadoSolicitud' },
+            ],
+            order: [['fechaInicio', 'DESC']]
+        });
+
+        if (solicitudes === null) {
+            return res.status(400).json({ message: 'No se pudo obtener las solicitudes responsable' });
+        } else {
+            return res.status(200).json(solicitudes);
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Ha ocurrido un error al obtener las solicitudes del responsable' });
+    }
+};
