@@ -329,8 +329,8 @@ export function HomePage() {
 
         const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
         if (!res.success) {
-          setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
-          openSnackBar('No se pudo crear la RESERVA. Intente nuevamente.', 'error');
+          //setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
+          openSnackBar(res.message, 'error');
         } else {
           openSnackBar('Se creó la RESERVA con exito.', 'success');
           await getReservas(); // Refrescar las reservas después de guardar

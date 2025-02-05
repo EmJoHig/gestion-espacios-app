@@ -10,7 +10,8 @@ export default defineConfig({
       cert: fs.readFileSync('cert.pem'),
     }, */
     host: '0.0.0.0', // Permite que el servidor escuche en todas las interfaces
-    port: 5173,      // El puerto puede ser cambiado si es necesario
+    port: 5173,
+    allowedHosts: ["ge.patriciorodriguez.com.ar"],      // El puerto puede ser cambiado si es necesario
   },
   plugins: [react()],
 })
