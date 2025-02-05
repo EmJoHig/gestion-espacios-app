@@ -43,6 +43,7 @@ export function ReservaProvider({ children }) {
       });
       const res = await getReservaRequest(token, id);
       setReserva(res);
+      return res;
     } catch (error) {
       console.error('Error fetching reservas:', error);
     }

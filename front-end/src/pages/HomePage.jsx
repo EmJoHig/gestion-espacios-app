@@ -69,6 +69,7 @@ export function HomePage() {
   const [ rolUsuarioBD, setRolUsuarioBD ] = useState("");
   const [ minUsuario, setMinUsuario ] = useState("");
   const [modulosFiltrados, setModulosFiltrados] = useState([]);
+  const [ minSelect, setMinSelect ] = useState("");
 
 
 
@@ -214,6 +215,7 @@ export function HomePage() {
 
   useEffect(() => {
     setSelectedDate(reserva)
+    setMinSelect(reserva.ministerioId)
   }, [reserva]);
 
 
@@ -393,15 +395,20 @@ export function HomePage() {
     }
   };
 
-  const handleEventClick = (info) => {
+  const handleEventClick = async (info) => {
     console.log("handleEventClick rolUsuarioBD: ", rolUsuarioBD); 
 
     const selectedReserva = reservas.find((res) => res.id === parseInt(info.event.id));
-    getReserva(parseInt(info.event.id));
+    console.log(":",reservas.find((res) => res.id === parseInt(info.event.id)))
+    const reservaSelect = await getReserva(parseInt(info.event.id));
     if (selectedReserva) {
-      setSelectedDate(selectedReserva);
-      setIsEditing(true);
-      setOpenDialog(true);
+      if(reservaSelect.ministerioId == minUsuario || rolUsuarioBD == "ADMIN"){
+        setSelectedDate(selectedReserva);
+        setIsEditing(true);
+        setOpenDialog(true);
+        } else{
+          openSnackBar('No se pudo editar reservas de otros Ministerios.', 'error');
+        }
     }
   };
 
