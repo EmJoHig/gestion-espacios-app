@@ -123,7 +123,7 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
       )}
       <DialogContent>
         {/* Selector de Ministerios */}
-        <FormControl fullWidth margin="normal" disabled={!!selectedMinisterio || isEditing && !editable} variant="outlined">
+        <FormControl fullWidth margin="normal" disabled={(rolUsuarioBD != 'ADMIN' && !!selectedMinisterio) || (isEditing && !editable)} variant="outlined">
           <InputLabel id="ministerio-label">Ministerio</InputLabel>
           <Select
             labelId="ministerio-label"
