@@ -67,6 +67,7 @@ export function HomePage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [ rolUsuarioBD, setRolUsuarioBD ] = useState("");
+  const [ minUsuario, setMinUsuario ] = useState("");
   const [modulosFiltrados, setModulosFiltrados] = useState([]);
 
 
@@ -173,6 +174,8 @@ export function HomePage() {
         try {
           const usuario = await getUserByIdAUTH0(id);
           console.log("usuario: ", usuario);
+          console.log("userMin: ",usuario.ministerioId)
+          setMinUsuario(usuario.ministerioId);
 
           const rolUserBD = usuario?.rol?.name || "";
           setRolUsuarioBD(rolUserBD);
@@ -268,7 +271,7 @@ export function HomePage() {
     const reserva = {
       id: null, // Puedes asignar null si es una nueva reserva
       espacioId: null, // Define el espacioId según tu lógica
-      ministerioId: null, // Define el ministerioId según tu lógica
+      ministerioId: minUsuario, // Define el ministerioId según tu lógica
       actividadId: null, // Define la actividadId según tu lógica
       fechaInicio: fechaInicio.toISOString(), // Convertir a formato ISO
       fechaFin: fechaFin.toISOString(), // Convertir a formato ISO
@@ -325,7 +328,7 @@ export function HomePage() {
       const respGetEspacio = await getEspacio(nuevaReserva.espacioId);
 
       // SI EL ESPACIO ES DE TIPO AULA, CREO DIRECTO LA RESERVA
-      if (respGetEspacio && respGetEspacio.tipoEspacio.nombre === "AULA") {
+      if (respGetEspacio && respGetEspacio.tipoEspacio.nombre === "AULA" || rolUsuarioBD == "ADMIN") {
 
         const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
         if (!res.success) {
@@ -364,17 +367,27 @@ export function HomePage() {
 
   const handleUpdateReserva = async (reservaData) => {
     try {
+      const respGetEspacio = await getEspacio(reservaData.espacioId);
+
+      if (respGetEspacio && respGetEspacio.tipoEspacio.nombre === "AULA" || rolUsuarioBD == "ADMIN") {
+
+
       // console.log("reservaData: ", reservaData)
       const updatedReserva = buildReservaObject(reservaData);
       //console.log("aca: ",updateReserva)
       const res = await updateReserva(updatedReserva); // Suponiendo que tienes una función updateReserva
-      // console.log("res", res)
+      console.log("res", res)
       if (!res.success) {
-        setErrorMessage(res.message || "No se pudo actualizar la reserva. Intente nuevamente.");
+        openSnackBar('No se pudo actualizar la reserva. Intente nuevamente', 'error');
       } else {
+        openSnackBar('Se actualizo la RESERVA con exito.', 'success');
         await getReservas(); // Refrescar las reservas
         setOpenDialog(false); // Cerrar el diálogo
+
       }
+    } else {
+      openSnackBar('No se puede actualizar por un espacio que no sea Aula', 'error');
+    }
     } catch (error) {
       console.error('Error al actualizar la reserva:', error);
     }
