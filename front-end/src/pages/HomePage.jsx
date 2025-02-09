@@ -71,6 +71,7 @@ export function HomePage() {
   const [modulosFiltrados, setModulosFiltrados] = useState([]);
   const [ minSelect, setMinSelect ] = useState("");
 
+  const [dialogOrigin, setDialogOrigin] = useState(null); // 'C' (calendario)' , 'B' (boton)
 
 
   //snackbar
@@ -153,6 +154,7 @@ export function HomePage() {
 
   // modulos
   const modulos = [
+    { codigo: "1", descripcion: "RESERVAS", ruta: "/reservas", rolesPermitidos: ["ADMIN"] },
     { codigo: "3", descripcion: "ESPACIOS", ruta: "/espacio", rolesPermitidos: ["ADMIN"] },
     { codigo: "4", descripcion: "RECURSOS", ruta: "/recurso", rolesPermitidos: ["ADMIN"] },
     { codigo: "5", descripcion: "SOLICITUDES DE RESERVA", ruta: "/solicitudes-reservas", rolesPermitidos: ["ADMIN", "RESPONSABLE"] },
@@ -165,7 +167,7 @@ export function HomePage() {
 
   useEffect(() => {
     getEspacios();
-    getActividades();
+    // getActividades();
     getMinisterios();
     getReservas();
 
@@ -175,7 +177,7 @@ export function HomePage() {
         try {
           const usuario = await getUserByIdAUTH0(id);
           console.log("usuario: ", usuario);
-          console.log("userMin: ",usuario.ministerioId)
+          // console.log("userMin: ",usuario.ministerioId)
           setMinUsuario(usuario.ministerioId);
 
           const rolUserBD = usuario?.rol?.name || "";
@@ -189,6 +191,9 @@ export function HomePage() {
             }
             return true;
           }));
+
+          // gets
+          await getActividades();
 
         } catch (error) {
           console.error("Error fetching tipos de espacio:", error);
@@ -263,6 +268,7 @@ export function HomePage() {
 
 
   const handleDateClick = (info) => {
+    setDialogOrigin('C');
     const fechaInicio = new Date(info.date); // Crear una nueva fecha basada en info.date
     fechaInicio.setHours(10, 0, 0, 0); // Ajustar el horario a 12:00 AM
 
@@ -426,6 +432,8 @@ export function HomePage() {
           isEditing={isEditing}
           errorMessage={errorMessage}
           rolUsuarioBD={rolUsuarioBD}
+          dialogOrigin={dialogOrigin}
+          ministerioUser = {minUsuario}
         />
         <Box sx={{ flexGrow: 1, margin: "20px 0" }}>
           <Grid container spacing={2}>
@@ -512,10 +520,30 @@ export function HomePage() {
           </Alert>
         </Snackbar>
       </Container>
-        <Fab sx={fabStyle} aria-label='Add' color={'primary'} variant="extended" onClick={() => setOpenDialog(true)}>
+
+      {
+          (rolUsuarioBD !== "CONSULTA") && (
+            <Fab
+              color={'primary'}
+              aria-label='Add'
+              variant="extended"
+              sx={fabStyle}
+              // onClick={() => setOpenDialog(true)}
+              onClick={() => {
+                setDialogOrigin('B');
+                setOpenDialog(true);
+              }}
+            >
+              <AddIcon />
+              NUEVA RESERVA
+            </Fab>
+          )
+        }
+
+        {/* <Fab sx={fabStyle} aria-label='Add' color={'primary'} variant="extended" onClick={() => setOpenDialog(true)}>
                     <AddIcon />
                     NUEVA RESERVA
-        </Fab>
+        </Fab> */}
     </>
   );
 }

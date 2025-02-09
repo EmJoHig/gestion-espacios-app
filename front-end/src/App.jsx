@@ -86,6 +86,7 @@ function App() {
                             <Route path="/asociar-actividades" element={<AsociarActMinisterioPage />} />
                             <Route path="/usuarios" element={<UsuarioPage />} />
                             <Route path="/espacio" element={<EspacioPage />} />
+                            <Route path="/reservas" element={<ReservasPage />} /> 
                           </Route>
 
                           <Route element={<ProtectedRoute allowedRoles={["ADMIN", "CONSULTA", "RESPONSABLE"]} />}>

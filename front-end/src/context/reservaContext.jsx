@@ -6,6 +6,8 @@ import {
   createReservaRequest,
   updateReservaRequest,
   deleteReservaRequest,
+  getReservasFilterRequest,
+  bajaReservaRequest
 } from "../api/reserva.js";
 
 const ReservaContext = createContext();
@@ -20,11 +22,12 @@ export function ReservaProvider({ children }) {
   const [reservas, setReservas] = useState([]);
   const { getAccessTokenSilently } = useAuth0();
   const [reserva, setReserva] = useState([]);
+  const [loading, setLoading] = useState(false);
 
 
   const getReservas = async () => {
     try {
-      
+
       const token = await getAccessTokenSilently({
         audience: 'https://gestion-espacios/api',
       });
@@ -37,7 +40,7 @@ export function ReservaProvider({ children }) {
 
   const getReserva = async (id) => {
     try {
-      
+
       const token = await getAccessTokenSilently({
         audience: 'https://gestion-espacios/api',
       });
@@ -68,10 +71,10 @@ export function ReservaProvider({ children }) {
     console.log("reserva: ", reserva)
     try {
       const res = await updateReservaRequest(reserva);
-      console.log("context: ",res)
+      console.log("context: ", res)
       return res
     } catch (error) {
-      console.error("er",error);
+      console.error("er", error);
       return error
     }
   };
@@ -89,16 +92,76 @@ export function ReservaProvider({ children }) {
   };
 
 
+
+  const getReservasFilter = async (filtros) => {
+
+    try {
+
+      setLoading(true);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await getReservasFilterRequest(token, filtros);
+
+      if (res.status === 200) {
+        // setSolicitudes(res.data);
+        return res.data;
+      } else {
+        // setSolicitudes([]);
+        return null;
+      }
+
+    } catch (error) {
+      console.error('Error fetching solicitudes:', error);
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+
+
+  const bajaReserva = async (body) => {
+    try {
+
+      setLoading(true);
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await bajaReservaRequest(token, body);
+
+      if (res.status === 200) {
+        return "";
+      } else {
+        return "Hubo un error al dar de baja la reserva";
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+
+
+
   return (
     <ReservaContext.Provider
       value={{
         reservas,
         reserva,
+        loading,
         getReservas,
         getReserva,
         createReserva,
         updateReserva,
         deleteReserva,
+        getReservasFilter,
+        bajaReserva
       }}
     >
       {children}

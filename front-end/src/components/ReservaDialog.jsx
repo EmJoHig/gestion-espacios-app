@@ -20,7 +20,7 @@ import dayjs from 'dayjs';
 import { Close } from '@mui/icons-material';
 
 
-export default function ReservaDialog({ open, onClose, onSave, ministerios, actividades, espacios, selectedDate, errorMessage, isEditing, rolUsuarioBD }) {
+export default function ReservaDialog({ open, onClose, onSave, ministerios, actividades, espacios, selectedDate, errorMessage, isEditing, rolUsuarioBD, dialogOrigin, ministerioUser }) {
   // Estados para los selectores
   const [selectedMinisterio, setSelectedMinisterio] = useState('');
   const [selectedActividad, setSelectedActividad] = useState('');
@@ -30,6 +30,16 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
   const [fechaHoraFin, setFechaHoraFin] = useState(null);
   const [editable, setEditable] = useState(false); // Controla si los campos están habilitados
 
+
+  useEffect(() => {
+    if (!isEditing && dialogOrigin === "B" && rolUsuarioBD === "RESPONSABLE") {
+      console.log("entra")
+      setSelectedMinisterio(ministerioUser || "");
+      const actividadesRelacionadas = actividades.filter((actividad) => actividad.ministerioId === ministerioUser);
+      setActividadesFiltradas(actividadesRelacionadas);
+      setSelectedActividad('');
+    }
+  }, [open]);
 
   useEffect(() => {
     if (selectedDate) {

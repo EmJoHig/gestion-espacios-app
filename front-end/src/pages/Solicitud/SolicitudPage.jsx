@@ -43,6 +43,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 export function SolicitudPage() {
 
@@ -98,7 +99,8 @@ export function SolicitudPage() {
 
     const filtros = {
         espacioId: espacioSelect || "", // Agregar solo si tiene valor
-        fechaInicio: valueFecha ? valueFecha.toISOString() : "", // Agregar solo si tiene valor
+        fechaInicio: valueFecha && dayjs(valueFecha).isValid() ? dayjs(valueFecha).format('YYYY-MM-DD') : "",
+        // fechaInicio: valueFecha ? valueFecha.toISOString() : "", // Agregar solo si tiene valor
     };
 
 

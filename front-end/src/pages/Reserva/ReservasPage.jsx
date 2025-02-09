@@ -20,116 +20,170 @@ import Button from '@mui/material/Button';
 import TablaGenerica from '../../components/TablaGenerica';
 import MonthlyCalendar from '../../components/MonthlyCalendar';
 import TextField from '@mui/material/TextField';
-//dialog
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-
-//dialog
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
-import dayjs from "dayjs";
-
-
-
-
-// import TablaSolictudes from './TablaSolicitudes.jsx';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Container from '@mui/material/Container';
+import TablaReservas from './TablaReservas.jsx';
+import { useAuth0 } from "@auth0/auth0-react";
 
 // importo el conetxt de usuario para llamar a la api
-import { useUsuario } from "../../context/usuarioContext.jsx";
-import { useMinisterio } from "../../context/ministerioContext.jsx";
-import { useActividad } from "../../context/actividadContext.jsx";
-import { useEspacio } from '../../context/espacioContext';
-import { useReserva } from '../../context/reservaContext.jsx';
+import { useReserva } from "../../context/reservaContext.jsx";
+import { useEspacio } from "../../context/espacioContext.jsx";
+// import { useUsuario } from "../../context/usuarioContext.jsx";
 
 //picker
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 export function ReservasPage() {
-    const { usuarios, getUsuarios } = useUsuario();
-    const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
-    const { actividades, getActividades } = useActividad();
+
+    // const { user } = useAuth0();
+
+    const { loading, getReservasFilter, bajaReserva } = useReserva();
+
+    const [listReservasFilter, setListReservasFilter] = useState([]);
+
     const { espacios, getEspacios } = useEspacio();
-    const { reservas, getReservas, createReserva } = useReserva();
 
-    // Estados para los selectores
-    const [selectedMinisterio, setSelectedMinisterio] = useState('');
-    const [selectedActividad, setSelectedActividad] = useState('');
-    const [actividadesFiltradas, setActividadesFiltradas] = useState([]);
-    const [selectedEspacio, setSelectedEspacio] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    // const { getUserByIdAUTH0 } = useUsuario();
 
+    const [cleared, setCleared] = useState(false);
 
+    const [espacioSelect, setEspacioSelect] = React.useState('');
 
     const [valueFecha, setValueFecha] = useState(null);
-    const [horaInicio, setHoraInicio] = useState(null);
-    const [horaFin, setHoraFin] = useState(null);
+
+    // const [isAdmin, setIsAdmin] = useState(false);
+
+    // const [usuarioBD, setUsuarioBD] = useState(null);
+
+    // const bodyGetreservasPorResp = {
+    //     idMinistDeResponsable: null,
+    //     espacioId: null,
+    //     fechaInicio: null,
+    // };
 
     const navigate = useNavigate();
 
-    // cuando inicia la pantalla se ejecuta 
-    // Obtener datos cuando se carga el componente
+    //snackbar
+    const [snackBarState, setSnackBarState] = React.useState({
+        open: false,
+        message: '',
+        severity: 'success', // Puede ser 'success', 'error', 'info', 'warning'
+    });
+    const openSnackBar = (message, severity) => {
+        setSnackBarState({
+            open: true,
+            message,
+            severity,
+        });
+    };
+    const closeSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackBarState({ ...snackBarState, open: false });
+    };
+    //snackbar
+
+
+    const filtros = {
+        espacioId: espacioSelect || "", // Agregar solo si tiene valor
+        // fechaInicio: valueFecha ? valueFecha.toISOString() : "", // Agregar solo si tiene valor
+        fechaInicio: valueFecha && dayjs(valueFecha).isValid() ? dayjs(valueFecha).format('YYYY-MM-DD') : "",
+    };
+
+
+    // useEffect(() => {
+        
+    // }, []);
+
     useEffect(() => {
-        const fetchData = async () => {
-            await getMinisterios(); // Llama a la API y actualiza el contexto
-            await getActividades(); // Llama a la API y actualiza el contexto
-            await getEspacios();
+        const checkAccess = async () => {
+            try {
+                
+                await getEspacios();
+                const resp = await getReservasFilter(filtros);
+                setListReservasFilter(resp);
+
+            } catch (error) {
+                console.error("Error fetching user role:", error);
+            }
         };
-        fetchData();
+        checkAccess();
     }, []);
-      
 
-    const handleEspacioChange = (event) => {
-        setSelectedEspacio(event.target.value);
+
+    //cleared date picker
+    useEffect(() => {
+        if (cleared) {
+            const timeout = setTimeout(() => {
+                setCleared(false);
+            }, 1500);
+            return () => clearTimeout(timeout);
+        }
+        return () => { };
+    }, [cleared]);
+
+
+    const ChangeSelectEspacio = (event) => {
+        setEspacioSelect(event.target.value);
     };
 
 
-    // Manejar el cambio en el selector de ministerios
-    const handleMinisterioChange = (event) => {
-        const selectedId = event.target.value;
-        console.log("aca: ", selectedId)
-        setSelectedMinisterio(selectedId);
-        // Filtrar actividades relacionadas con el ministerio seleccionado
-        const actividadesRelacionadas = actividades.filter((actividad) => actividad.ministerioId === selectedId);
-        setActividadesFiltradas(actividadesRelacionadas);
-        setSelectedActividad(''); // Reiniciar actividad seleccionada
-        console.log("act: ",actividadesRelacionadas)
-    };
+    const columnas = [
+        {
+            id: 'espacio',
+            numeric: false,
+            disablePadding: true,
+            label: 'Espacio',
+        },
+        {
+            id: 'ministerio',
+            numeric: true,
+            disablePadding: false,
+            label: 'Ministerio',
+        },
+        {
+            id: 'actividad',
+            numeric: false,
+            disablePadding: true,
+            label: 'Actividad',
+        },
+        {
+            id: 'fechaInicio',
+            numeric: true,
+            disablePadding: false,
+            label: 'Fecha Inicio',
+        },
+        {
+            id: 'fechaFin',
+            numeric: true,
+            disablePadding: false,
+            label: 'Fecha Fin',
+        },
+        {
+            id: 'fechaBaja',
+            numeric: true,
+            disablePadding: false,
+            label: 'Fecha Baja',
+        },
+    ];
 
-    // Manejar el cambio en el selector de actividades
-    const handleActividadChange = (event) => {
-        setSelectedActividad(event.target.value);
-    };
-
-    console.log("min: ", selectedMinisterio)
-    console.log("act: ", selectedActividad)
-    console.log("esp: ", selectedEspacio)
-    console.log("fecha", valueFecha)
-    console.log("horaInicio", horaInicio)
-    console.log("fechaFin", horaFin)
-
-    const fabStyle = {
-        position: 'absolute',
-        bottom: 16,
-        right: 16,
-    };
 
 
-
-
-    // DIALOG RESERVA METODOS
     const [open, setOpen] = React.useState(false);
 
-    const handleAbrirDialog = () => {
+    const handleClickOpen = () => {
         setOpen(true);
     };
 
@@ -137,270 +191,185 @@ export function ReservasPage() {
         setOpen(false);
     };
 
-/*     const handleGuardarSolicitud = () => {
-        setOpen(false);
-    }; */
 
-    
+    const handleBuscar = async () => {
 
-    const buildReservaObject = () => {
-        if (!valueFecha || !horaInicio || !horaFin || !selectedEspacio || !selectedMinisterio || !selectedActividad) {
-            console.error("Faltan datos para construir la reserva");
-            return;
+        try {
+            filtros.espacioId = espacioSelect;
+            filtros.fechaInicio = valueFecha ? valueFecha.format('YYYY-MM-DD') : "";
+
+            const resp = await getReservasFilter(filtros);
+            setListReservasFilter(resp);
+
+            // if (isAdmin) {
+            //     await getreservasFilter(filtros);
+            // } else {
+            //     if (usuarioBD !== null) {
+                    
+            //         bodyGetreservasPorResp.idMinistDeResponsable = usuarioBD.ministerioId;
+            //         bodyGetreservasPorResp.espacioId = espacioSelect;
+            //         bodyGetreservasPorResp.fechaInicio = valueFecha ? valueFecha.format('YYYY-MM-DD') : "";
+
+            //         await getreservasPorResponsable(bodyGetreservasPorResp);
+            //     }
+            // }
+        } catch (error) {
+            openSnackBar('Error al obtener reservas.', 'error');
         }
-    
-        const fechaInicio = dayjs(valueFecha.$d)
-            .hour(horaInicio.$H)
-            .minute(horaInicio.$m)
-            .second(horaInicio.$s)
-            .toISOString(); // Convierte a formato ISO
-    
-        const fechaFin = dayjs(valueFecha.$d)
-            .hour(horaFin.$H)
-            .minute(horaFin.$m)
-            .second(horaFin.$s)
-            .toISOString(); // Convierte a formato ISO
-    
-        const reserva = {
-            espacioId: selectedEspacio,
-            ministerioId: selectedMinisterio,
-            actividadId: selectedActividad,
-            fechaInicio,
-            fechaFin,
-        };
-    
-        console.log("Reserva construida:", reserva);
-        return reserva;
+
     };
 
-    const handleGuardarSolicitud = async () => {
-        const nuevaReserva = buildReservaObject();
-    
-        if (nuevaReserva) {
-            try {
-                const result = await createReserva(nuevaReserva);
-                console.log("ResrvPag",result)
-                if (!result.success) {
-                    setErrorMessage(result.message || "No se pudo crear la reserva. Intente nuevamente.");
-                } else {
-                    setErrorMessage(""); // Limpia cualquier mensaje previo
-                    setOpen(false); // Cierra el diálogo si la operación fue exitosa
-                }
-            } catch (error) {
-                console.error("Error al crear la reserva:", error);
-                setErrorMessage("Ocurrió un error inesperado. Intente nuevamente.");
+
+    const onReservasSelected = async (reserva) => {
+        try {
+
+            const bodyDarBaja = {
+                idReserva: reserva[0],
+            };
+
+            const resp = await bajaReserva(bodyDarBaja);
+            console.log("resp: ", resp);
+            if (resp == "") {
+                
+                openSnackBar('La reserva se dio de baja con éxito.', 'success');
+                    
+            } else {
+                openSnackBar('Error al dar de baja la reserva.', 'error');
             }
-        } else {
-            setErrorMessage("Por favor complete todos los campos.");
+
+            filtros.espacioId = espacioSelect;
+            filtros.fechaInicio = valueFecha ? valueFecha.format('YYYY-MM-DD') : "";
+
+            const list = await getReservasFilter(filtros);
+            setListReservasFilter(list);
+
+        } catch (error) {
+            openSnackBar('Error al dar de baja la reserva.', 'error');
         }
     };
-    
 
 
 
     return (
         <>
-            {/* DIALOG RESEEVA  */}
+            <Container fixed>
+                <Box sx={{ marginTop: '50px' }}>
+                    <Typography gutterBottom variant="h5" component="div">
+                        Modulo de Reservas
+                    </Typography>
 
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                PaperProps={{
-                    component: 'form',
-                    onSubmit: (event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const formJson = Object.fromEntries(formData.entries());
-                        const { startDate, endDate, observation, days } = formJson;
-                        console.log('Start Date:', startDate);
-                        console.log('End Date:', endDate);
-                        console.log('Selected Days:', days);
-                        console.log('Observation:', observation);
-                        handleClose();
-                    },
-                }}
-            >
-                <DialogTitle>Nueva Solicitud de Reserva</DialogTitle>
-                <DialogContent>
-                    {errorMessage && (
-                        <Typography color="error" variant="body2" style={{ marginBottom: '10px' }}>
-                            {errorMessage}
-                        </Typography>
-                    )}
-                    <DialogContentText>
-                        Selecciona un ministerio y una actividad para la nueva reserva.
-                    </DialogContentText>
+                    <Button style={{ marginTop: '10px', marginBottom: '10px' }} variant="contained" onClick={() => navigate("/home")}>
+                        HOME
+                    </Button>
 
-                    {/* Selector de Ministerios */}
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel id="ministerio-label">Ministerio</InputLabel>
-                        <Select
-                            labelId="ministerio-label"
-                            value={selectedMinisterio}
-                            onChange={handleMinisterioChange}
-                        >
-                            {ministerios.map((ministerio) => (
-                                <MenuItem key={ministerio.id} value={ministerio.id}>
-                                    {ministerio.codigo} - {ministerio.descripcion}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    <Box sx={{ width: '100%', marginTop: '50px' }}>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} sm={6} md={4} lg={4}>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    Espacio
+                                </Typography>
+                                <FormControl sx={{ width: '100%', marginTop: 3 }} variant="standard">
+                                    <Select
+                                        value={espacioSelect}
+                                        onChange={ChangeSelectEspacio}
+                                        displayEmpty
+                                        inputProps={{ 'aria-label': 'Without label' }}
+                                    >
+                                        <MenuItem value="">
+                                            <em>TODOS</em>
+                                        </MenuItem>
+                                        {
+                                            espacios.map((espacio) => (
+                                                <MenuItem key={espacio.id} value={espacio.id}>{espacio.nombre}</MenuItem>
+                                            ))
+                                        }
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-                    {/* Selector de Actividades */}
-                    <FormControl fullWidth margin="normal" disabled={!selectedMinisterio}>
-                        <InputLabel id="actividad-label">Actividad</InputLabel>
-                        <Select
-                            labelId="actividad-label"
-                            value={selectedActividad}
-                            onChange={handleActividadChange}
-                        >
-                            {actividadesFiltradas.map((actividad) => (
-                                <MenuItem key={actividad.id} value={actividad.id}>
-                                    {actividad.nombre}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-
-                    {/* Selector de Espacios */}
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel id="espacio-label">Espacio</InputLabel>
-                        <Select
-                            labelId="espacio-label"
-                            value={selectedEspacio}
-                            onChange={handleEspacioChange}
-                        >
-                            {espacios.map((espacio) => (
-                                <MenuItem key={espacio.id} value={espacio.id}>
-                                    {espacio.nombre}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-
-                    <DialogContentText>
-                        {/* Please enter the start and end dates, select the days, and add any observations. */}
-                    </DialogContentText>
-
-                    <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-                        <Grid item xs={6}>
-                            <div>
-                                <Typography gutterBottom variant="h6" component="div">
-                                    Día de Reserva
+                            <Grid item xs={12} sm={6} md={4} lg={3}>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    Fecha Inicio
                                 </Typography>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DemoContainer components={['DatePicker']}>
-                                        <DatePicker 
-                                            label="Seleccionar Día" 
-                                            value={valueFecha} 
-                                            onChange={(newValue) => setValueFecha(newValue)} 
-                                        />
-                                    </DemoContainer>
+                                    {/* <DemoContainer components={['DatePicker']}> */}
+                                    <DatePicker
+                                        slotProps={{
+                                            field: { clearable: true, onClear: () => setCleared(true) },
+                                        }}
+                                        value={valueFecha}
+                                        onChange={(newValue) => setValueFecha(newValue)}
+                                    />
+                                    {/* </DemoContainer> */}
                                 </LocalizationProvider>
-                            </div>
+                            </Grid>
                         </Grid>
-
-                        <Grid item xs={6}>
-                            <div>
-                                <Typography gutterBottom variant="h6" component="div">
-                                    Hora Inicio
-                                </Typography>
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DemoContainer components={['TimePicker']}>
-                                        <TimePicker 
-                                            label="Hora Inicio" 
-                                            value={horaInicio} 
-                                            onChange={(newValue) => {
-                                                setHoraInicio(newValue);
-                                                // Ajusta automáticamente la hora de fin
-                                                setHoraFin(newValue?.add(1, 'hour'));
-                                            }} 
-                                        />
-                                    </DemoContainer>
-                                </LocalizationProvider>
-                            </div>
-                        </Grid>
-
-                        <Grid item xs={6} style={{ marginTop: '20px' }}>
-                            <div>
-                                <Typography gutterBottom variant="h6" component="div">
-                                    Hora Fin
-                                </Typography>
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DemoContainer components={['TimePicker']}>
-                                        <TimePicker 
-                                            label="Hora Fin" 
-                                            value={horaFin} 
-                                            onChange={(newValue) => setHoraFin(newValue)} 
-                                        />
-                                    </DemoContainer>
-                                </LocalizationProvider>
-                            </div>
-                        </Grid>
-                    </Grid>
-
-{/*                     <Grid container rowSpacing={1} style={{ marginTop: '20px' }}>
-                        <Grid item xs={6}>
-                            <Typography gutterBottom variant="h6" component="div">
-                                Periodicidad
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                            {['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'].map((day) => (
-                                <FormControlLabel
-                                    key={day}
-                                    control={<Checkbox name="days" value={day.toLowerCase()} />}
-                                    label={day}
-                                />
-                            ))}
-                        </Grid>
-                    </Grid> */}
-
-{/*                     <TextField
-                        margin="dense"
-                        id="observacion"
-                        name="observacion"
-                        label="Observacion"
-                        type="text"
-                        fullWidth
-                        variant="standard"
-                    /> */}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancelar</Button>
-                    <Button onClick={handleGuardarSolicitud}>Guardar</Button>
-                </DialogActions>
-            </Dialog>
+                        <Button
+                            style={{ marginTop: '40px', marginBottom: '80px' }}
+                            variant="contained"
+                            onClick={handleBuscar}
+                        >
+                            BUSCAR RESERVAS
+                        </Button>
+                    </Box>
 
 
-            {/* FIN DIALOG RESEEVA  */}
+                    {
+                        loading ? (
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    // height: '100vh'
+                                }}
+                            >
+                                <Card sx={{ padding: 2, boxShadow: 3, maxWidth: 400, textAlign: 'center' }}>
+                                    <CardContent>
+                                        <CircularProgress />
+                                        <Typography variant="h4" gutterBottom>
+                                            Buscando ...
+                                        </Typography>
 
-            <Box sx={{ marginTop: '50px' }}>
-                <Typography gutterBottom variant="h5" component="div">
-                    Modulo ABM RESERVAS
-                </Typography>
+                                        {/* <Typography variant="body2" color="text.secondary" sx={{ marginTop: 2 }}>
+                                        Por favor, espere mientras cargamos la información.
+                                    </Typography> */}
+                                    </CardContent>
+                                </Card>
+                            </Box>
+                        ) : listReservasFilter && listReservasFilter.length > 0 ? (
+                            <TablaReservas data={listReservasFilter} columnasTabla={columnas} onReservasSelected={onReservasSelected} />
+                        ) : (
+                            <Box sx={{ textAlign: 'center' }}>
+                                <Card sx={{ maxWidth: "100%" }}>
+                                    <CardActionArea>
+                                        <CardContent>
+                                            <Typography gutterBottom variant="h5" component="div">
+                                                No hay reservas
+                                            </Typography>
+                                        </CardContent>
+                                    </CardActionArea>
+                                </Card>
+                            </Box>
+                        )
+                    }
+                </Box>
 
-
-                <Button style={{ marginTop: '10px' }} variant="contained" onClick={() => navigate("/home")}>
-                    HOME
-                </Button>
-
-
-                <Typography gutterBottom variant="h4" component="div" style={{ marginTop: '50px' }}>
-                    componente CALENDARIO QUE MUESTRE LOS DIAS QUE HAY RESERVAS
-                </Typography>
-
-
-                {/* <MonthlyCalendar /> */}
-
-
-                
-            </Box>
-            <Fab sx={fabStyle} aria-label='Add' color={'primary'} variant="extended" onClick={handleAbrirDialog}>
-                    <AddIcon />
-                    NUEVA RESERVA
-                </Fab>
+                <Snackbar
+                    open={snackBarState.open}
+                    autoHideDuration={4000}
+                    onClose={closeSnackBar}
+                >
+                    <Alert
+                        onClose={closeSnackBar}
+                        severity={snackBarState.severity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {snackBarState.message}
+                    </Alert>
+                </Snackbar>
+            </Container>
         </>
     );
 }

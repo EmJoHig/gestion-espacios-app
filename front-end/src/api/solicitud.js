@@ -112,7 +112,7 @@ export const cambiarEstadoSolicitudRequest = async (token, body) => {
                 Authorization: `Bearer ${token}`,
             },
         });
-        await delay(2000);
+        // await delay(2000);
         return response;
     } catch (error) {
         console.error('Error cambiarEstadoSolicitudRequest: ', error);
