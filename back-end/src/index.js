@@ -42,7 +42,7 @@ async function main() {
     console.log("error en la conexion", error);
   }
 
-  app.listen(3000, () => {
+  app.listen(4000, () => {
     console.log("Servidor iniciado en el puerto 3000");
   });
 }

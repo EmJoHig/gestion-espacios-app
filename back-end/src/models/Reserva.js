@@ -49,6 +49,10 @@ Reserva.init({
     type: DataTypes.DATE,
     allowNull: false,
   },
+  fechaBaja: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 }, {
   sequelize: db2,
   modelName: 'Reserva',

@@ -8,7 +8,9 @@ import {
   getReservaById,
   createReserva,
   updateReserva,
-  deleteReserva
+  deleteReserva,
+  getReservasFilter,
+  bajaReserva,
 } from "../controllers/reserva.controller.js";
 
 const router = express.Router();
@@ -20,10 +22,13 @@ const jwtCheck = auth({
   });
 
 router.get('/get_reservas', getReservas);
+router.get('/get_reservas_filter', jwtCheck, getReservasFilter);
 router.get('/:id', getReservaById);
 router.post('/nueva_reserva', createReserva);
 router.put('/editar_reserva/:id', updateReserva);
 router.delete('/eliminar_reserva/:id', deleteReserva);
+
+router.post('/dar_baja_reserva', jwtCheck, bajaReserva);
 
 
 export default router;

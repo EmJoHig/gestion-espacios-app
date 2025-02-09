@@ -2,30 +2,30 @@ import Reserva from '../models/Reserva.js';
 import Espacio from '../models/Espacio.js';
 import Ministerio from '../models/Ministerio.js';
 import Actividad from "../models/Actividad.js";
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 Reserva.associate();
 
 
 export const getReservas = async (req, res) => {
     try {
         const reservas = await Reserva.findAll({
-          include: [
-            {
-              model: Espacio, // Asegúrate de tener el modelo de Espacio
-              attributes: ['nombre'], // Solo traer el nombre de espacio
-            },
-            {
-              model: Ministerio, // Asegúrate de tener el modelo de Ministerio
-              attributes: ['codigo'], // Solo traer el nombre del ministerio
-            },
-            {
-              model: Actividad, // Asegúrate de tener el modelo de Actividad
-              attributes: ['nombre'], // Solo traer el nombre de la actividad
-            },
-          ],
-          attributes: { exclude: ['espacioId', 'ministerioId', 'actividadId'] },
+            include: [
+                {
+                    model: Espacio, // Asegúrate de tener el modelo de Espacio
+                    attributes: ['nombre'], // Solo traer el nombre de espacio
+                },
+                {
+                    model: Ministerio, // Asegúrate de tener el modelo de Ministerio
+                    attributes: ['codigo'], // Solo traer el nombre del ministerio
+                },
+                {
+                    model: Actividad, // Asegúrate de tener el modelo de Actividad
+                    attributes: ['nombre'], // Solo traer el nombre de la actividad
+                },
+            ],
+            attributes: { exclude: ['espacioId', 'ministerioId', 'actividadId'] },
         });
-    
+
         const reservasFormateadas = reservas.map((reserva) => {
             return {
                 id: reserva.id,
@@ -35,13 +35,13 @@ export const getReservas = async (req, res) => {
                 Ministerio: reserva.Ministerio,
                 Actividad: reserva.Actividad,
             };
-          });
-      
-          res.json(reservasFormateadas); // Enviar las reservas sin los IDs
-        } catch (error) {
-          console.error('Error al obtener las reservas:', error);
-          res.status(500).send('Error al obtener las reservas');
-        }
+        });
+
+        res.json(reservasFormateadas); // Enviar las reservas sin los IDs
+    } catch (error) {
+        console.error('Error al obtener las reservas:', error);
+        res.status(500).send('Error al obtener las reservas');
+    }
 };
 
 export const getReservaById = async (req, res) => {
@@ -67,7 +67,7 @@ export const createReserva = async (req, res) => {
         // console.log(req.body);
         const { espacioId, ministerioId, actividadId, fechaInicio, fechaFin } = req.body;
 
-       // Verificar si ya existe una reserva para el mismo espacio en el rango de fechas
+        // Verificar si ya existe una reserva para el mismo espacio en el rango de fechas
         const reservasConflicto = await Reserva.findOne({
             where: {
                 espacioId: { [Op.ne]: espacioId }, // Excluir la reserva que se está actualizando
@@ -88,14 +88,14 @@ export const createReserva = async (req, res) => {
         if (reservasConflicto) {
             return res.status(400).json({ message: 'Ya existe una reserva para este espacio en el rango de fechas indicado.' });
         }
-       
-       
+
+
         // Crear el nuevo espacio
         const nuevaReserva = await Reserva.create({
-            espacioId, ministerioId,actividadId, fechaInicio, fechaFin
+            espacioId, ministerioId, actividadId, fechaInicio, fechaFin
         });
 
-       
+
         // Enviar una respuesta al cliente con el ministerio creado
         res.status(201).json(nuevaReserva);
     } catch (error) {
@@ -172,5 +172,83 @@ export const deleteReserva = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Ha ocurrido un error al eliminar la Reserva' });
+    }
+};
+
+
+// BUSQUEDA RESERVAS POR FILTROS
+export const getReservasFilter = async (req, res) => {
+    try {
+
+        const { espacioId, fechaInicio } = req.query;
+        const whereClause = {};
+
+        if (espacioId) whereClause.espacioId = espacioId;
+        if (fechaInicio) {
+            whereClause[Op.and] = [
+                Sequelize.where(
+                    Sequelize.fn('DATE', Sequelize.col('fechaInicio')),
+                    '=',
+                    fechaInicio
+                ),
+            ];
+        }
+
+        const reservas = await Reserva.findAll({
+            where: whereClause,
+            include: [
+                {
+                    model: Espacio,
+                    attributes: ['nombre'],
+                },
+                {
+                    model: Ministerio,
+                    attributes: ['descripcion'],
+                },
+                {
+                    model: Actividad,
+                    attributes: ['nombre'],
+                },
+            ],
+            attributes: { exclude: ['espacioId', 'ministerioId', 'actividadId'] },
+            order: [['fechaInicio', 'DESC']],
+        });
+
+        res.status(200).json(reservas);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Ha ocurrido un error al obtener las reservas' });
+    }
+};
+
+
+// DAR BAJA RESERVA
+export const bajaReserva = async (req, res) => {
+    try {
+
+        const { idReserva } = req.body;
+        const _reserva = await Reserva.findByPk(idReserva);
+
+        if (_reserva === null) {
+
+            return res.status(500).json({ message: 'Reserva no encontrada' });
+
+        } else {
+
+            const resp = await Reserva.update(
+                { fechaBaja: new Date() },
+                { where: { id: idReserva } }
+            );
+
+            if (resp && resp[0] >= 0) {
+                res.status(200).json({ message: 'La Reserva ha sido dada de baja' });
+            } else {
+                res.status(500).json({ message: 'Error al dar de baja la Reserva.' });
+            }
+        }
+    } catch (error) {
+        console.error('Error al dar de baja la Reserva :', error);
+        res.status(500).json({ message: 'Ha ocurrido un error al dar de baja la Reserva ' });
     }
 };
