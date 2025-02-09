@@ -6,9 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import FormularioEspacio from './FormularioEspacio';
 import { useEspacio, EspacioProvider } from '../../context/espacioContext';
 import { EstadoProvider } from "../../context/estadoContext";
+import { RecursoProvider } from '../../context/recursoContext';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import FormularioEditar from './FormularioEditar';
+import FormularioDetalleRecurso from './FormularioDetalleRecurso';
+import { useDetalleRecurso } from '../../context/detalleRecurso';
 
 // Datos de de columnas
 const columns = [
@@ -22,31 +25,22 @@ const columns = [
 export function EspacioPage() {
 
     const navigate = useNavigate();
+    const [openAddRecursoDialog, setOpenAddRecursoDialog] = useState(false); // Lo utilizo para abrir el dialogo con el formulario Crear.
     const [openCrearDialog, setOpenCrearDialog] = useState(false); // Lo utilizo para abrir el dialogo con el formulario Crear.
     const [openEditDialog, setOpenEditDialog] = useState(false); // Lo utilizo para abrir el dialogo con el formulario Editar.
     const [selectedEspacio, setSelectedEspacio] = useState(null); // Lo uso para buscar el espacio seleccionado a Editar.
-    const [listadoTipoEspacio, setListadoTipoEspacio] = useState([]);
 
-    const { espacios, getEspacios, createEspacio, updateEspacio, getTiposEspacio } = useEspacio(); // Variables y metodos del espacioContext.
-
+    const { espacios,tiposEspacios, getEspacios, createEspacio, updateEspacio,getTiposEspacio } = useEspacio(); // Variables y metodos del espacioContext.
+    const {createDetalleRecurso} = useDetalleRecurso();
 
     // useEffect es un hook que se usa para hacer llamada a APIs y se ejecuta una sola vez al renderizar el componenete.
     useEffect(() => {
         getEspacios(); // getEspacios es un metodo de espacioContext que hace la llamada a la api y guarda los datos obtenidos en espacios.
-        
-        const fetchTiposEspacio = async () => {
-            try {
-                const tiposEspacio = await getTiposEspacio(); // Esperar la respuesta de la API
-                setListadoTipoEspacio(tiposEspacio); // Guardar los datos en el estado
-            } catch (error) {
-                console.error("Error fetching tipos de espacio:", error);
-            }
-        };
-        fetchTiposEspacio();
-
     }, []);
 
-    
+    useEffect(() => {
+        getTiposEspacio(); // getEspacios es un metodo de espacioContext que hace la llamada a la api y guarda los datos obtenidos en espacios.
+    }, []);
 
     // Funcion que redirige al home.
     const backHome = () => {
@@ -74,7 +68,33 @@ export function EspacioPage() {
         setSnackBarState({ ...snackBarState, open: false });
     };
 
+    // Funcion que se ejecuta al clickear el boton asociar recurso, la orden viene de TablaEspacio.
+    const handleAddRecurso = (id) => {
+        const espacioSeleccionado = espacios.find((espacio) => espacio.id === id);
+        setSelectedEspacio(espacioSeleccionado); // Guarda el espacio seleccionado.
+        setOpenAddRecursoDialog(true); // Abre el diálogo-
+    };
 
+    const handleSaveAddRecurso = async (data) => {
+        try {
+          console.log("Detalles Recursos: ", data);
+      
+          // Si data es un array con un solo objeto, pasamos el primer objeto
+          const recurso = data.length === 1 ? data[0] : data;  // Si hay más de uno, enviamos el array completo
+      
+          const respCreate = await createDetalleRecurso(recurso);
+      
+          if (respCreate != "") {
+            openSnackBar('Recursos asociados con éxito.', 'success');
+            getEspacios(); // Muestro la tabla actualizada para que se vean los cambios en el ver espacio.
+          } else {
+            openSnackBar('Error al asociar recursos.', 'error');
+          }
+        } catch (error) {
+          console.error("Failed to create: ", error);
+        }
+      };
+      
     // Funcion que se ejecuta al apretar el boton guardar de crear Espacio-
     const handleSave = async (data) => {
         try {
@@ -102,6 +122,7 @@ export function EspacioPage() {
         setSelectedEspacio(espacioSeleccionado); // Guarda el espacio seleccionado.
         setOpenEditDialog(true); // Abre el diálogo-
     };
+    
 
     // Función para manejar el guardado de la edición.
     const handleSaveEdit = async (editedEspacio) => {
@@ -123,7 +144,8 @@ export function EspacioPage() {
 
 
     return (
-        <Box>
+        <Box sx={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
+
             {/* Título */}
             <Box mb={2} mt={2}>
                 <Typography className="title" variant="h3">Espacios</Typography>
@@ -138,12 +160,24 @@ export function EspacioPage() {
                     + Nuevo espacio
                 </Button>
 
+                 {/* Formulario para asociar un recurso a un espacio */}
+                 <Dialog open={openAddRecursoDialog} onClose={() => setOpenAddRecursoDialog(false)} fullWidth maxWidth="sm">
+                    <DialogContent>
+                    {selectedEspacio && (
+                        <RecursoProvider>
+                            <FormularioDetalleRecurso espacio={selectedEspacio} onCancel={() => setOpenAddRecursoDialog(false)} onSave={handleSaveAddRecurso} />
+                        </RecursoProvider>
+                                                   
+                    )}
+                    </DialogContent>
+                </Dialog>
+
                 {/* Formulario de creación dentro de un diálogo */}
                 <Dialog open={openCrearDialog} onClose={() => setOpenCrearDialog(false)}>
                     <DialogTitle>Agregar Nuevo Espacio</DialogTitle>
                     <DialogContent>
                         <EstadoProvider>
-                            <FormularioEspacio onCancel={() => setOpenCrearDialog(false)} onSave={handleSave} tipoEspacioList={listadoTipoEspacio} />
+                            <FormularioEspacio onCancel={() => setOpenCrearDialog(false)} onSave={handleSave} tipoEspacioList={tiposEspacios} />
                         </EstadoProvider>
                     </DialogContent>
                 </Dialog>
@@ -154,7 +188,7 @@ export function EspacioPage() {
                     <DialogContent>
                         {selectedEspacio && (
                             <EstadoProvider>
-                                <FormularioEditar espacio={selectedEspacio} onSave={handleSaveEdit} onCancel={() => setOpenEditDialog(false)} tipoEspacioList={listadoTipoEspacio} />
+                                <FormularioEditar espacio={selectedEspacio} onSave={handleSaveEdit} onCancel={() => setOpenEditDialog(false)} tipoEspacioList={tiposEspacios} />
                             </EstadoProvider>
                         )}
                     </DialogContent>
@@ -169,6 +203,7 @@ export function EspacioPage() {
                         rows={espacios}
                         entityName="Espacio"
                         onEdit={handleEdit}
+                        onAddRecurso={handleAddRecurso}
                     />
                 </EspacioProvider>
             </Box>

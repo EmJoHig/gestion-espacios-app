@@ -82,6 +82,12 @@ export function RecursoPage() {
             label: 'Cantidad',
         },
         {
+            id: 'disponible',
+            numeric: true,
+            disablePadding: true,
+            label: 'Disponible',
+        },
+        {
             id: 'accion',
             numeric: true,
             disablePadding: false,
@@ -331,6 +337,7 @@ export function RecursoPage() {
                                 maxLength: 4, // Limita la longitud máxima a 4 caracteres
                             }}
                         />
+                        
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseEdit}>Cancelar</Button>

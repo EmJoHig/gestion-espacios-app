@@ -1,15 +1,18 @@
-import React, { useContext, useEffect,useState } from "react";
+import React, { useEffect,useState } from "react";
 import PropTypes from "prop-types";
-import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, FormControl } from "@mui/material";
+import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
+import Inventory from "@mui/icons-material/Inventory";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useEspacio } from "../../context/espacioContext";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { Tooltip } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
-const TablaEspacio = ({ columns, rows: espacios, entityName , onEdit}) => {
+const TablaEspacio = ({ columns, rows: espacios, entityName , onEdit, onAddRecurso}) => {
   const [rows, setRows] = useState(espacios); // Inicialización de las filas
   const [searchValue, setSearchValue] = useState(""); // Valor del buscador
   const [filteredRows, setFilteredRows] = useState(espacios); // Filas filtradas
@@ -73,7 +76,7 @@ const TablaEspacio = ({ columns, rows: espacios, entityName , onEdit}) => {
         break;
     }
   };
-
+  console.log("Esta es la manera en que me muestra espacios:",espacios);
 
   const handleDeleteClick = (row) => {
     setSelectedRow(row);
@@ -156,24 +159,43 @@ const TablaEspacio = ({ columns, rows: espacios, entityName , onEdit}) => {
             type: "actions",
             width: 200,
             getActions: (params) => [
-              <GridActionsCellItem
-                key={`view-${params.id}`}
-                icon={<VisibilityIcon />}
-                label="Ver"
-                onClick={() => handleViewClick(params.row)}
-              />,
-              <GridActionsCellItem
-                key={`edit-${params.id}`}
-                icon={<EditIcon />}
-                label="Editar"
-                onClick={() => onEdit(params.row.id)}
-              />,
-              <GridActionsCellItem
-                key={`delete-${params.id}`}
-                icon={<DeleteIcon />}
-                label="Eliminar"
-                onClick={() => handleDeleteClick(params.row)}
-              />,
+              <>
+      <Tooltip title="Asociar recursos" arrow>
+        <GridActionsCellItem
+          key={`view-${params.id}`}
+          icon={<AddCircleOutlineIcon />}
+          label="Asociar Recursos"
+          onClick={() => onAddRecurso(params.row.id)}
+        />
+      </Tooltip>
+
+      <Tooltip title="Ver detalles" arrow>
+        <GridActionsCellItem
+          key={`view-${params.id}`}
+          icon={<VisibilityIcon />}
+          label="Ver"
+          onClick={() => handleViewClick(params.row)}
+        />
+      </Tooltip>
+
+      <Tooltip title="Editar espacio" arrow>
+        <GridActionsCellItem
+          key={`edit-${params.id}`}
+          icon={<EditIcon />}
+          label="Editar"
+          onClick={() => onEdit(params.row.id)}
+        />
+      </Tooltip>
+
+      <Tooltip title="Eliminar espacio" arrow>
+        <GridActionsCellItem
+          key={`delete-${params.id}`}
+          icon={<DeleteIcon />}
+          label="Eliminar"
+          onClick={() => handleDeleteClick(params.row)}
+        />
+      </Tooltip>
+    </>,
             ],
           },
         ]}
@@ -193,16 +215,37 @@ const TablaEspacio = ({ columns, rows: espacios, entityName , onEdit}) => {
         </DialogActions>
       </Dialog>
 
-      {/* Diálogo para visualizar */}
-      <Dialog open={openViewDialog} onClose={() => handleDialogClose("view")}>
+{/* Diálogo para visualizar */}
+<Dialog open={openViewDialog} onClose={() => handleDialogClose("view")}>
         <DialogTitle>Ver {entityName}</DialogTitle>
         <DialogContent>
+          {/* Mostrar los detalles del espacio */}
           <DynamicTextField columns={columns} row={selectedRow} onChange={handleFieldChange} readOnly={!isEditable} />
+
+          {/* Mostrar los recursos asociados */}
+          <h3>Recursos asociados:</h3>
+          {selectedRow?.detalleRecursosEspacio && selectedRow.detalleRecursosEspacio.length > 0 ? (
+            <ul>
+              {selectedRow.detalleRecursosEspacio.map((detalle, index) => {
+                return (
+                  <li key={index}>
+                    <strong>{detalle.nombre}</strong> - Cantidad: {detalle.cantidad} <br />
+                    <em>{detalle.descripcion}</em>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p>No hay recursos asociados.</p>
+          )}
         </DialogContent>
         <DialogActions>
           <Button variant="outlined" onClick={() => handleDialogClose("view")}>Salir</Button>
         </DialogActions>
       </Dialog>
+
+
+
 
       <Snackbar
         open={snackBarState.open}
