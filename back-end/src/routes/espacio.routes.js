@@ -9,7 +9,7 @@ import {
   createEspacio,
   updateEspacio,
   deleteEspacio,
-  getTiposEspacio
+  getTiposEspacio,
 } from "../controllers/espacio.controller.js";
 
 const router = express.Router();
@@ -21,7 +21,7 @@ const jwtCheck = auth({
 });
 
 router.get("/get_espacios", getEspacios);
-router.get('/get_espacio/:id', jwtCheck, getEspacioById);
+router.get("/get_espacio/:id", jwtCheck, getEspacioById);
 router.post("/nuevo_espacio", createEspacio);
 router.put("/editar_espacio/:id", updateEspacio);
 router.delete("/eliminar_espacio/:id", deleteEspacio);

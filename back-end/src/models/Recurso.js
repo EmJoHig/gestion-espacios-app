@@ -21,15 +21,10 @@ Recurso.init(
       allowNull: true,
       trim: true,
     },
-    //espacioId se refiere a la clave foránea dentro del modelo de datos y no el la BD.
-    espacioId: {
+    disponible: {
       type: DataTypes.INTEGER,
-      references: {
-        model: Espacio,
-        key: "id",
-      },
       allowNull: true,
-      field: "id_espacio", // Acá defino el nombre real de la columna en la BD.
+      trim: true,
     },
   },
   {
@@ -42,11 +37,5 @@ Recurso.init(
     version: false,
   }
 );
-
-// Ahora establezco la relación entre los modelos: Recurso y Espacio.
-Recurso.belongsTo(Espacio, {
-  foreignKey: "espacioId",
-  as: "espacio", // Establece un alias para acceder a la relación de manera más clara cuando hagas las consultas.
-});
 
 export default Recurso;

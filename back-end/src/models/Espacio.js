@@ -2,6 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import db2 from "../database/db2.js";
 import EstadoEspacio from "./EstadoEspacio.js";
 import TipoEspacio from "./TipoEspacio.js";
+import DetalleRecurso from "./DetalleRecurso.js"; // Asegúrate de importar DetalleRecurso
 
 class Espacio extends Model {}
 
@@ -51,6 +52,7 @@ Espacio.init(
   }
 );
 
+// Relaciones
 Espacio.belongsTo(EstadoEspacio, {
   foreignKey: "estadoId",
   as: "estado",
@@ -59,6 +61,12 @@ Espacio.belongsTo(EstadoEspacio, {
 Espacio.belongsTo(TipoEspacio, {
   foreignKey: "tipoEspacioId",
   as: "tipoEspacio",
+});
+
+// Relación con DetalleRecurso: Un espacio tiene muchos detalles de recursos
+Espacio.hasMany(DetalleRecurso, {
+  foreignKey: "espacioId",
+  as: "detalleRecursos",
 });
 
 export default Espacio;

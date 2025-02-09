@@ -17,19 +17,20 @@ import reservaRoutes from "./routes/reserva.routes.js";
 import solicitudRoutes from "./routes/solicitud.routes.js";
 import espacioRoutes from "./routes/espacio.routes.js";
 import estadoRoutes from "./routes/estado.routes.js";
+import detalleRecursoRoutes from "./routes/detalle_recurso.routes.js";
 
 import "./config/passport.js";
 import bodyParser from "body-parser";
 import multer from "multer";
 import cors from "cors";
 //AUTH0
-import { auth } from "express-oauth2-jwt-bearer"; 
+import { auth } from "express-oauth2-jwt-bearer";
 
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://ge.patriciorodriguez.com.ar'],
+  origin: ["http://localhost:5173", "https://ge.patriciorodriguez.com.ar"],
   credentials: true, // Habilitar el intercambio de cookies y otros datos de autenticación
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders:
@@ -84,6 +85,7 @@ app.use("/api/actividad", actividadRoutes);
 app.use("/api/espacio", espacioRoutes);
 app.use("/api/reserva", reservaRoutes);
 app.use("/api/solicitud", solicitudRoutes);
+app.use("/api/detalle_recurso", detalleRecursoRoutes);
 
 // static files
 app.use(express.static(join(__dirname, "public")));
