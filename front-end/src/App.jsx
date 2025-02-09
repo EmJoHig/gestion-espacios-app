@@ -15,6 +15,7 @@ import { ReservaProvider } from "./context/reservaContext";
 import { EspacioProvider } from "./context/espacioContext";
 import { ActividadProvider } from "./context/actividadContext";
 import { SolicitudProvider } from "./context/solicitudContext";
+import { DetalleRecursoProvider } from "./context/detalleRecurso";
 
 // vistas
 import WelcomePage from "./pages/WelcomePage";
@@ -36,6 +37,7 @@ import { PerfilUsuarioPage } from "./pages/Usuario/PerfilUsuarioPage";
 function App() {
   return (
     <SolicitudProvider>
+      <DetalleRecursoProvider>
       <RecursoProvider>
         <MinisterioProvider>
           <RolProvider>
@@ -104,6 +106,7 @@ function App() {
           </RolProvider>
         </MinisterioProvider>
       </RecursoProvider>
+      </DetalleRecursoProvider>
     </SolicitudProvider>
   );
 }

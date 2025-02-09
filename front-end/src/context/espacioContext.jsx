@@ -19,6 +19,7 @@ export const useEspacio = () => {
 
 export function EspacioProvider({ children }) {
   const [espacios, setEspacios] = useState([]);
+  const [tiposEspacios, setTiposEspacios] = useState([]);
   const { getAccessTokenSilently } = useAuth0();
 
 
@@ -94,7 +95,7 @@ export function EspacioProvider({ children }) {
       });
       const res = await getTiposEspacioRequest(token);
 
-      return res.data;
+      setTiposEspacios(res.data);
     } catch (error) {
       console.error('Error fetching espacios:', error);
     }
@@ -104,6 +105,7 @@ export function EspacioProvider({ children }) {
   return (
     <EspacioContext.Provider
       value={{
+        tiposEspacios,
         espacios,
         getEspacios,
         getEspacio,

@@ -2,16 +2,74 @@ import Espacio from "../models/Espacio.js";
 import bcrypt from "bcryptjs";
 import EstadoEspacio from "../models/EstadoEspacio.js";
 import TipoEspacio from "../models/TipoEspacio.js";
+import DetalleRecurso from "../models/DetalleRecurso.js";
+import Recurso from "../models/Recurso.js";
 
 export const getEspacios = async (req, res) => {
   try {
+    // Obtener los espacios junto con los recursos asociados
     const espacios = await Espacio.findAll({
-      include: [{ model: EstadoEspacio, as: "estado" },
-        { model: TipoEspacio, as: 'tipoEspacio' },
+      include: [
+        {
+          model: EstadoEspacio,
+          as: "estado",
+        },
+        {
+          model: TipoEspacio,
+          as: "tipoEspacio",
+        },
+        {
+          model: DetalleRecurso,
+          as: "detalleRecursosEspacio",
+          include: [
+            {
+              model: Recurso,
+              as: "recurso",
+            },
+          ],
+        },
       ],
     });
-    // Enviar una respuesta al cliente
-    res.status(200).json(espacios);
+
+    // Agrupar los recursos por nombre y descripción, sumando las cantidades
+    const espaciosAgrupados = espacios.map((espacio) => {
+      const recursosAgrupados = espacio.detalleRecursosEspacio.reduce(
+        (acc, detalle) => {
+          const { recurso, cantidad } = detalle;
+
+          // Verificar si ya existe este recurso en el acumulador
+          const existingRecurso = acc.find(
+            (item) =>
+              item.nombre === recurso.nombre &&
+              item.descripcion === recurso.descripcion
+          );
+
+          if (existingRecurso) {
+            // Si ya existe, sumamos la cantidad
+            existingRecurso.cantidad += cantidad;
+          } else {
+            // Si no existe, lo agregamos al acumulador
+            acc.push({
+              nombre: recurso.nombre,
+              descripcion: recurso.descripcion,
+              cantidad: cantidad,
+            });
+          }
+
+          return acc;
+        },
+        []
+      );
+
+      // Retornamos el espacio con los recursos agrupados
+      return {
+        ...espacio.dataValues,
+        detalleRecursosEspacio: recursosAgrupados,
+      };
+    });
+
+    // Enviar los datos agrupados como respuesta
+    res.status(200).json(espaciosAgrupados);
   } catch (error) {
     console.error(error);
     res
@@ -22,30 +80,33 @@ export const getEspacios = async (req, res) => {
 
 export const getEspacioById = async (req, res) => {
   try {
-      const { id } = req.params;
+    const { id } = req.params;
 
-      const espacio = await Espacio.findByPk(id, {
-        include: [
-            { model: EstadoEspacio, as: "estado" },
-            { model: TipoEspacio, as: 'tipoEspacio' },
-        ],
+    const espacio = await Espacio.findByPk(id, {
+      include: [
+        { model: EstadoEspacio, as: "estado" },
+        { model: TipoEspacio, as: "tipoEspacio" },
+      ],
     });
 
-      if (!espacio) {
-          return res.status(404).json({ message: 'Espacio no encontrado' });
-      }
+    if (!espacio) {
+      return res.status(404).json({ message: "Espacio no encontrado" });
+    }
 
-      res.status(200).json(espacio);
+    res.status(200).json(espacio);
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Ha ocurrido un error al obtener el Espacio' });
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Ha ocurrido un error al obtener el Espacio" });
   }
 };
 
 export const createEspacio = async (req, res) => {
   try {
     console.log(req.body);
-    const { nombre, descripcion, capacidad, id_estado, id_tipo_espacio } = req.body;
+    const { nombre, descripcion, capacidad, id_estado, id_tipo_espacio } =
+      req.body;
 
     // Crear el nuevo espacio
     const nuevoEspacio = await Espacio.create({
@@ -53,7 +114,7 @@ export const createEspacio = async (req, res) => {
       descripcion: descripcion,
       capacidad: capacidad,
       estadoId: id_estado,
-      tipoEspacioId: id_tipo_espacio
+      tipoEspacioId: id_tipo_espacio,
     });
 
     // Enviar una respuesta al cliente con el ministerio creado
@@ -123,15 +184,14 @@ export const deleteEspacio = async (req, res) => {
   }
 };
 
-
 export const getTiposEspacio = async (req, res) => {
   try {
     const tiposEspacio = await TipoEspacio.findAll();
     res.status(200).json(tiposEspacio);
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ message: "Ha ocurrido un error al obtener los tipos de espacios" });
+    res.status(500).json({
+      message: "Ha ocurrido un error al obtener los tipos de espacios",
+    });
   }
 };

@@ -298,6 +298,7 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                         <TableCell id={row.nombre} align="center" > {row.nombre} </TableCell>
                                         <TableCell align="center">{row.descripcion}</TableCell>
                                         <TableCell component="th" align="center" >{row.cantidad}</TableCell>
+                                        <TableCell component="th" align="center" >{row.disponible}</TableCell>
                                         <TableCell align="center">
                                             <IconButton aria-label="edit" onClick={() => onEditClick(row)}>
                                                 <EditIcon />
