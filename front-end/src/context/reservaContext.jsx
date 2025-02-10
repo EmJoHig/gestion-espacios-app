@@ -7,7 +7,8 @@ import {
   updateReservaRequest,
   deleteReservaRequest,
   getReservasFilterRequest,
-  bajaReservaRequest
+  bajaReservaRequest,
+  validarAulasDisponiblesRequest
 } from "../api/reserva.js";
 
 const ReservaContext = createContext();
@@ -148,6 +149,29 @@ export function ReservaProvider({ children }) {
   };
 
 
+  const validarAulasDisponibles = async (body) => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await validarAulasDisponiblesRequest(token, body);
+
+      if (res.status === 200) {
+        return res.data.result;
+      } else {
+        return false;
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <ReservaContext.Provider
@@ -161,7 +185,8 @@ export function ReservaProvider({ children }) {
         updateReserva,
         deleteReserva,
         getReservasFilter,
-        bajaReserva
+        bajaReserva,
+        validarAulasDisponibles
       }}
     >
       {children}

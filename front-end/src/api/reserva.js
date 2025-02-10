@@ -138,3 +138,18 @@ export const bajaReservaRequest = async (token, body) => {
     throw error;
   }
 }
+
+export const validarAulasDisponiblesRequest = async (token, body) => {
+
+  try {
+    const response = await axios.post(`${API_URL}/reserva/validar_aulas_disponibles`, body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Error validarAulasDisponiblesRequest: ', error);
+    throw error;
+  }
+}

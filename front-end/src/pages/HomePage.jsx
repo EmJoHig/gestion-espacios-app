@@ -55,7 +55,7 @@ export function HomePage() {
   const [eventos, setEventos] = useState([]);
   const [espaciosDisponibles, setEspaciosDisponibles] = useState([]);
   const [espaciosSeleccionados, setEspaciosSeleccionados] = useState([]);
-  const { reservas, reserva, getReserva, getReservas, createReserva, updateReserva } = useReserva();
+  const { reservas, reserva, getReserva, getReservas, createReserva, updateReserva, validarAulasDisponibles } = useReserva();
   const { espacios, getEspacios, getEspacio } = useEspacio();
   const { ministerios, getMinisterios, createMinisterio, updateMinisterio } = useMinisterio();
   const { actividades, getActividades } = useActividad();
@@ -66,10 +66,10 @@ export function HomePage() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [ rolUsuarioBD, setRolUsuarioBD ] = useState("");
-  const [ minUsuario, setMinUsuario ] = useState("");
+  const [rolUsuarioBD, setRolUsuarioBD] = useState("");
+  const [minUsuario, setMinUsuario] = useState("");
   const [modulosFiltrados, setModulosFiltrados] = useState([]);
-  const [ minSelect, setMinSelect ] = useState("");
+  const [minSelect, setMinSelect] = useState("");
 
   const [dialogOrigin, setDialogOrigin] = useState(null); // 'C' (calendario)' , 'B' (boton)
 
@@ -288,7 +288,7 @@ export function HomePage() {
     console.log("rolUsuarioBD: ", rolUsuarioBD); // Para verificar el objeto creado
 
     setSelectedDate(reserva); // Actualizar el estado con la nueva reserva
-    if(rolUsuarioBD !== "CONSULTA")
+    if (rolUsuarioBD !== "CONSULTA")
       setOpenDialog(true); // Abrir el diálogo
   };
 
@@ -338,14 +338,43 @@ export function HomePage() {
       // SI EL ESPACIO ES DE TIPO AULA, CREO DIRECTO LA RESERVA
       if (respGetEspacio && respGetEspacio.tipoEspacio.nombre === "AULA" || rolUsuarioBD == "ADMIN") {
 
-        const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
-        if (!res.success) {
-          //setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
-          openSnackBar(res.message, 'error');
+        if (rolUsuarioBD == "RESPONSABLE") {
+          const fechaini = nuevaReserva.fechaInicio;
+          const fechafin = nuevaReserva.fechaFin;
+
+          const bodyValidar = {
+            espacioId: nuevaReserva.espacioId,
+            fechaInicio: fechaini,
+            fechaFin: fechafin,
+
+          }
+
+          const hayDisponibles = await validarAulasDisponibles(bodyValidar);
+
+          if (!hayDisponibles) {
+            openSnackBar('No hay aulas disponibles.', 'error');
+          } else {
+            const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
+            if (!res.success) {
+              //setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
+              openSnackBar(res.message, 'error');
+            } else {
+              openSnackBar('Se creó la RESERVA con exito.', 'success');
+              await getReservas(); // Refrescar las reservas después de guardar
+              setOpenDialog(false); // Cerrar el diálogo
+            }
+          }
+
         } else {
-          openSnackBar('Se creó la RESERVA con exito.', 'success');
-          await getReservas(); // Refrescar las reservas después de guardar
-          setOpenDialog(false); // Cerrar el diálogo
+          const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
+          if (!res.success) {
+            //setErrorMessage(res.message || "No se pudo crear la reserva. Intente nuevamente.");
+            openSnackBar(res.message, 'error');
+          } else {
+            openSnackBar('Se creó la RESERVA con exito.', 'success');
+            await getReservas(); // Refrescar las reservas después de guardar
+            setOpenDialog(false); // Cerrar el diálogo
+          }
         }
       } else {
         // SINO, CREO UNA SOLICITUD DE RESERVA
@@ -379,42 +408,69 @@ export function HomePage() {
 
       if (respGetEspacio && respGetEspacio.tipoEspacio.nombre === "AULA" || rolUsuarioBD == "ADMIN") {
 
+        if (rolUsuarioBD == "RESPONSABLE") {
 
-      // console.log("reservaData: ", reservaData)
-      const updatedReserva = buildReservaObject(reservaData);
-      //console.log("aca: ",updateReserva)
-      const res = await updateReserva(updatedReserva); // Suponiendo que tienes una función updateReserva
-      console.log("res", res)
-      if (!res.success) {
-        openSnackBar('No se pudo actualizar la reserva. Intente nuevamente', 'error');
+          const fechaini = reservaData.fechaHoraFin;
+          const fechafin = reservaData.fechaHoraInicio;
+
+          const bodyValidar = {
+            fechaInicio: fechaini,
+            fechaFin: fechafin,
+
+          }
+          
+          const hayDisponibles = await validarAulasDisponibles(bodyValidar);
+
+          if (!hayDisponibles) {
+            openSnackBar('No hay aulas disponibles.', 'error');
+          } else {
+            const updatedReserva = buildReservaObject(reservaData);
+            const res = await updateReserva(updatedReserva);
+
+            if (!res.success) {
+              openSnackBar('No se pudo actualizar la reserva. Intente nuevamente', 'error');
+            } else {
+              openSnackBar('Se actualizo la RESERVA con exito.', 'success');
+              await getReservas(); // Refrescar las reservas
+              setOpenDialog(false); // Cerrar el diálogo
+
+            }
+          }
+        } else {
+          const updatedReserva = buildReservaObject(reservaData);
+          const res = await updateReserva(updatedReserva);
+
+          if (!res.success) {
+            openSnackBar('No se pudo actualizar la reserva. Intente nuevamente', 'error');
+          } else {
+            openSnackBar('Se actualizo la RESERVA con exito.', 'success');
+            await getReservas(); // Refrescar las reservas
+            setOpenDialog(false); // Cerrar el diálogo
+
+          }
+        }
       } else {
-        openSnackBar('Se actualizo la RESERVA con exito.', 'success');
-        await getReservas(); // Refrescar las reservas
-        setOpenDialog(false); // Cerrar el diálogo
-
+        openSnackBar('No se puede actualizar por un espacio que no sea Aula', 'error');
       }
-    } else {
-      openSnackBar('No se puede actualizar por un espacio que no sea Aula', 'error');
-    }
     } catch (error) {
       console.error('Error al actualizar la reserva:', error);
     }
   };
 
   const handleEventClick = async (info) => {
-    console.log("handleEventClick rolUsuarioBD: ", rolUsuarioBD); 
+    console.log("handleEventClick rolUsuarioBD: ", rolUsuarioBD);
 
     const selectedReserva = reservas.find((res) => res.id === parseInt(info.event.id));
-    console.log(":",reservas.find((res) => res.id === parseInt(info.event.id)))
+    console.log(":", reservas.find((res) => res.id === parseInt(info.event.id)))
     const reservaSelect = await getReserva(parseInt(info.event.id));
     if (selectedReserva) {
-      if(reservaSelect.ministerioId == minUsuario || rolUsuarioBD == "ADMIN"){
+      if (reservaSelect.ministerioId == minUsuario || rolUsuarioBD == "ADMIN") {
         setSelectedDate(selectedReserva);
         setIsEditing(true);
         setOpenDialog(true);
-        } else{
-          openSnackBar('No se pudo editar reservas de otros Ministerios.', 'error');
-        }
+      } else {
+        openSnackBar('No se pudo editar reservas de otros Ministerios.', 'error');
+      }
     }
   };
 
@@ -433,67 +489,67 @@ export function HomePage() {
           errorMessage={errorMessage}
           rolUsuarioBD={rolUsuarioBD}
           dialogOrigin={dialogOrigin}
-          ministerioUser = {minUsuario}
+          ministerioUser={minUsuario}
         />
-<Box sx={{ flexGrow: 1, margin: "20px 0" }}>
-  <Grid container spacing={2}>
-    {modulosFiltrados.map((modulo) => (
-      <Grid item xs={4} sm={3} md={2} lg={1.5} key={modulo.codigo}>
-        <StyledCard
-          onClick={handleClick(modulo.ruta)}
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            height: '120px', // Altura más corta para la tarjeta
-            padding: 0,
-            overflow: 'hidden', // Evita que el contenido se desborde
-            borderRadius: '8px', // Mantén bordes redondeados
-            boxShadow: 'none', // Elimina sombra (puedes ajustarlo si lo deseas)
-          }}
-        >
-          <CardActionArea sx={{ height: '100%' }}>
-            <CardContent
-              sx={{
-                padding: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                height: '100%',
-                justifyContent: "flex-start", // Subir el texto un poco
-                overflow: 'hidden',
-              }}
-            >
-              <Icon
-                sx={{
-                  fontSize: { xs: "3rem", sm: "3rem", md: "3rem" }, // Tamaño del icono
-                  marginBottom: '8px', // Separación entre icono y texto
-                }}
-              >
-                {getIcon(modulo.codigo)}
-              </Icon>
-              <Typography
-                variant="caption"
-                component="div"
-                align="center"
-                sx={{
-                  fontWeight: "medium",
-                  fontSize: { xs: "0.8rem", sm: "0.8rem", md: "0.9rem" },
-                  lineHeight: 1.1,
-                  textAlign: 'center', // Alineación del texto
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis', // Asegura que el texto largo se recorte si es necesario
-                }}
-              >
-                {modulo.descripcion}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </StyledCard>
-      </Grid>
-    ))}
-  </Grid>
-</Box>
+        <Box sx={{ flexGrow: 1, margin: "20px 0" }}>
+          <Grid container spacing={2}>
+            {modulosFiltrados.map((modulo) => (
+              <Grid item xs={4} sm={3} md={2} lg={1.5} key={modulo.codigo}>
+                <StyledCard
+                  onClick={handleClick(modulo.ruta)}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    height: '120px', // Altura más corta para la tarjeta
+                    padding: 0,
+                    overflow: 'hidden', // Evita que el contenido se desborde
+                    borderRadius: '8px', // Mantén bordes redondeados
+                    boxShadow: 'none', // Elimina sombra (puedes ajustarlo si lo deseas)
+                  }}
+                >
+                  <CardActionArea sx={{ height: '100%' }}>
+                    <CardContent
+                      sx={{
+                        padding: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        height: '100%',
+                        justifyContent: "flex-start", // Subir el texto un poco
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <Icon
+                        sx={{
+                          fontSize: { xs: "3rem", sm: "3rem", md: "3rem" }, // Tamaño del icono
+                          marginBottom: '8px', // Separación entre icono y texto
+                        }}
+                      >
+                        {getIcon(modulo.codigo)}
+                      </Icon>
+                      <Typography
+                        variant="caption"
+                        component="div"
+                        align="center"
+                        sx={{
+                          fontWeight: "medium",
+                          fontSize: { xs: "0.8rem", sm: "0.8rem", md: "0.9rem" },
+                          lineHeight: 1.1,
+                          textAlign: 'center', // Alineación del texto
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis', // Asegura que el texto largo se recorte si es necesario
+                        }}
+                      >
+                        {modulo.descripcion}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </StyledCard>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
 
 
 
@@ -504,7 +560,7 @@ export function HomePage() {
           </Typography>
 
           {/* Select para filtrar espacios */}
-          <FormControl sx={{ m: 1, width: 300, transform: 'scale(0.75)',transformOrigin: 'top left' }}>
+          <FormControl sx={{ m: 1, width: 300, transform: 'scale(0.75)', transformOrigin: 'top left' }}>
             <InputLabel sx={{ fontSize: '0.875rem' }}>Espacios</InputLabel>
             <Select
               multiple
@@ -555,25 +611,25 @@ export function HomePage() {
       </Container>
 
       {
-          (rolUsuarioBD !== "CONSULTA") && (
-            <Fab
-              color={'primary'}
-              aria-label='Add'
-              variant="extended"
-              sx={fabStyle}
-              // onClick={() => setOpenDialog(true)}
-              onClick={() => {
-                setDialogOrigin('B');
-                setOpenDialog(true);
-              }}
-            >
-              <AddIcon />
-              NUEVA RESERVA
-            </Fab>
-          )
-        }
+        (rolUsuarioBD !== "CONSULTA") && (
+          <Fab
+            color={'primary'}
+            aria-label='Add'
+            variant="extended"
+            sx={fabStyle}
+            // onClick={() => setOpenDialog(true)}
+            onClick={() => {
+              setDialogOrigin('B');
+              setOpenDialog(true);
+            }}
+          >
+            <AddIcon />
+            NUEVA RESERVA
+          </Fab>
+        )
+      }
 
-        {/* <Fab sx={fabStyle} aria-label='Add' color={'primary'} variant="extended" onClick={() => setOpenDialog(true)}>
+      {/* <Fab sx={fabStyle} aria-label='Add' color={'primary'} variant="extended" onClick={() => setOpenDialog(true)}>
                     <AddIcon />
                     NUEVA RESERVA
         </Fab> */}
