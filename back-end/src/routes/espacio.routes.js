@@ -10,7 +10,9 @@ import {
   updateEspacio,
   deleteEspacio,
   getTiposEspacio,
+  getDetallesRecursos,
 } from "../controllers/espacio.controller.js";
+import { getDetalleRecursoById } from "../controllers/detalle_recurso.controller.js";
 
 const router = express.Router();
 
@@ -26,5 +28,6 @@ router.post("/nuevo_espacio", createEspacio);
 router.put("/editar_espacio/:id", updateEspacio);
 router.delete("/eliminar_espacio/:id", deleteEspacio);
 router.get("/get_tipos_espacio", getTiposEspacio);
+router.get("/get_detalles_recursos/:id", getDetallesRecursos);
 
 export default router;

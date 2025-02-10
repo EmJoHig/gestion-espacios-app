@@ -18,7 +18,7 @@ Recurso.init(
     },
     cantidad: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       trim: true,
     },
     disponible: {
