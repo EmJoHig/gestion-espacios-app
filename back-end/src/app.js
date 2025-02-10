@@ -39,8 +39,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 app.use((req, res, next) => {
-  //console.log(`Request: ${req.method} ${req.url}`);
-  //console.log(`Headers:`, req.headers);
+  //console.log(Request: ${req.method} ${req.url});
+  //console.log(Headers:, req.headers);
   next();
 });
 
