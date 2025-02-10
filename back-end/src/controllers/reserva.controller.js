@@ -22,6 +22,7 @@ const transporter = nodemailer.createTransport({
 export const getReservas = async (req, res) => {
     try {
         const reservas = await Reserva.findAll({
+            where: { fechaBaja: null},
             include: [
                 {
                     model: Espacio, // Asegúrate de tener el modelo de Espacio
@@ -163,6 +164,7 @@ export const updateReserva = async (req, res) => {
             where: {
                 espacioId: { [Op.ne]: espacioId }, // Excluir la reserva que se está actualizando
                 espacioId: espacioId || reserva.espacioId, // Usar el nuevo espacioId o el actual
+                fechaBaja: null,
                 [Op.or]: [
                     {
                         fechaInicio: {
@@ -325,6 +327,7 @@ export const validarAulasDisponibles = async (req, res) => {
                 },
             ],
             where: {
+                fechaBaja: null,
                 //espacioId: espacioId, // Verificar el espacio específico
                 [Op.or]: [
                     {
