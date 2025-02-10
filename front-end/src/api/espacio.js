@@ -54,3 +54,19 @@ export const getTiposEspacioRequest = async (token) => {
     throw error;
   }
 };
+
+export const getDetallesRecursosRequest = async (token, id) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/espacio/get_detalles_recursos/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error al obtener los detalles recursos del espacio:", error);
+  }
+};

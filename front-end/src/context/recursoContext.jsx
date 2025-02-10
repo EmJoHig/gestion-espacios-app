@@ -6,6 +6,7 @@ import {
   createRecursoRequest,
   updateRecursoRequest,
   deleteRecursoRequest,
+  incrementarDisponibleRequest,
 } from "../api/recurso";
 
 const RecursoContext = createContext();
@@ -88,6 +89,27 @@ export function RecursoProvider({ children }) {
     }
   };
 
+  const incrementarDisponible = async (recurso) => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+      
+      const res = await incrementarDisponibleRequest(token, recurso);
+
+      if (res.status == 200) {
+        return "";
+      } else {
+        return "Error al editar el recurso";
+      }
+
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
   const deleteRecurso = async (id) => {
     try {
@@ -117,6 +139,7 @@ export function RecursoProvider({ children }) {
         createRecurso,
         updateRecurso,
         deleteRecurso,
+        incrementarDisponible,
       }}
     >
       {children}

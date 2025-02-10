@@ -195,3 +195,36 @@ export const getTiposEspacio = async (req, res) => {
     });
   }
 };
+
+export const getDetallesRecursos = async (req, res) => {
+  try {
+    const { id } = req.params; // Obtener el id del espacio desde los parámetros de la URL
+
+    // Buscar los detalles de los recursos asociados a este espacio
+    const detallesRecursos = await DetalleRecurso.findAll({
+      where: {
+        espacioId: id, // Filtrar los detalles de los recursos por el id del espacio
+      },
+      include: [
+        {
+          model: Recurso, // Incluir los detalles del recurso (nombre, descripción, etc.)
+          as: "recurso", // Alias para la relación con Recurso
+          attributes: ["id", "nombre", "descripcion"], // Incluir solo los campos necesarios
+        },
+      ],
+    });
+
+    if (!detallesRecursos || detallesRecursos.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No se encontraron recursos para este espacio." });
+    }
+
+    return res.status(200).json(detallesRecursos);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Ha ocurrido un error al obtener los detalles de los recursos.",
+    });
+  }
+};

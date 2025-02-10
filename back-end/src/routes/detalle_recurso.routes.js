@@ -7,7 +7,7 @@ import {
   getDetallesRecursos,
   getDetalleRecursoById,
   createDetalleRecurso,
-  updateDetalleRecurso,
+  updateDetallesRecursos,
   deleteDetalleRecurso,
 } from "../controllers/detalle_recurso.controller.js";
 
@@ -22,7 +22,7 @@ const jwtCheck = auth({
 router.get("/get_detalles_recursos", getDetallesRecursos);
 router.get("/get_detalle_recurso/:id", jwtCheck, getDetalleRecursoById);
 router.post("/nuevo_detalle_recurso", createDetalleRecurso);
-router.put("/editar_detalle_recurso/:id", updateDetalleRecurso);
+router.patch("/updateDetallesRecursos", updateDetallesRecursos);
 router.delete("/eliminar_detalle_recurso/:id", deleteDetalleRecurso);
 
 export default router;

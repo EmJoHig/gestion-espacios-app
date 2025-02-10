@@ -107,36 +107,74 @@ export const createDetalleRecurso = async (req, res) => {
   }
 };
 
-export const updateDetalleRecurso = async (req, res) => {
+export const updateDetallesRecursos = async (req, res) => {
   try {
-    console.log(req.body);
-    const { id } = req.params;
-    const { cantidad } = req.body;
-    const { id_espacio } = req.body;
-    const { id_recurso } = req.body;
+    const { idDetalle, idRecurso, cantidad } = req.body; // Recibe los IDs y la nueva cantidad
 
-    const detalle_recurso = await DetalleRecurso.findByPk(id);
-    if (!detalle_recurso) {
-      return res.status(404).json({ message: "DetalleRecurso no encontrado" });
+    // 📌 Buscar el detalle del recurso
+    const detalle = await DetalleRecurso.findByPk(idDetalle);
+    if (!detalle) {
+      return res
+        .status(404)
+        .json({ message: `Detalle con ID ${idDetalle} no encontrado` });
     }
 
-    const updates = {};
-    //USO TODAS LAS PROPIEDADES PORQUE EL PUT SOLO DEJA ACTUALIZAR TODO EL OBJETO
-    if (id) updates.id = detalle_recurso.id;
-    if (cantidad) updates.cantidad = detalle_recurso.cantidad;
-    if (id_espacio) updates.espacioId = id_espacio;
-    if (id_recurso) updates.recursoId = id_recurso;
+    // 📌 Buscar el recurso asociado
+    const recurso = await Recurso.findByPk(idRecurso);
+    if (!recurso) {
+      return res
+        .status(404)
+        .json({ message: `Recurso con ID ${idRecurso} no encontrado` });
+    }
 
-    await DetalleRecurso.update(updates, {
-      where: { id: id },
+    console.log(
+      `🔹 Antes de actualizar -> Detalle ID: ${idDetalle}, Cantidad Detalle: ${detalle.cantidad}`
+    );
+    console.log(
+      `🔹 Recurso ID: ${idRecurso}, Cantidad: ${recurso.cantidad}, Disponible: ${recurso.disponible}`
+    );
+
+    // 📌 Calcular la diferencia entre la nueva cantidad y la anterior
+    const diferencia = cantidad - detalle.cantidad; // Positivo si aumenta, negativo si disminuye
+
+    // 📌 Ajustar disponibilidad con el mismo incremento o decremento
+    let nuevaDisponibilidad = recurso.disponible - diferencia;
+
+    // 📌 Evitar valores negativos en `disponible`
+    if (nuevaDisponibilidad < 0) {
+      return res.status(400).json({
+        message: `No hay suficiente disponibilidad para reducir el recurso con ID ${idRecurso}.`,
+      });
+    }
+
+    // 📌 Actualizar `cantidad` en `detalleRecurso`
+    await DetalleRecurso.update({ cantidad }, { where: { id: idDetalle } });
+
+    // 📌 Actualizar `disponible` en `recurso`
+    await Recurso.update(
+      { disponible: nuevaDisponibilidad },
+      { where: { id: idRecurso } }
+    );
+
+    console.log(
+      `✅ Después de actualizar -> Detalle ID: ${idDetalle}, Cantidad Detalle: ${cantidad}`
+    );
+    console.log(
+      `✅ Recurso ID: ${idRecurso}, Cantidad: ${recurso.cantidad}, Disponible: ${nuevaDisponibilidad}`
+    );
+
+    res.status(200).json({
+      message: `Detalle y recurso actualizados correctamente.`,
+      detalle: { id: idDetalle, cantidad },
+      recurso: {
+        id: idRecurso,
+        cantidad: recurso.cantidad,
+        disponible: nuevaDisponibilidad,
+      },
     });
-
-    res.status(200).json(detalle_recurso);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Ha ocurrido un error al actualizar el Detalle Recurso",
-    });
+    console.error("❌ Error al actualizar el detalle y recurso:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 };
 

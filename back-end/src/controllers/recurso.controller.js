@@ -81,24 +81,33 @@ export const updateRecurso = async (req, res) => {
       where: { id_recurso: id },
     });
 
-    // Si la cantidad asignada no existe, se establece en 0
-    const cantidadDisponible = cantidad - (cantidadAsignada || 0);
-
     // Preparar los campos a actualizar
     const updates = {
       nombre: nombre || recurso.nombre,
       descripcion: descripcion || recurso.descripcion,
-      cantidad: cantidad || recurso.cantidad, // Solo actualizamos cantidad si es necesario
-      disponible: cantidadDisponible, // Recalculamos disponible con la diferencia
     };
 
-    // Actualizar el recurso en la base de datos
+    let cantidadDisponible = recurso.disponible; // Mantener la disponibilidad original si no hay cambio en cantidad
+
+    // Si la cantidad fue enviada y es diferente a la actual
+    if (cantidad !== undefined) {
+      if (cantidad !== recurso.cantidad) {
+        // Si la cantidad cambia, recalcular la disponibilidad
+        cantidadDisponible = cantidad - (cantidadAsignada || 0);
+        updates.cantidad = cantidad; // Actualizamos la cantidad
+      }
+    }
+
+    // Actualizar la disponibilidad
+    updates.disponible = cantidadDisponible;
+
+    // Realizar la actualización en la base de datos
     const _editRecurso = await Recurso.update(updates, {
       where: { id: id },
     });
 
     // Verificar si la actualización fue exitosa
-    if (_editRecurso[0] === 0) {
+    if (_editRecurso === null) {
       return res.status(400).json({ message: "No se pudo editar el Recurso" });
     } else {
       return res.status(200).json({ message: "El Recurso se editó con éxito" });
@@ -134,16 +143,57 @@ export const deleteRecurso = async (req, res) => {
         .json({ message: "No se pudo eliminar el Recurso" });
     }
 
-    return res
-      .status(200)
-      .json({
-        message:
-          "El Recurso y sus detalles asociados fueron eliminados con éxito",
-      });
+    return res.status(200).json({
+      message:
+        "El Recurso y sus detalles asociados fueron eliminados con éxito",
+    });
   } catch (error) {
     console.error(error);
     res
       .status(500)
       .json({ message: "Ha ocurrido un error al eliminar el Recurso" });
+  }
+};
+
+export const incrementarDisponible = async (req, res) => {
+  console.log(
+    "📌 Petición recibida en incrementarDisponible:",
+    req.params,
+    req.body
+  );
+  try {
+    const { id } = req.params; // Obtiene el ID desde la URL
+    let { sumar } = req.body; // Obtiene `sumar` desde el body
+
+    console.log(`🔹 Recibido en la API -> ID: ${id}, Sumar: ${sumar}`);
+
+    // Convertir `sumar` a número y asegurarse de que sea positivo
+    sumar = Math.abs(Number(sumar));
+
+    // 📌 Incrementar directamente en la base de datos
+    const _editRecurso = await Recurso.increment(
+      { disponible: sumar }, // Incrementa `disponible`
+      { where: { id: id } } // Filtra por ID
+    );
+
+    if (_editRecurso[0] === 0) {
+      console.log(`❌ No se encontró el recurso con ID ${id}`);
+      return res.status(404).json({ message: "Recurso no encontrado" });
+    }
+
+    // Obtener el recurso actualizado
+    const recursoActualizado = await Recurso.findByPk(id);
+
+    console.log(
+      `✅ Después de actualizar -> ID: ${id}, Disponible: ${recursoActualizado.disponible}`
+    );
+
+    res.status(200).json({
+      message: "Disponible actualizado correctamente",
+      recurso: recursoActualizado,
+    });
+  } catch (error) {
+    console.error("❌ Error al incrementar disponible:", error);
+    res.status(500).json({ message: "Ha ocurrido un error al incrementar" });
   }
 };

@@ -38,11 +38,11 @@ export const createDetalleRecursoRequest = async (token, body) => {
   }
 };
 
-export const updateDetalleRecursoRequest = async (token, detalle_recurso) => {
+export const updateDetalleRecursoRequest = async (token, body) => {
   try {
-    const response = await axios.put(
-      `${API_URL}/detalle_recurso/editar_detalle_recurso:id/${detalle_recurso.id}`,
-      detalle_recurso,
+    const response = await axios.patch(
+      `${API_URL}/detalle_recurso/updateDetallesRecursos`,
+      body,
       {
         headers: {
           Authorization: `Bearer ${token}`, // ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
