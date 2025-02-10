@@ -3,8 +3,19 @@ import Espacio from '../models/Espacio.js';
 import Ministerio from '../models/Ministerio.js';
 import Actividad from "../models/Actividad.js";
 import TipoEspacio from "../models/TipoEspacio.js";
+import Usuario from '../models/Usuario.js';
+import nodemailer from 'nodemailer';
 import { Op, Sequelize } from 'sequelize';
 Reserva.associate();
+
+const transporter = nodemailer.createTransport({
+    service: "gmail", // O usa SMTP de tu proveedor
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+  
 
 
 export const getReservas = async (req, res) => {
@@ -95,6 +106,32 @@ export const createReserva = async (req, res) => {
         const nuevaReserva = await Reserva.create({
             espacioId, ministerioId, actividadId, fechaInicio, fechaFin
         });
+
+        const usuarios = await Usuario.findAll({
+            where: { ministerioId },
+            attributes: ['email']
+        });
+
+        // Enviar correo a cada usuario del ministerio
+        if (usuarios.length > 0) {
+            const destinatarios = usuarios.map(user => user.email).join(',');
+            
+            const mailOptions = {
+                from: 'incidenciasydespliegues@gmail.com',
+                to: destinatarios,
+                subject: 'Confirmación de Reserva',
+                text: `Se ha creado una nueva reserva en el sistema:\n\nEspacio ID: ${espacioId}\nFecha Inicio: ${fechaInicio}\nFecha Fin: ${fechaFin}\n\nSaludos, Sistema de Reservas.`
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Error al enviar correo:', error);
+                } else {
+                    console.log('Correo enviado:', info.response);
+                }
+            });
+        }
+
 
 
         // Enviar una respuesta al cliente con el ministerio creado
@@ -262,7 +299,7 @@ export const bajaReserva = async (req, res) => {
 export const validarAulasDisponibles = async (req, res) => {
     try {
 
-        const { espacioId, fechaInicio, fechaFin } = req.body;
+        const { fechaInicio, fechaFin } = req.body;
 
 
         // const tipoEspacio = await TipoEspacio.findOne({ where: { nombre: "AULA" } });

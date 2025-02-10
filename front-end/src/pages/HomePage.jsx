@@ -352,7 +352,24 @@ export function HomePage() {
           const hayDisponibles = await validarAulasDisponibles(bodyValidar);
 
           if (!hayDisponibles) {
-            openSnackBar('No hay aulas disponibles.', 'error');
+            const nuevaSolicitud = {
+              id: null,
+              espacioId: nuevaReserva.espacioId,
+              ministerioId: nuevaReserva.ministerioId,
+              actividadId: nuevaReserva.actividadId,
+              fechaInicio: nuevaReserva.fechaInicio,
+              fechaFin: nuevaReserva.fechaFin,
+            };
+    
+            const res = await createSolicitud(nuevaSolicitud);
+    
+            if (res == "") {
+              openSnackBar('Se creó la SOLICITUD de RESERVA con exito.', 'success');
+              await getReservas();
+              setOpenDialog(false);
+            } else {
+              setErrorMessage(res.message || "No se pudo crear la solicitud. Intente nuevamente.");
+            }
           } else {
             const res = await createReserva(nuevaReserva); // Asume que tienes la función `createReserva`
             if (!res.success) {
@@ -410,8 +427,8 @@ export function HomePage() {
 
         if (rolUsuarioBD == "RESPONSABLE") {
 
-          const fechaini = reservaData.fechaHoraFin;
-          const fechafin = reservaData.fechaHoraInicio;
+          const fechaini = reservaData.fechaHoraInicio;
+          const fechafin = reservaData.fechaHoraFin;
 
           const bodyValidar = {
             fechaInicio: fechaini,

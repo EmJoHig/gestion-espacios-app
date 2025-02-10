@@ -194,7 +194,6 @@ export default function ReservaDialog({ open, onClose, onSave, ministerios, acti
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 disabled={isEditing && !editable}
-                minDateTime={dayjs()}
               />
             </LocalizationProvider>
           </Grid>
