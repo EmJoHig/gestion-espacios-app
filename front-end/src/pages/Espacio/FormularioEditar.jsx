@@ -32,6 +32,10 @@ const [recursoAEliminar, setRecursoAEliminar] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
 
   useEffect(() => {
+    getEstados();
+  }, []);
+
+  useEffect(() => {
     if (espacio.id) {
       console.log("Ejecutando cargarDetalleRecursos...");
       cargarDetalleRecursos();
