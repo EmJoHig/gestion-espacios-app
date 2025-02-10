@@ -435,35 +435,68 @@ export function HomePage() {
           dialogOrigin={dialogOrigin}
           ministerioUser = {minUsuario}
         />
-        <Box sx={{ flexGrow: 1, margin: "20px 0" }}>
-          <Grid container spacing={2}>
-            {modulosFiltrados.map((modulo) => (
-              <Grid item xs={4} sm={3} md={2} lg={1.5} key={modulo.codigo}>
-                <StyledCard onClick={handleClick(modulo.ruta)}>
-                  <CardActionArea>
-                    <CardContent sx={{ padding: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                      <Icon sx={{ fontSize: { xs: "3rem", sm: "3rem", md: "3rem" } }}> {/* Ajuste directo al tamaño del icono */}
-                        {getIcon(modulo.codigo)}
-                      </Icon>
-                      <Typography
-                        variant="caption"
-                        component="div"
-                        align="center"
-                        sx={{
-                          fontWeight: "medium",
-                          fontSize: { xs: "0.8rem", sm: "0.8rem", md: "0.9rem" },
-                          lineHeight: 1.1,
-                        }}
-                      >
-                        {modulo.descripcion}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </StyledCard>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
+<Box sx={{ flexGrow: 1, margin: "20px 0" }}>
+  <Grid container spacing={2}>
+    {modulosFiltrados.map((modulo) => (
+      <Grid item xs={4} sm={3} md={2} lg={1.5} key={modulo.codigo}>
+        <StyledCard
+          onClick={handleClick(modulo.ruta)}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '120px', // Altura más corta para la tarjeta
+            padding: 0,
+            overflow: 'hidden', // Evita que el contenido se desborde
+            borderRadius: '8px', // Mantén bordes redondeados
+            boxShadow: 'none', // Elimina sombra (puedes ajustarlo si lo deseas)
+          }}
+        >
+          <CardActionArea sx={{ height: '100%' }}>
+            <CardContent
+              sx={{
+                padding: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                height: '100%',
+                justifyContent: "flex-start", // Subir el texto un poco
+                overflow: 'hidden',
+              }}
+            >
+              <Icon
+                sx={{
+                  fontSize: { xs: "3rem", sm: "3rem", md: "3rem" }, // Tamaño del icono
+                  marginBottom: '8px', // Separación entre icono y texto
+                }}
+              >
+                {getIcon(modulo.codigo)}
+              </Icon>
+              <Typography
+                variant="caption"
+                component="div"
+                align="center"
+                sx={{
+                  fontWeight: "medium",
+                  fontSize: { xs: "0.8rem", sm: "0.8rem", md: "0.9rem" },
+                  lineHeight: 1.1,
+                  textAlign: 'center', // Alineación del texto
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis', // Asegura que el texto largo se recorte si es necesario
+                }}
+              >
+                {modulo.descripcion}
+              </Typography>
+            </CardContent>
+          </CardActionArea>
+        </StyledCard>
+      </Grid>
+    ))}
+  </Grid>
+</Box>
+
+
+
 
         <Box sx={{ width: '100%', marginTop: '50px', marginBottom: '100px' }}>
           <Typography gutterBottom variant="h5" sx={{ textAlign: 'center', mb: 3 }}>

@@ -381,35 +381,52 @@ export function RolPage() {
                                         <h1>no hay roles</h1>
                                     )}
 
-                                    {roles.map((rol) => (
-                                        <Grid item xs={3} key={rol.id}>
-                                            <Card sx={{ maxWidth: '100%', textAlign: 'center', backgroundColor: '#90caf9' }} onClick={handleClick(null)}>
-                                                <CardContent>
-                                                    <Stack direction="row" spacing={0} sx={{
-                                                        justifyContent: "flex-end",
-                                                        alignItems: "center",
-                                                    }}>
-                                                        <IconButton aria-label="edit" onClick={() => handleSetRolState(rol)}>
-                                                            <EditIcon />
-                                                        </IconButton>
-                                                    </Stack>
-                                                </CardContent>
-                                                <CardContent>
-                                                    <Typography gutterBottom variant="h6" component="div">
-                                                        <b>{rol.name}</b>
-                                                    </Typography>
-                                                    <br />
-                                                    <Typography gutterBottom variant="h6" component="div">
-                                                        {rol.description}
-                                                    </Typography>
-                                                    <br />
-                                                    <Button variant="contained" onClick={() => handleConfirmarEliminarRol(rol.id)}>
-                                                        ELIMINAR
-                                                    </Button>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                    ))}
+<Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ marginTop: 4 }}>
+  {roles.map((rol) => (
+    <Grid item xs={3} key={rol.id}>
+      <Card
+        sx={{
+          maxWidth: '100%',
+          textAlign: 'center',
+          backgroundColor: '#fff', // Fondo blanco
+          border: '2px solid #90caf9', // Borde azul claro
+          borderRadius: '16px', // Esquinas redondeadas
+          display: 'flex',
+          flexDirection: 'column',
+          height: 300, // Altura fija
+          boxSizing: 'border-box',
+        }}
+        onClick={handleClick(null)}
+      >
+        <CardContent>
+          <Stack direction="row" spacing={0} sx={{
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}>
+            <IconButton aria-label="edit" onClick={() => handleSetRolState(rol)}>
+              <EditIcon />
+            </IconButton>
+          </Stack>
+        </CardContent>
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Typography gutterBottom variant="h6" component="div">
+            <b>{rol.name}</b>
+          </Typography>
+          <Typography gutterBottom variant="body2" component="div">
+            {rol.description}
+          </Typography>
+        </CardContent>
+        <CardContent>
+          <Button variant="contained" onClick={() => handleConfirmarEliminarRol(rol.id)}>
+            ELIMINAR
+          </Button>
+        </CardContent>
+      </Card>
+    </Grid>
+  ))}
+</Grid>
+
+
                                 </Grid>
                             ) : (
                                 <h1>no hay rolesUsuario</h1>
