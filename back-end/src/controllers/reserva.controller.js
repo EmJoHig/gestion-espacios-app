@@ -6,6 +6,7 @@ import TipoEspacio from "../models/TipoEspacio.js";
 import Usuario from '../models/Usuario.js';
 import nodemailer from 'nodemailer';
 import { Op, Sequelize } from 'sequelize';
+import moment from 'moment';
 Reserva.associate();
 
 const transporter = nodemailer.createTransport({
@@ -111,6 +112,10 @@ export const createReserva = async (req, res) => {
             where: { ministerioId },
             attributes: ['email']
         });
+        const espacio = await Espacio.findByPk(espacioId, { attributes: ['nombre'] });
+        const nombreEspacio = espacio ? espacio.nombre : 'Desconocido';
+
+        const formatoFecha = (fecha) => moment(fecha).format('DD-MM-YYYY HH:mm');
 
         // Enviar correo a cada usuario del ministerio
         if (usuarios.length > 0) {
@@ -120,7 +125,7 @@ export const createReserva = async (req, res) => {
                 from: 'incidenciasydespliegues@gmail.com',
                 to: destinatarios,
                 subject: 'Confirmación de Reserva',
-                text: `Se ha creado una nueva reserva en el sistema:\n\nEspacio ID: ${espacioId}\nFecha Inicio: ${fechaInicio}\nFecha Fin: ${fechaFin}\n\nSaludos, Sistema de Reservas.`
+                text: `Se ha creado una nueva reserva en el sistema:\n\nEspacio: ${nombreEspacio}\nFecha Inicio: ${formatoFecha(fechaInicio)}\nFecha Fin: ${formatoFecha(fechaFin)}\n\nSaludos, Sistema de Reservas.`
             };
 
             transporter.sendMail(mailOptions, (error, info) => {
