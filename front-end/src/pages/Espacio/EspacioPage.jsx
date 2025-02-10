@@ -11,7 +11,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import FormularioEditar from './FormularioEditar';
 import FormularioDetalleRecurso from './FormularioDetalleRecurso';
-import { useDetalleRecurso } from '../../context/detalleRecurso';
+import { DetalleRecursoProvider, useDetalleRecurso } from '../../context/detalleRecurso';
 
 // Datos de de columnas
 const columns = [
@@ -187,9 +187,18 @@ export function EspacioPage() {
                     <DialogTitle>Editar Espacio</DialogTitle>
                     <DialogContent>
                         {selectedEspacio && (
-                            <EstadoProvider>
-                                <FormularioEditar espacio={selectedEspacio} onSave={handleSaveEdit} onCancel={() => setOpenEditDialog(false)} tipoEspacioList={tiposEspacios} />
+                            <EspacioProvider>
+                                <DetalleRecursoProvider>
+                                <EstadoProvider>
+                                    <RecursoProvider>
+                                    <FormularioEditar espacio={selectedEspacio} onSave={handleSaveEdit} onCancel={() => setOpenEditDialog(false)} tipoEspacioList={tiposEspacios} />
+                                    </RecursoProvider>
+                                
                             </EstadoProvider>
+                                </DetalleRecursoProvider>
+                                
+                            </EspacioProvider>
+                            
                         )}
                     </DialogContent>
                 </Dialog>

@@ -76,7 +76,6 @@ const TablaEspacio = ({ columns, rows: espacios, entityName , onEdit, onAddRecur
         break;
     }
   };
-  console.log("Esta es la manera en que me muestra espacios:",espacios);
 
   const handleDeleteClick = (row) => {
     setSelectedRow(row);

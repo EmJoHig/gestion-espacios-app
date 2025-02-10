@@ -260,6 +260,20 @@ export function RecursoPage() {
         const [nombreEdit, setNombreEdit] = React.useState(recurso ? recurso.nombre : "");
         const [descripcionEdit, setDescripcionEdit] = React.useState(recurso ? recurso.descripcion : "");
         const [cantidadEdit, setCantidadEdit] = React.useState(recurso ? recurso.cantidad : "");
+        const [errors, setErrors] = useState({});
+
+        const validate = () => {
+            const newErrors = {};
+    
+            if (!nombreEdit.trim()) newErrors.nombreEdit = "El nombre es obligatorio";
+            // Validar que cantidad no sea menor
+            if (cantidadEdit < recurso.cantidad) {
+                newErrors.cantidadEdit = "La cantidad a editar no puede ser menor que la cantidad actual.";
+            }
+    
+            setErrors(newErrors);
+            return Object.keys(newErrors).length === 0; // Devuelve true si no hay errores
+        }
 
         // Actualiza el estado cuando cambien los valores de los campos
         const handleNombreChange = (event) => {
@@ -275,6 +289,7 @@ export function RecursoPage() {
             if (/^\d{0,4}$/.test(value)) {
                 setCantidadEdit(value);
             }
+            
         };
         return (
             <>
@@ -287,6 +302,12 @@ export function RecursoPage() {
                             event.preventDefault();
                             const formData = new FormData(event.currentTarget);
                             const formJson = Object.fromEntries(formData.entries());
+                            // Validar si la cantidad es la misma, y si es así, establecerla como undefined
+                            if (cantidadEdit === recurso.cantidad) {
+                                delete formJson.cantidad;
+                            }
+                            console.log("Recirsooo",formJson);
+                            if (!validate()) return;
                             handleSubmitEdit(formJson);
                         },
                     }}
@@ -308,6 +329,7 @@ export function RecursoPage() {
                             fullWidth
                             value={nombreEdit}
                             onChange={handleNombreChange}
+                            helperText={errors.nombreEdit}
                         />
                         <TextField
                             required
@@ -332,6 +354,7 @@ export function RecursoPage() {
                             fullWidth
                             value={cantidadEdit}
                             onChange={handleCantidadChange}
+                            helperText={errors.cantidadEdit}
                             inputProps={{
                                 pattern: "\\d{1,4}", // Expresión regular para 1 a 4 dígitos
                                 maxLength: 4, // Limita la longitud máxima a 4 caracteres

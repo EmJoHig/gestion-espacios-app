@@ -2,12 +2,18 @@ import { useState, useEffect } from 'react';
 import { Box, Autocomplete, Button, TextField, Grid, FormHelperText, FormControl } from '@mui/material';
 import { useRecurso } from '../../context/recursoContext';
 import CloseIcon from '@mui/icons-material/Close'; 
+import { useEspacio } from '../../context/espacioContext';
 
 const FormularioDetalleRecurso = ({ espacio, onCancel, onSave }) => {
 
   const [detalleRecursos, setDetalleRecursos] = useState([{ recursoId: '', cantidad: 1 }]);
   const { recursos, getRecursos } = useRecurso();
   const [errors, setErrors] = useState({});
+  const {getDetallesRecursos} = useEspacio();
+
+  // Acá obtengo todos los detallesRecursos del espacio.
+  const detallesRecursos = getDetallesRecursos(espacio.id);
+  console.log("Estos son los detallesRecursos del espacio:",detallesRecursos);
 
   useEffect(() => {
     getRecursos();
@@ -83,7 +89,6 @@ const FormularioDetalleRecurso = ({ espacio, onCancel, onSave }) => {
     }
   };
   
-
   return (
     <Box sx={{
       width: '95%', 

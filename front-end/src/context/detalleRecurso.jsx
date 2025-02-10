@@ -57,19 +57,19 @@ export function DetalleRecursoProvider({ children }) {
 
 
 
-  const updateDetalleRecurso = async (detalle_recurso) => {
+  const updateDetalleRecurso = async (detalles_recursos) => {
     try {
 
       const token = await getAccessTokenSilently({
         audience: 'https://gestion-espacios/api',
       });
       
-      const res = await updateDetalleRecursoRequest(token, detalle_recurso);
+      const res = await updateDetalleRecursoRequest(token, detalles_recursos);
 
       if (res.status == 200) {
         return "";
       } else {
-        return "Error al editar el Detalle Recurso";
+        return "Error al editar los Detalles Recursos";
       }
 
 

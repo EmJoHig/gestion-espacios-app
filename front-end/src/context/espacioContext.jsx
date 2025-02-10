@@ -7,6 +7,7 @@ import {
   updateEspacioRequest,
   deleteEspacioRequest,
   getTiposEspacioRequest,
+  getDetallesRecursosRequest,
 } from "../api/espacio.js";
 
 const EspacioContext = createContext();
@@ -101,6 +102,25 @@ export function EspacioProvider({ children }) {
     }
   }; 
 
+  const getDetallesRecursos = async (id) => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await getDetallesRecursosRequest(token, id);
+
+      if (res.status === 200) {
+        return res.data;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }; 
+
 
   return (
     <EspacioContext.Provider
@@ -113,6 +133,7 @@ export function EspacioProvider({ children }) {
         updateEspacio,
         deleteEspacio,
         getTiposEspacio,
+        getDetallesRecursos,
       }}
     >
       {children}
