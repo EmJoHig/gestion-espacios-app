@@ -628,7 +628,7 @@ export function HomePage() {
       </Container>
 
       {
-        (rolUsuarioBD !== "CONSULTA") && (
+        (rolUsuarioBD !== "CONSULTA" && rolUsuarioBD !== "") && (
           <Fab
             color={'primary'}
             aria-label='Add'
