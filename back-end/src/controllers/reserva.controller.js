@@ -2,6 +2,7 @@ import Reserva from '../models/Reserva.js';
 import Espacio from '../models/Espacio.js';
 import Ministerio from '../models/Ministerio.js';
 import Actividad from "../models/Actividad.js";
+import TipoEspacio from "../models/TipoEspacio.js";
 import { Op, Sequelize } from 'sequelize';
 Reserva.associate();
 
@@ -250,5 +251,60 @@ export const bajaReserva = async (req, res) => {
     } catch (error) {
         console.error('Error al dar de baja la Reserva :', error);
         res.status(500).json({ message: 'Ha ocurrido un error al dar de baja la Reserva ' });
+    }
+};
+
+
+
+//  validar si hay mas aulas disopnibles
+
+
+export const validarAulasDisponibles = async (req, res) => {
+    try {
+
+        const { espacioId, fechaInicio, fechaFin } = req.body;
+
+
+        // const tipoEspacio = await TipoEspacio.findOne({ where: { nombre: "AULA" } });
+
+
+        // Verificar si ya existe una reserva para el mismo espacio en el rango de fechas
+        const reservasConflicto = await Reserva.findAll({
+            include: [
+                {
+                    model: Espacio,
+                    include: [
+                        {
+                            model: TipoEspacio,
+                            as: 'tipoEspacio',
+                            where: { nombre: "AULA" }, // Filtrar por tipo de espacio "COCINA"
+                        },
+                    ],
+                },
+            ],
+            where: {
+                //espacioId: espacioId, // Verificar el espacio específico
+                [Op.or]: [
+                    {
+                        fechaInicio: {
+                            [Op.lt]: fechaFin, // Fecha de inicio antes de la nueva fecha de fin
+                        },
+                        fechaFin: {
+                            [Op.gt]: fechaInicio, // Fecha de fin después de la nueva fecha de inicio
+                        },
+                    },
+                ],
+            },
+        });
+        console.log("reservasConflicto: ",  reservasConflicto.length);
+        if (reservasConflicto && reservasConflicto.length > 1) {
+            return res.status(200).json({ result: false });
+        }else{
+            return res.status(200).json({ result: true });
+        }
+
+    } catch (error) {
+        console.error('Error al crear la reserva:', error);
+        res.status(500).json({ message: 'Ha ocurrido un error al crear la Reserva' });
     }
 };

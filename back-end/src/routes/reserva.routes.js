@@ -11,6 +11,7 @@ import {
   deleteReserva,
   getReservasFilter,
   bajaReserva,
+  validarAulasDisponibles,
 } from "../controllers/reserva.controller.js";
 
 const router = express.Router();
@@ -30,5 +31,6 @@ router.delete('/eliminar_reserva/:id', deleteReserva);
 
 router.post('/dar_baja_reserva', jwtCheck, bajaReserva);
 
+router.post('/validar_aulas_disponibles', jwtCheck, validarAulasDisponibles);
 
 export default router;
