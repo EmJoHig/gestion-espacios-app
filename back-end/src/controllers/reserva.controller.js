@@ -317,13 +317,9 @@ export const validarAulasDisponibles = async (req, res) => {
             include: [
                 {
                     model: Espacio,
-                    include: [
-                        {
-                            model: TipoEspacio,
-                            as: 'tipoEspacio',
-                            where: { nombre: "AULA" }, // Filtrar por tipo de espacio "COCINA"
-                        },
-                    ],
+                    where : {
+                        id_tipo_espacio: 2
+                    }
                 },
             ],
             where: {
@@ -342,6 +338,7 @@ export const validarAulasDisponibles = async (req, res) => {
             },
         });
         console.log("reservasConflicto: ",  reservasConflicto.length);
+        console.log("reservasConflicto: ",  reservasConflicto);
         if (reservasConflicto && reservasConflicto.length > 1) {
             return res.status(200).json({ result: false });
         }else{
