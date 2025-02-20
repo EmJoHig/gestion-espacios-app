@@ -20,7 +20,7 @@ import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { visuallyHidden } from '@mui/utils';
-
+import { format } from 'date-fns';
 import { useMinisterio } from "../../context/ministerioContext";
 
 
@@ -308,6 +308,8 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                             {row.codigo}
                                         </TableCell>
                                         <TableCell align="center">{row.descripcion}</TableCell>
+                                        {
+                                        row.fechaBaja ? <TableCell align="center">{format(new Date(row.fechaBaja), 'dd/MM/yyyy HH:mm')}</TableCell> :
                                         <TableCell align="center">
                                             <IconButton aria-label="edit" onClick={() => onEditClick(row)}>
                                                 <EditIcon />
@@ -316,6 +318,7 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>
+                                        }
                                         {/* <TableCell align="right">{row.fat}</TableCell>
                     <TableCell align="right">{row.carbs}</TableCell> */}
                                     </TableRow>

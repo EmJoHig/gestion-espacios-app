@@ -10,7 +10,9 @@ import {
     updateMinisterio,
     deleteMinisterio,
     asociarResponsableAMinist,
-    getActividadesPorMinisterio
+    getActividadesPorMinisterio,
+    bajaMinisterio,
+    getMinisteriosBaja
 } from "../controllers/ministerio.controller.js";
 
 const router = express.Router();
@@ -30,6 +32,7 @@ router.put('/editar_ministerio/:id', jwtCheck, updateMinisterio);
 router.delete('/eliminar_ministerio/:id', jwtCheck, deleteMinisterio);
 router.post('/asociar_responsable_ministerio', jwtCheck, asociarResponsableAMinist);
 router.get('/get_actividades_de_ministerio', jwtCheck, getActividadesPorMinisterio);
-
+router.put('/baja_ministerio/:id', jwtCheck, bajaMinisterio);
+router.get('/get_ministerios_baja',jwtCheck, getMinisteriosBaja);
 
 export default router;

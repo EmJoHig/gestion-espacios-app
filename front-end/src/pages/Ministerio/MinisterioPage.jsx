@@ -32,7 +32,7 @@ import { useMinisterio } from "../../context/ministerioContext";
 
 export function MinisterioPage() {
 
-    const { ministerios, getMinisterios, createMinisterio, updateMinisterio, deleteMinisterio } = useMinisterio();
+    const { ministerios, getMinisterios, createMinisterio, updateMinisterio, bajaMinisterio, ministeriosBaja, getMinisteriosBaja } = useMinisterio();
     const navigate = useNavigate();
 
     const [snackBarState, setSnackBarState] = React.useState({
@@ -59,6 +59,7 @@ export function MinisterioPage() {
 
     useEffect(() => {
         getMinisterios();
+        getMinisteriosBaja();
     }, []);
 
     const [age, setAge] = React.useState('');
@@ -86,6 +87,27 @@ export function MinisterioPage() {
             numeric: true,
             disablePadding: false,
             label: 'Accion',
+        },
+    ];
+
+    const columnasBaja = [
+        {
+            id: 'codigo',
+            numeric: false,
+            disablePadding: true,
+            label: 'Codigo',
+        },
+        {
+            id: 'descripcion',
+            numeric: true,
+            disablePadding: false,
+            label: 'Descripcion',
+        },
+        {
+            id: 'fechaBaja',
+            numeric: true,
+            disablePadding: false,
+            label: 'Fecha Baja',
         },
     ];
 
@@ -323,12 +345,12 @@ export function MinisterioPage() {
 
         try {
 
-            const respDelete = await deleteMinisterio(idMinist);
+            const respDelete = await bajaMinisterio(idMinist);
 
             if (respDelete == "") {
-                openSnackBar('El ministerio se ha eliminado con éxito.', 'success');
+                openSnackBar('El ministerio ha sido dado de baja con éxito.', 'success');
             } else {
-                openSnackBar('Error al eliminar el ministerio.', 'error');
+                openSnackBar('Error al dar de baja el ministerio.', 'error');
             }
 
             await getMinisterios();
@@ -354,7 +376,7 @@ export function MinisterioPage() {
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            Esta seguro que desea eliminar el ministerio?
+                            Esta seguro que desea dar de baja el ministerio?
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -399,6 +421,16 @@ export function MinisterioPage() {
                             data={ministerios}
                             columnasTabla={columnas}
                             nombreTabla={"Listado de Ministerios"}
+                            onEditClick={handleObtenerRow}
+                            onClickDeleteMinisterio={handleDeleteMinisterio}
+                        />
+                    </Box>
+
+                    <Box sx={{ marginTop: '50px' }}>
+                        <TablaMinisterios
+                            data={ministeriosBaja}
+                            columnasTabla={columnasBaja}
+                            nombreTabla={"Listado de Ministerios dados de baja"}
                             onEditClick={handleObtenerRow}
                             onClickDeleteMinisterio={handleDeleteMinisterio}
                         />

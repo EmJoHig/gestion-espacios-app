@@ -19,6 +19,10 @@ Ministerio.init({
     allowNull: false,
     trim: true,
   },
+  fechaBaja: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 }, {
   sequelize: db2,
   modelName: 'Ministerio',

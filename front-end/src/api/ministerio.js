@@ -105,4 +105,36 @@ export const GetActividadesMinisterioRequest = async (token, bodyIdMinisterio) =
         console.error('Error GetActividadesMinisterio: ', error);
         throw error;
     }
-}
+};
+
+
+export const bajaMinisterioRequest = async (token, id) => {
+
+    try {
+        const response = await axios.put(`${API_URL}/ministerio/baja_ministerio/${id}`,{}, {
+            headers: {
+                Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Error bajaMinisterio: ', error);
+        throw error;
+    }
+};
+
+export const getMinisteriosBajaRequest = async (token) => {
+
+    try {
+        const response = await axios.get(`${API_URL}/ministerio/get_ministerios_baja`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response;
+    } catch (error) {
+        console.error('Error fetching ministerios:', error);
+        throw error;
+    }
+};

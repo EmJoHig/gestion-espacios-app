@@ -7,7 +7,9 @@ import {
   updateMinisterioRequest,
   deleteMinisterioRequest,
   asociarResponsableAMinistRequest,
-  GetActividadesMinisterioRequest
+  GetActividadesMinisterioRequest,
+  bajaMinisterioRequest,
+  getMinisteriosBajaRequest
 } from "../api/ministerio";
 
 const MinisterioContext = createContext();
@@ -20,6 +22,7 @@ export const useMinisterio = () => {
 
 export function MinisterioProvider({ children }) {
   const [ministerios, setMinisterios] = useState([]);
+  const [ministeriosBaja, setMinisteriosBaja] = useState([]);
   const { getAccessTokenSilently } = useAuth0();
 
 
@@ -156,18 +159,56 @@ export function MinisterioProvider({ children }) {
     }
   };
 
+  const bajaMinisterio = async (id) => {
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await bajaMinisterioRequest(token, id);
+      if (res.status == 200) {
+        return "";
+      } else {
+        return "Error al dar de baja el ministerio";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getMinisteriosBaja = async () => {
+    // const res = await getMinisteriosRequest();
+    // setMinisterios(res.data);
+    try {
+
+      const token = await getAccessTokenSilently({
+        audience: 'https://gestion-espacios/api',
+      });
+
+      const res = await getMinisteriosBajaRequest(token);
+      setMinisteriosBaja(res.data);
+    } catch (error) {
+      console.error('Error fetching ministerios:', error);
+    }
+  };
+
+
 
   return (
     <MinisterioContext.Provider
       value={{
         ministerios,
+        ministeriosBaja,
         getMinisterios,
         // getMinisterio,
         createMinisterio,
         updateMinisterio,
         deleteMinisterio,
         AsociarResponsableAMinist,
-        getActividadesMinisterio
+        getActividadesMinisterio,
+        bajaMinisterio,
+        getMinisteriosBaja
       }}
     >
       {children}
