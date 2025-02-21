@@ -354,6 +354,7 @@ export function MinisterioPage() {
             }
 
             await getMinisterios();
+            await getMinisteriosBaja();
             handleCloseConfirm();
         } catch (error) {
             console.error('Error al editar el ministerio:', error);
