@@ -20,7 +20,7 @@ import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { visuallyHidden } from '@mui/utils';
-
+import { format } from 'date-fns';
 import { useActividad } from "../../context/actividadContext";
 
 
@@ -169,6 +169,7 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    
 
     const { actividades, getActividades, deleteActividad } = useActividad();
 
@@ -258,6 +259,7 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                         />
                         <TableBody>
                             {visibleRows.map((row, index) => {
+                                console.log("row: ",row)
                                 const isItemSelected = isSelected(row.id);
                                 const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -275,7 +277,9 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                         <TableCell id={row.id} align="center" > {row.nombre} </TableCell>
                                         <TableCell align="center">{row.descripcion}</TableCell>
                                         <TableCell component="th" align="center" >{row.ministerio ? row.ministerio.descripcion : ""}</TableCell>
-                                        <TableCell align="center">
+                                        {
+                                        row.fechaBaja ? <TableCell align="center">{format(new Date(row.fechaBaja), 'dd/MM/yyyy HH:mm')}</TableCell> :
+                                         <TableCell align="center">
                                             <IconButton aria-label="edit" onClick={() => onEditClick(row)}>
                                                 <EditIcon />
                                             </IconButton>
@@ -283,6 +287,7 @@ export default function EnhancedTable({ data, columnasTabla, nombreTabla, onEdit
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>
+                                         } 
                                     </TableRow>
                                 );
                             })}

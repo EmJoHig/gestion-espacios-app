@@ -28,6 +28,10 @@ Actividad.init(
       allowNull: true,
       field: "id_ministerio", // Acá defino el nombre real de la columna en la BD.
     },
+    fechaBaja: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     sequelize: db2,

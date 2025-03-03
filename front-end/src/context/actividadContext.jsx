@@ -8,7 +8,9 @@ import {
   deleteActividadRequest,
   asociarActividadAMinistRequest,
   GetActividadesSinMinisterioRequest,
-  quitarActividadAMinisterioRequest
+  quitarActividadAMinisterioRequest,
+  bajaActvidadRequest,
+  getActividadesBajaRequest
 } from "../api/actividad";
 
 const ActividadContext = createContext();
@@ -21,6 +23,7 @@ export const useActividad = () => {
 
 export function ActividadProvider({ children }) {
   const [actividades, setActividades] = useState([]);
+  const [actividadesBaja, setActividadesBaja] = useState([]);
   const { getAccessTokenSilently } = useAuth0();
 
 
@@ -176,12 +179,47 @@ export function ActividadProvider({ children }) {
     }
   };
 
+    const bajaActividad = async (id) => {
+      try {
+  
+        const token = await getAccessTokenSilently({
+          audience: 'https://gestion-espacios/api',
+        });
+  
+        const res = await bajaActvidadRequest(token, id);
+        if (res.status == 200) {
+          return "";
+        } else {
+          return "Error al dar de baja la actividad";
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
+    const getActividadesBaja = async () => {
+      // const res = await getMinisteriosRequest();
+      // setMinisterios(res.data);
+      try {
+  
+        const token = await getAccessTokenSilently({
+          audience: 'https://gestion-espacios/api',
+        });
+  
+        const res = await getActividadesBajaRequest(token);
+        setActividadesBaja(res.data);
+      } catch (error) {
+        console.error('Error fetching actividades baja:', error);
+      }
+    };
+
 
 
   return (
     <ActividadContext.Provider
       value={{
         actividades,
+        actividadesBaja,
         getActividades,
         // getActividad,
         createActividad,
@@ -189,7 +227,9 @@ export function ActividadProvider({ children }) {
         deleteActividad,
         asociarActividadAMinisterio,
         getActividadesSinMinisterio,
-        quitarActividadAMinisterio
+        quitarActividadAMinisterio,
+        bajaActividad,
+        getActividadesBaja
       }}
     >
       {children}

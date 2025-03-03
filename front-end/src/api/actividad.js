@@ -117,3 +117,34 @@ export const quitarActividadAMinisterioRequest = async (token, actMinisterioBody
         throw error;
     }
 }
+
+export const bajaActvidadRequest = async (token, id) => {
+
+    try {
+        const response = await axios.put(`${API_URL}/actividad/baja_actividad/${id}`,{}, {
+            headers: {
+                Authorization: `Bearer ${token}`,// ENVIO EL TOKEN NORMAL PARA QUE VALIDE QUE ESTA AUTENTICADO
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Error bajaActividad: ', error);
+        throw error;
+    }
+};
+
+export const getActividadesBajaRequest = async (token) => {
+
+    try {
+        const response = await axios.get(`${API_URL}/actividad/get_actividades_baja`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response;
+    } catch (error) {
+        console.error('Error fetching actividades baja:', error);
+        throw error;
+    }
+};

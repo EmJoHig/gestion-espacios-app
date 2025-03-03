@@ -186,14 +186,14 @@ const TablaEspacio = ({ columns, rows: espacios, entityName , onEdit, onAddRecur
         />
       </Tooltip>
 
-      <Tooltip title="Eliminar espacio" arrow>
+{/*       <Tooltip title="Eliminar espacio" arrow>
         <GridActionsCellItem
           key={`delete-${params.id}`}
           icon={<DeleteIcon />}
           label="Eliminar"
           onClick={() => handleDeleteClick(params.row)}
         />
-      </Tooltip>
+      </Tooltip> */}
     </>,
             ],
           },

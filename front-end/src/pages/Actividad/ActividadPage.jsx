@@ -35,7 +35,7 @@ import { useMinisterio } from "../../context/ministerioContext";
 
 export function ActividadPage() {
 
-    const { actividades, getActividades, createActividad, updateActividad, deleteActividad } = useActividad();
+    const { actividades, getActividades, createActividad, updateActividad, deleteActividad, bajaActividad, actividadesBaja, getActividadesBaja } = useActividad();
 
     const { ministerios, getMinisterios } = useMinisterio();
 
@@ -74,6 +74,7 @@ export function ActividadPage() {
 
     useEffect(() => {
         getActividades();
+        getActividadesBaja();
         getMinisterios();
     }, []);
     console.log(actividades);
@@ -104,6 +105,33 @@ export function ActividadPage() {
             numeric: true,
             disablePadding: false,
             label: 'Accion',
+        },
+    ];
+
+    const columnasBaja = [
+        {
+            id: 'nombre',
+            numeric: false,
+            disablePadding: true,
+            label: 'Nombre',
+        },
+        {
+            id: 'descripcion',
+            numeric: false,
+            disablePadding: false,
+            label: 'Descripcion',
+        },
+        {
+            id: 'ministerio',
+            numeric: false,
+            disablePadding: false,
+            label: 'Ministerio',
+        },
+        {
+            id: 'fechaBaja',
+            numeric: true,
+            disablePadding: false,
+            label: 'Fecha Baja',
         },
     ];
 
@@ -192,19 +220,20 @@ export function ActividadPage() {
 
     const EliminarActividad = async (id) => {
         try {
-            console.log("id actividad a eliminar:", actIdToDelete);
+            console.log("id actividad a dar de baja:", actIdToDelete);
 
-            const resp = await deleteActividad(actIdToDelete);
+            const resp = await bajaActividad(actIdToDelete);
             if (resp === "") {
-                openSnackBar('La actividad se ha eliminado con éxito.', 'success');
+                openSnackBar('La actividad se ha dado de baja con éxito.', 'success');
             } else {
-                openSnackBar('No se pudo eliminado la actividad. Inténtalo de nuevo.', 'error');
+                openSnackBar('No se pudo dar de baja la actividad. Inténtalo de nuevo.', 'error');
             }
             await getActividades();
+            await getActividadesBaja();
             handleCloseConfirm();
         } catch (error) {
-            console.error('Error al eliminar la actividad:', error);
-            openSnackBar('Error al eliminar la actividad.', 'error');
+            console.error('Error al dar de baja la actividad:', error);
+            openSnackBar('Error al dar de baja la actividad.', 'error');
         }
     }
 
@@ -305,6 +334,25 @@ export function ActividadPage() {
                                     data={actividades}
                                     columnasTabla={columnas}
                                     nombreTabla={"Listado de actividades"}
+                                    onEditClick={handleObtenerRow}
+                                    onClickDeleteActividad={handleDeleteActividad}
+                                />
+                            </Grid>
+                        ) : (
+                            <h1>no hay actividades</h1>
+                        )}
+
+                        {actividadesBaja != null && actividadesBaja.length > 0 ? (
+                            <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+
+                                {actividadesBaja.length === 0 && (
+                                    <h1>no hay actividades dadas de baja</h1>
+                                )}
+
+                                <TablaActividades
+                                    data={actividadesBaja}
+                                    columnasTabla={columnasBaja}
+                                    nombreTabla={"Listado de actividades dadas de baja"}
                                     onEditClick={handleObtenerRow}
                                     onClickDeleteActividad={handleDeleteActividad}
                                 />

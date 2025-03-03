@@ -1,11 +1,12 @@
 import Actividad from "../models/Actividad.js";
 import Ministerio from "../models/Ministerio.js";
+import { Op } from "sequelize";
 
 
 export const getActividades = async (req, res) => {
   try {
 
-    const actividades = await Actividad.findAll({ include: [{ model: Ministerio, as: 'ministerio' }] });
+    const actividades = await Actividad.findAll({ where: { fechaBaja: null}, include: [{ model: Ministerio, as: 'ministerio', } ] });
 
     // Enviar una respuesta al cliente
     res.status(200).json(actividades);
@@ -17,23 +18,7 @@ export const getActividades = async (req, res) => {
   }
 };
 
-// export const getActividadById = async (req, res) => {
-//   try {
-//     const { id } = req.params;
 
-//     const actividad = await Actividad.findByPk(id);
-//     if (!actividad) {
-//       return res.status(404).json({ message: "Actividad no encontrada." });
-//     }
-
-//     res.status(200).json(actividad);
-//   } catch (error) {
-//     console.error(error);
-//     res
-//       .status(500)
-//       .json({ message: "Ha ocurrido un error al obtener la Actividad." });
-//   }
-// };
 
 export const createActividad = async (req, res) => {
   try {
@@ -85,6 +70,34 @@ export const updateActividad = async (req, res) => {
     res
       .status(500)
       .json({ message: "Ha ocurrido un error al actualizar la actividad" });
+  }
+};
+
+export const bajaActividad = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const actividadBaja = await Actividad.findByPk(id);
+    if (actividadBaja === null) {
+
+      return res.status(500).json({ message: 'Actividad no encontrada' });
+
+    } else {
+
+        const resp = await Actividad.update(
+            { fechaBaja: new Date() },
+            { where: { id: id } }
+        );
+
+        if (resp && resp[0] >= 0) {
+            res.status(200).json({ message: 'La Actividad ha sido dada de baja' });
+        } else {
+            res.status(500).json({ message: 'Error al dar de baja el Actividad.' });
+        }
+    }
+  } catch (error) {
+    console.error('Error al dar de baja la Actividad :', error);
+    res.status(500).json({ message: 'Ha ocurrido un error al dar de baja La Actividad ' });
   }
 };
 
@@ -189,5 +202,22 @@ export const quitarActividadAMinisterio = async (req, res) => {
   } catch (error) {
       console.error('Ha ocurrido un error al quitar la actividad del Ministerio: ', error);
       res.status(500).json({ message: 'Ha ocurrido un error al quitar la actividad del Ministerio' });
+  }
+};
+
+export const getActividadesBaja = async (req, res) => {
+  try {
+      const actividades = await Actividad.findAll({
+          where: { 
+              fechaBaja: { [Op.ne]: null } // Traer actividades con fechaBaja distinta de null
+          },include: { model: Ministerio, as: 'ministerio',
+      }
+    }
+      );
+      // Enviar una respuesta al cliente
+      res.status(200).json(actividades);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Ha ocurrido un error al obtener las actividades' });
   }
 };

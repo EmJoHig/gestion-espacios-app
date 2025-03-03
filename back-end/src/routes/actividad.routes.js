@@ -12,6 +12,8 @@ import {
   asociarActividadAMinisterio,
   getActividadesSinMinisterio,
   quitarActividadAMinisterio,
+  bajaActividad,
+  getActividadesBaja
 } from "../controllers/actividad.controller.js";
 
 const router = express.Router();
@@ -30,5 +32,7 @@ router.delete("/eliminar_actividad/:id", jwtCheck, deleteActividad);
 router.post("/asociar_actividad_a_ministerio", jwtCheck, asociarActividadAMinisterio);
 router.get("/get_actividades_sin_ministerio", jwtCheck, getActividadesSinMinisterio);
 router.post("/quitar_actividad_a_ministerio", jwtCheck, quitarActividadAMinisterio);
+router.put('/baja_actividad/:id', jwtCheck, bajaActividad);
+router.get('/get_actividades_baja',jwtCheck, getActividadesBaja);
 
 export default router;
